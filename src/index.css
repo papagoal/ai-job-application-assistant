@@ -557,6 +557,7 @@ h1 {
   color: #344054;
   background: #fafbfc;
   line-height: 1.65;
+  white-space: pre-line;
 }
 
 .cover-letter-preview p {

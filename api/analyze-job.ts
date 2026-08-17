@@ -1,5 +1,7 @@
-import { mockJobAnalysis } from '../src/mocks/jobAnalysis'
 import type { JobDescriptionInput } from '../src/types/jobApplication'
+import { getAIProvider } from './_lib/ai/getAIProvider'
+
+const aiProvider = getAIProvider()
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
@@ -41,10 +43,8 @@ export default {
       )
     }
 
-    return Response.json({
-      ...mockJobAnalysis,
-      companyName: body.companyName.trim(),
-      jobTitle: body.jobTitle.trim(),
-    })
+    const analysis = await aiProvider.analyze(body)
+
+    return Response.json(analysis)
   },
 }

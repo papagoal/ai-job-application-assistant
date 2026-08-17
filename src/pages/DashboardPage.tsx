@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import ApplicationCard from '../components/ApplicationCard'
 import { mockApplications } from '../mocks/applications'
 
@@ -13,9 +12,6 @@ function DashboardPage() {
             Review your job matches and continue working on saved applications.
           </p>
         </div>
-        <Link className="primary-action page-action" to="/applications/new">
-          New Application
-        </Link>
       </div>
 
       <div className="application-grid">

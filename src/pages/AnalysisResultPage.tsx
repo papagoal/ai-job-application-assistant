@@ -1,15 +1,19 @@
 import { Link, useParams } from 'react-router-dom'
+import { mockJobAnalysis } from '../mocks/jobAnalysis'
 
 function AnalysisResultPage() {
   const { id } = useParams()
+  const analysis = mockJobAnalysis
 
   return (
     <section className="analysis-page">
       <div className="analysis-heading">
         <div>
           <p className="eyebrow">Application analysis</p>
-          <h1>Frontend Developer</h1>
-          <p className="page-description">Northstar Labs · Application ID: {id}</p>
+          <h1>{analysis.jobTitle}</h1>
+          <p className="page-description">
+            {analysis.companyName} · Application ID: {id}
+          </p>
         </div>
         <Link className="secondary-action" to="/">Back to Dashboard</Link>
       </div>
@@ -17,14 +21,15 @@ function AnalysisResultPage() {
       <div className="analysis-layout">
         <aside className="analysis-score-card" aria-labelledby="match-score-heading">
           <p className="analysis-label" id="match-score-heading">Match score</p>
-          <div className="analysis-score" aria-label="82 percent match">
-            <strong>82</strong>
+          <div
+            className="analysis-score"
+            aria-label={`${analysis.matchScore} percent match`}
+          >
+            <strong>{analysis.matchScore}</strong>
             <span>/ 100</span>
           </div>
-          <p className="score-summary">Strong overall match</p>
-          <p className="score-description">
-            Your frontend experience aligns well with the core requirements for this role.
-          </p>
+          <p className="score-summary">{analysis.scoreSummary}</p>
+          <p className="score-description">{analysis.scoreDescription}</p>
         </aside>
 
         <div className="analysis-content">
@@ -40,18 +45,17 @@ function AnalysisResultPage() {
               <div>
                 <h3>Matching skills</h3>
                 <ul className="skill-list matching-skills">
-                  <li>React</li>
-                  <li>TypeScript</li>
-                  <li>Responsive design</li>
-                  <li>Git</li>
+                  {analysis.matchingSkills.map((skill) => (
+                    <li key={skill}>{skill}</li>
+                  ))}
                 </ul>
               </div>
               <div>
                 <h3>Missing skills</h3>
                 <ul className="skill-list missing-skills">
-                  <li>Jest</li>
-                  <li>CI/CD</li>
-                  <li>Accessibility testing</li>
+                  {analysis.missingSkills.map((skill) => (
+                    <li key={skill}>{skill}</li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -65,9 +69,9 @@ function AnalysisResultPage() {
               </div>
             </div>
             <ol className="suggestion-list">
-              <li>Highlight measurable impact from your React projects.</li>
-              <li>Add examples of automated testing or quality assurance work.</li>
-              <li>Mention accessibility practices used in production interfaces.</li>
+              {analysis.suggestions.map((suggestion) => (
+                <li key={suggestion}>{suggestion}</li>
+              ))}
             </ol>
           </section>
 
@@ -79,17 +83,7 @@ function AnalysisResultPage() {
               </div>
             </div>
             <div className="cover-letter-preview">
-              <p>Dear Hiring Manager,</p>
-              <p>
-                I am excited to apply for the Frontend Developer role at Northstar Labs.
-                My experience building responsive React and TypeScript applications aligns
-                closely with the needs described in this position.
-              </p>
-              <p>
-                I would welcome the opportunity to bring my frontend development skills and
-                product-focused approach to your team.
-              </p>
-              <p>Sincerely,<br />Your Name</p>
+              <p>{analysis.coverLetter}</p>
             </div>
           </section>
         </div>

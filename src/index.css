@@ -342,6 +342,19 @@ h1 {
   font-weight: 600;
 }
 
+.field-details {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.character-count {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
 .form-actions {
   display: flex;
   align-items: center;
@@ -351,6 +364,32 @@ h1 {
 
 .save-message {
   color: #067647;
+}
+
+.form-actions-between {
+  justify-content: space-between;
+}
+
+.form-submit-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+}
+
+.secondary-action {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 17px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.secondary-action:hover {
+  background: #f1f3f8;
 }
 
 .submit-button {
@@ -417,6 +456,15 @@ h1 {
   .form-actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .form-submit-group {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .secondary-action {
+    text-align: center;
   }
 
   .submit-button {

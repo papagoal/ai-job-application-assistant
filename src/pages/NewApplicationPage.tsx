@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { analyzeJob } from '../services/jobAnalysisService'
 import type { JobDescriptionInput } from '../types/jobApplication'
 
 const initialJobDescription: JobDescriptionInput = {
@@ -11,9 +12,9 @@ const initialJobDescription: JobDescriptionInput = {
 type JobDescriptionErrors = Partial<Record<keyof JobDescriptionInput, string>>
 
 function NewApplicationPage() {
+  const navigate = useNavigate()
   const [job, setJob] = useState(initialJobDescription)
   const [errors, setErrors] = useState<JobDescriptionErrors>({})
-  const [isReady, setIsReady] = useState(false)
 
   function handleChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const field = event.target.name as keyof JobDescriptionInput
@@ -23,10 +24,9 @@ function NewApplicationPage() {
       [field]: event.target.value,
     }))
     setErrors((currentErrors) => ({ ...currentErrors, [field]: undefined }))
-    setIsReady(false)
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const nextErrors: JobDescriptionErrors = {}
@@ -38,7 +38,14 @@ function NewApplicationPage() {
     }
 
     setErrors(nextErrors)
-    setIsReady(Object.keys(nextErrors).length === 0)
+
+    if (Object.keys(nextErrors).length > 0) return
+
+    const analysis = await analyzeJob(job)
+
+    navigate('/applications/new-analysis', {
+      state: { analysis },
+    })
   }
 
   return (
@@ -123,11 +130,6 @@ function NewApplicationPage() {
         <div className="form-actions form-actions-between">
           <Link className="secondary-action" to="/">Cancel</Link>
           <div className="form-submit-group">
-            {isReady && (
-              <p className="save-message" role="status">
-                Job details are ready. Analysis will be connected next.
-              </p>
-            )}
             <button className="submit-button" type="submit">Analyze match</button>
           </div>
         </div>

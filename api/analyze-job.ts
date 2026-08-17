@@ -15,7 +15,8 @@ function isJobDescriptionInput(value: unknown): value is JobDescriptionInput {
   return (
     isNonEmptyString(input.companyName) &&
     isNonEmptyString(input.jobTitle) &&
-    isNonEmptyString(input.jobDescription)
+    isNonEmptyString(input.jobDescription) &&
+    isNonEmptyString(input.resumeText)
   )
 }
 
@@ -38,7 +39,7 @@ export default {
 
     if (!isJobDescriptionInput(body)) {
       return Response.json(
-        { error: 'Company name, job title, and job description are required.' },
+        { error: 'Company name, job title, job description, and resume are required.' },
         { status: 400 },
       )
     }

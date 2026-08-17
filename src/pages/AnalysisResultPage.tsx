@@ -1,9 +1,16 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { mockJobAnalysis } from '../mocks/jobAnalysis'
+import type { JobAnalysis } from '../types/jobAnalysis'
+
+interface AnalysisLocationState {
+  analysis?: JobAnalysis
+}
 
 function AnalysisResultPage() {
   const { id } = useParams()
-  const analysis = mockJobAnalysis
+  const location = useLocation()
+  const state = location.state as AnalysisLocationState | null
+  const analysis = state?.analysis ?? mockJobAnalysis
 
   return (
     <section className="analysis-page">

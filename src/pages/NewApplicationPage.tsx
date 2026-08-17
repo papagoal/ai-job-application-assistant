@@ -7,6 +7,7 @@ const initialJobDescription: JobDescriptionInput = {
   companyName: '',
   jobTitle: '',
   jobDescription: '',
+  resumeText: '',
 }
 
 type JobDescriptionErrors = Partial<Record<keyof JobDescriptionInput, string>>
@@ -36,6 +37,7 @@ function NewApplicationPage() {
     if (!job.jobDescription.trim()) {
       nextErrors.jobDescription = 'Paste the job description.'
     }
+    if (!job.resumeText.trim()) nextErrors.resumeText = 'Paste your resume text.'
 
     setErrors(nextErrors)
 
@@ -53,9 +55,9 @@ function NewApplicationPage() {
       <div className="page-heading">
         <div>
           <p className="eyebrow">New application</p>
-          <h1>Add a job description</h1>
+          <h1>Add application details</h1>
           <p className="page-description">
-            Add the role you want to compare with your saved profile and resume.
+            Add the role and resume you want to compare in this analysis.
           </p>
         </div>
       </div>
@@ -123,6 +125,38 @@ function NewApplicationPage() {
             </div>
             {errors.jobDescription && (
               <p className="field-error" id="jobDescription-error">{errors.jobDescription}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="form-section">
+          <div className="form-section-heading">
+            <h2>Resume</h2>
+            <p>Paste the resume text that should be compared with this job.</p>
+          </div>
+
+          <div className="form-field">
+            <label htmlFor="resumeText">Resume text</label>
+            <textarea
+              id="resumeText"
+              name="resumeText"
+              rows={14}
+              value={job.resumeText}
+              onChange={handleChange}
+              aria-invalid={Boolean(errors.resumeText)}
+              aria-describedby={errors.resumeText ? 'resumeText-error' : 'resumeText-count'}
+              placeholder="Paste your work experience, education, skills, and projects."
+            />
+            <div className="field-details">
+              <p className="field-hint">
+                A saved profile will replace this manual step after persistence is added.
+              </p>
+              <p className="character-count" id="resumeText-count">
+                {job.resumeText.length.toLocaleString()} characters
+              </p>
+            </div>
+            {errors.resumeText && (
+              <p className="field-error" id="resumeText-error">{errors.resumeText}</p>
             )}
           </div>
         </div>

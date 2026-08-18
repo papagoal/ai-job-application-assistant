@@ -995,6 +995,11 @@ h1 {
   cursor: pointer;
 }
 
+.tailored-resume-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .tailored-resume-error,
 .tailored-resume-success,
 .tailored-resume-unavailable {
@@ -1014,6 +1019,18 @@ h1 {
 .tailored-resume-unavailable {
   color: var(--color-muted);
   line-height: 1.55;
+}
+
+.tailored-resume-profile-warning {
+  margin: 0;
+  color: #9a3412;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.tailored-resume-profile-warning a {
+  color: inherit;
+  text-underline-offset: 2px;
 }
 
 .tailored-resume-editor {
@@ -1056,17 +1073,65 @@ h1 {
 }
 
 .tailored-resume-preview {
-  padding: 20px;
+  padding: clamp(24px, 5vw, 52px);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  color: #344054;
-  background: #fafbfc;
-  line-height: 1.65;
+  color: #1d2939;
+  background: #ffffff;
+}
+
+.tailored-resume-document {
+  max-width: 760px;
+  margin: 0 auto;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.98rem;
+  line-height: 1.58;
+}
+
+.tailored-resume-document-header {
+  margin-bottom: 28px;
+  padding-bottom: 18px;
+  border-bottom: 2px solid #3157d5;
+  text-align: center;
+}
+
+.tailored-resume-document-header h1 {
+  margin: 0 0 6px;
+  color: #101828;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  letter-spacing: -0.025em;
+}
+
+.tailored-resume-document-header a,
+.tailored-resume-document-header span {
+  color: #475467;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.9rem;
+}
+
+.tailored-resume-document h3 {
+  margin: 24px 0 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #d0d5dd;
+  color: #2345a4;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+}
+
+.tailored-resume-document p {
+  margin: 0 0 12px;
   white-space: pre-line;
 }
 
-.tailored-resume-preview p {
-  margin: 0;
+.tailored-resume-document ul {
+  margin: 0 0 14px;
+  padding-left: 20px;
+}
+
+.tailored-resume-document li {
+  margin-bottom: 5px;
 }
 
 .cover-letter-preview {
@@ -1169,7 +1234,8 @@ h1 {
 
 @media print {
   @page {
-    margin: 0.75in;
+    size: auto;
+    margin: 0.65in;
   }
 
   :root,
@@ -1179,14 +1245,21 @@ h1 {
     background: #ffffff;
   }
 
-  .app-header,
-  .analysis-heading,
-  .delete-error,
-  .analysis-score-card,
-  .analysis-content > .analysis-panel:not(.cover-letter-panel),
-  .cover-letter-actions,
-  .cover-letter-editor {
+  body[data-print-target] .app-header,
+  body[data-print-target] .analysis-heading,
+  body[data-print-target] .delete-error,
+  body[data-print-target] .analysis-score-card,
+  body[data-print-target] .analysis-content > .analysis-panel,
+  body[data-print-target='cover-letter'] .cover-letter-actions,
+  body[data-print-target='cover-letter'] .cover-letter-editor,
+  body[data-print-target='tailored-resume'] .tailored-resume-actions,
+  body[data-print-target='tailored-resume'] .tailored-resume-editor {
     display: none !important;
+  }
+
+  body[data-print-target='cover-letter'] .cover-letter-panel,
+  body[data-print-target='tailored-resume'] .tailored-resume-panel {
+    display: block !important;
   }
 
   .page-content {
@@ -1200,16 +1273,17 @@ h1 {
     display: block;
   }
 
-  .cover-letter-panel {
+  body[data-print-target] .analysis-panel {
     border: 0;
     padding: 0;
+    box-shadow: none;
   }
 
-  .cover-letter-panel .analysis-panel-heading {
+  body[data-print-target] .analysis-panel-heading {
     display: none;
   }
 
-  .print-cover-letter-heading {
+  body[data-print-target='cover-letter'] .print-cover-letter-heading {
     display: block;
     margin-bottom: 32px;
     padding-bottom: 18px;
@@ -1235,6 +1309,44 @@ h1 {
     background: transparent;
     font-size: 11pt;
     line-height: 1.65;
+  }
+
+  .tailored-resume-preview {
+    border: 0;
+    padding: 0;
+  }
+
+  .tailored-resume-document {
+    max-width: none;
+    color: #111827;
+    font-size: 10.5pt;
+    line-height: 1.48;
+  }
+
+  .tailored-resume-document-header {
+    margin-bottom: 20pt;
+    padding-bottom: 12pt;
+    border-bottom-color: #3157d5;
+  }
+
+  .tailored-resume-document-header h1 {
+    font-size: 24pt;
+  }
+
+  .tailored-resume-document h3 {
+    break-after: avoid;
+    margin-top: 16pt;
+    color: #2345a4;
+  }
+
+  .tailored-resume-document p,
+  .tailored-resume-document li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  .tailored-resume-document li {
+    break-inside: avoid;
   }
 }
 

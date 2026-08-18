@@ -18,7 +18,8 @@ describe('MockAIProvider', () => {
       ...mockJobAnalysis,
       companyName: 'Northstar Labs',
       jobTitle: 'Frontend Developer',
-      tailoredResume: `React and TypeScript experience.
+      tailoredResume: `PROFESSIONAL SUMMARY
+React and TypeScript experience.
 
 TARGET ROLE
 Frontend Developer at Northstar Labs`,

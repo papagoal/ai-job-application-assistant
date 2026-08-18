@@ -12,7 +12,7 @@ export class MockAIProvider implements AIProvider {
       ...mockJobAnalysis,
       companyName,
       jobTitle,
-      tailoredResume: `${input.resumeText.trim()}\n\nTARGET ROLE\n${jobTitle} at ${companyName}`,
+      tailoredResume: `PROFESSIONAL SUMMARY\n${input.resumeText.trim()}\n\nTARGET ROLE\n${jobTitle} at ${companyName}`,
     })
   }
 }

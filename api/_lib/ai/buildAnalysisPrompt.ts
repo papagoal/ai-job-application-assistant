@@ -27,7 +27,7 @@ Return this exact JSON shape:
 
 The matchScore must be a number from 0 to 100. Base every claim on the supplied resume and job description. Do not invent candidate experience.
 
-The tailoredResume must be a plain-text resume draft targeted to this job. Reorder and rephrase only facts found in the supplied resume. Never invent or embellish skills, employers, job titles, dates, education, certifications, achievements, or metrics.`,
+The tailoredResume must be a plain-text resume draft targeted to this job. Reorder and rephrase only facts found in the supplied resume. Never invent or embellish skills, employers, job titles, dates, education, certifications, achievements, or metrics. Use short uppercase section headings and hyphen-prefixed bullet points where appropriate. Do not include a candidate name, email address, phone number, or contact header because the application adds verified profile details separately.`,
     user: `Analyze this application and respond in JSON.
 
 COMPANY:

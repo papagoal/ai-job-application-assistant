@@ -1,8 +1,9 @@
-import { useEffect, useState, type ChangeEvent } from 'react'
+import { useEffect, useState, type ChangeEvent, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteApplication,
   getApplication,
+  getProfile,
   updateApplicationCoverLetter,
   updateApplicationNotes,
   updateApplicationStatus,
@@ -29,6 +30,38 @@ function toFileNamePart(value: string) {
     .replace(/[^\p{L}\p{N}]+/gu, '-')
     .replace(/^-+|-+$/g, '')
     || 'application'
+}
+
+function TailoredResumeContent({ content }: { content: string }) {
+  const blocks = content.trim().split(/\n\s*\n/)
+
+  return blocks.flatMap((block, blockIndex) => {
+    const lines = block.split('\n').map((line) => line.trim()).filter(Boolean)
+    const elements: ReactNode[] = []
+    const firstLine = lines[0]
+    const startsWithHeading = firstLine.length <= 60
+      && firstLine === firstLine.toUpperCase()
+      && /[A-Z]/.test(firstLine)
+
+    if (startsWithHeading) {
+      elements.push(<h3 key={`heading-${blockIndex}`}>{firstLine}</h3>)
+      lines.shift()
+    }
+
+    if (lines.length && lines.every((line) => /^[-*•]\s+/.test(line))) {
+      elements.push(
+        <ul key={`list-${blockIndex}`}>
+          {lines.map((line, lineIndex) => (
+            <li key={`${line}-${lineIndex}`}>{line.replace(/^[-*•]\s+/, '')}</li>
+          ))}
+        </ul>,
+      )
+    } else if (lines.length) {
+      elements.push(<p key={`paragraph-${blockIndex}`}>{lines.join('\n')}</p>)
+    }
+
+    return elements
+  })
 }
 
 function AnalysisResultPage() {
@@ -64,6 +97,9 @@ function AnalysisResultPage() {
   const [isSavingTailoredResume, setIsSavingTailoredResume] = useState(false)
   const [tailoredResumeSaveMessage, setTailoredResumeSaveMessage] = useState('')
   const [tailoredResumeSaveError, setTailoredResumeSaveError] = useState('')
+  const [candidateName, setCandidateName] = useState('')
+  const [candidateEmail, setCandidateEmail] = useState('')
+  const [isProfileLoading, setIsProfileLoading] = useState(true)
   const [savedNotes, setSavedNotes] = useState('')
   const [notesDraft, setNotesDraft] = useState('')
   const [isSavingNotes, setIsSavingNotes] = useState(false)
@@ -94,6 +130,16 @@ function AnalysisResultPage() {
       })
       .finally(() => setIsLoading(false))
   }, [id, state?.analysis])
+
+  useEffect(() => {
+    void getProfile()
+      .then((profile) => {
+        setCandidateName(profile?.fullName.trim() ?? '')
+        setCandidateEmail(profile?.email.trim() ?? '')
+      })
+      .catch(() => undefined)
+      .finally(() => setIsProfileLoading(false))
+  }, [])
 
   async function handleStatusChange(event: ChangeEvent<HTMLSelectElement>) {
     if (!id) return
@@ -179,8 +225,23 @@ function AnalysisResultPage() {
     }
   }
 
-  function handlePrintCoverLetter() {
+  function handlePrint(target: 'cover-letter' | 'tailored-resume') {
+    document.body.dataset.printTarget = target
+    window.addEventListener(
+      'afterprint',
+      () => delete document.body.dataset.printTarget,
+      { once: true },
+    )
     window.print()
+  }
+
+  function handlePrintCoverLetter() {
+    handlePrint('cover-letter')
+  }
+
+  function handlePrintTailoredResume() {
+    if (!candidateName || !candidateEmail) return
+    handlePrint('tailored-resume')
   }
 
   function handleEditCoverLetter() {
@@ -498,7 +559,21 @@ function AnalysisResultPage() {
                           ? 'Downloaded!'
                           : 'Download tailored resume'}
                       </button>
+                      <button
+                        className="secondary-action tailored-resume-action"
+                        type="button"
+                        disabled={isProfileLoading || !candidateName || !candidateEmail}
+                        onClick={handlePrintTailoredResume}
+                      >
+                        Print / Save as PDF
+                      </button>
                     </div>
+                  )}
+                  {!isProfileLoading && (!candidateName || !candidateEmail) && (
+                    <p className="tailored-resume-profile-warning" role="alert">
+                      Add your name and email in <Link to="/profile">Profile</Link> before
+                      saving this resume as a PDF.
+                    </p>
                   )}
                   {tailoredResumeCopyError && (
                     <p className="tailored-resume-error" role="alert">
@@ -552,7 +627,17 @@ function AnalysisResultPage() {
                   </div>
                 ) : (
                   <div className="tailored-resume-preview">
-                    <p>{analysis.tailoredResume}</p>
+                    <article className="tailored-resume-document">
+                      <header className="tailored-resume-document-header">
+                        <h1>{candidateName || 'Complete your profile'}</h1>
+                        {candidateEmail ? (
+                          <a href={`mailto:${candidateEmail}`}>{candidateEmail}</a>
+                        ) : (
+                          <span>Add your email to Profile</span>
+                        )}
+                      </header>
+                      <TailoredResumeContent content={analysis.tailoredResume} />
+                    </article>
                   </div>
                 )}
               </>

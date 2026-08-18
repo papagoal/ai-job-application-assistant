@@ -10,11 +10,12 @@ const analysis = {
   missingSkills: ['Playwright'],
   suggestions: ['Highlight automated testing experience.'],
   coverLetter: 'Dear Hiring Manager, I am excited to apply.',
-  tailoredResume: `TEST CANDIDATE
-Frontend Developer
+  tailoredResume: `PROFESSIONAL SUMMARY
+Frontend developer experienced with React and TypeScript.
 
 SKILLS
-React · TypeScript`,
+- React
+- TypeScript`,
 }
 
 test('completes the profile-to-application workflow', async ({ page }) => {
@@ -56,7 +57,22 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await expect(page.getByLabel('82 percent match')).toBeVisible()
   await expect(page.getByText('Strong overall match')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Job-targeted draft' })).toBeVisible()
-  await expect(page.getByText('TEST CANDIDATE')).toBeVisible()
+  const tailoredResume = page.locator('.tailored-resume-document')
+  await expect(tailoredResume.getByRole('heading', { name: 'Test Candidate' })).toBeVisible()
+  await expect(tailoredResume.getByText('candidate@example.com')).toBeVisible()
+  await expect(tailoredResume.getByRole('heading', { name: 'SKILLS' })).toBeVisible()
+  await expect(tailoredResume.locator('li').filter({ hasText: /^React$/ })).toBeVisible()
+
+  await page.evaluate(() => {
+    window.print = () => document.body.setAttribute('data-print-invoked', 'true')
+  })
+  await page.locator('.tailored-resume-panel')
+    .getByRole('button', { name: 'Print / Save as PDF' })
+    .click()
+  await expect.poll(() => page.evaluate(() => document.body.dataset.printTarget))
+    .toBe('tailored-resume')
+  await expect.poll(() => page.evaluate(() => document.body.dataset.printInvoked))
+    .toBe('true')
 
   await page.getByRole('button', { name: 'Edit tailored resume' }).click()
   await page

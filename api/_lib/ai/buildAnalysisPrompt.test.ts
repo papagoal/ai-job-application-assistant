@@ -21,6 +21,8 @@ describe('buildAnalysisPrompt', () => {
       'The tailoredResume must be a plain-text resume draft targeted to this job.',
     )
     expect(prompt.system).toContain('Never invent or embellish skills')
+    expect(prompt.system).toContain('single Letter or A4 page')
+    expect(prompt.system).toContain('no longer than 450 words')
     expect(prompt.system).toContain('Begin with a PROFESSIONAL SUMMARY section')
     expect(prompt.system).toContain('Do not include a candidate name, email address')
     expect(prompt.system).toContain('uppercase section headings')

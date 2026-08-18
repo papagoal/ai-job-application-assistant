@@ -1235,7 +1235,7 @@ h1 {
 @media print {
   @page {
     size: auto;
-    margin: 0.65in;
+    margin: 0.45in;
   }
 
   :root,
@@ -1319,24 +1319,42 @@ h1 {
   .tailored-resume-document {
     max-width: none;
     color: #111827;
-    font-size: 10.5pt;
-    line-height: 1.48;
+    font-size: 9.5pt;
+    line-height: 1.35;
   }
 
   .tailored-resume-document-header {
-    margin-bottom: 20pt;
-    padding-bottom: 12pt;
+    margin-bottom: 12pt;
+    padding-bottom: 8pt;
     border-bottom-color: #3157d5;
+    break-inside: avoid;
   }
 
   .tailored-resume-document-header h1 {
-    font-size: 24pt;
+    margin-bottom: 3pt;
+    font-size: 20pt;
+  }
+
+  .tailored-resume-document-header a,
+  .tailored-resume-document-header span {
+    font-size: 8.5pt;
   }
 
   .tailored-resume-document h3 {
     break-after: avoid;
-    margin-top: 16pt;
+    margin: 9pt 0 4pt;
+    padding-bottom: 3pt;
     color: #2345a4;
+    font-size: 8.5pt;
+  }
+
+  .tailored-resume-document p {
+    margin-bottom: 6pt;
+  }
+
+  .tailored-resume-document ul {
+    margin-bottom: 6pt;
+    padding-left: 14pt;
   }
 
   .tailored-resume-document p,
@@ -1347,6 +1365,7 @@ h1 {
 
   .tailored-resume-document li {
     break-inside: avoid;
+    margin-bottom: 2pt;
   }
 }
 

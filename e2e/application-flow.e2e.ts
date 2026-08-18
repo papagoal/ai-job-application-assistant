@@ -81,6 +81,9 @@ test('completes the profile-to-application workflow', async ({ page }) => {
     }),
   ).toBeVisible()
   await expect(page.locator('.cover-letter-panel')).toBeHidden()
+  const resumePdf = await page.pdf({ format: 'Letter', printBackground: true })
+  const resumePageCount = resumePdf.toString('latin1').match(/\/Type\s*\/Page\b/g)?.length ?? 0
+  expect(resumePageCount).toBe(1)
   await page.emulateMedia({ media: 'screen' })
 
   await page.getByRole('button', { name: 'Edit tailored resume' }).click()

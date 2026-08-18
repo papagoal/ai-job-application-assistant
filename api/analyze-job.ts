@@ -1,5 +1,5 @@
 import type { JobDescriptionInput } from '../src/types/jobApplication'
-import { getAIProvider } from './_lib/ai/getAIProvider'
+import { getAIProvider } from './_lib/ai/getAIProvider.js'
 
 const aiProvider = getAIProvider()
 

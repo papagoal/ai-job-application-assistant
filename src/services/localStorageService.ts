@@ -74,3 +74,14 @@ export function updateApplicationStatus(
   }
   localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(applications))
 }
+
+export function deleteApplication(id: string): void {
+  const applications = getApplications()
+  const remainingApplications = applications.filter((application) => application.id !== id)
+
+  if (remainingApplications.length === applications.length) {
+    throw new Error('Application not found.')
+  }
+
+  localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(remainingApplications))
+}

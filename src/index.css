@@ -564,6 +564,43 @@ h1 {
   margin-bottom: 32px;
 }
 
+.analysis-heading-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.danger-action {
+  border: 1px solid #fecdca;
+  border-radius: 8px;
+  padding: 10px 17px;
+  color: #b42318;
+  background: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.danger-action:hover {
+  background: #fef3f2;
+}
+
+.danger-action:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.delete-error {
+  margin: -16px 0 24px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: #b42318;
+  background: #fef3f2;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
 .analysis-layout {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr);
@@ -796,6 +833,11 @@ h1 {
     align-items: flex-start;
     flex-direction: column;
     gap: 20px;
+  }
+
+  .analysis-heading-actions {
+    width: 100%;
+    flex-wrap: wrap;
   }
 
   .application-grid {

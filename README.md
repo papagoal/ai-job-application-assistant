@@ -10,6 +10,7 @@ A React application that compares a job description with a resume, produces an A
 - Resume suggestions and cover-letter draft
 - Saved application dashboard
 - Persistent application status tracking (Draft, Applied, and Interview)
+- Dashboard filtering by application status
 - Local browser persistence for profiles and applications
 - Optional Supabase cloud persistence with per-user Row Level Security
 - Email account connection, Magic Link sign-in, and sign-out

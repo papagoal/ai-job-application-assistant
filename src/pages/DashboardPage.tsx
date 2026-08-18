@@ -7,7 +7,14 @@ import type { ApplicationStatus, SavedApplication } from '../types/application'
 type StatusFilter = 'All' | ApplicationStatus
 type SortOrder = 'newest' | 'oldest' | 'highest-match' | 'lowest-match'
 
-const statusFilters: StatusFilter[] = ['All', 'Draft', 'Applied', 'Interview']
+const statusFilters: StatusFilter[] = [
+  'All',
+  'Draft',
+  'Applied',
+  'Interview',
+  'Offer',
+  'Rejected',
+]
 
 function encodeCsvCell(value: string | number) {
   let cell = String(value)
@@ -71,6 +78,10 @@ function DashboardPage() {
     {
       label: 'Interviews',
       value: applications.filter((application) => application.status === 'Interview').length,
+    },
+    {
+      label: 'Offers',
+      value: applications.filter((application) => application.status === 'Offer').length,
     },
   ]
 

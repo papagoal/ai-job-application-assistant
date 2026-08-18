@@ -13,7 +13,13 @@ interface AnalysisLocationState {
   analysis?: JobAnalysis
 }
 
-const applicationStatuses: ApplicationStatus[] = ['Draft', 'Applied', 'Interview']
+const applicationStatuses: ApplicationStatus[] = [
+  'Draft',
+  'Applied',
+  'Interview',
+  'Offer',
+  'Rejected',
+]
 
 function toFileNamePart(value: string) {
   return value

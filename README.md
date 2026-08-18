@@ -66,11 +66,31 @@ DEEPSEEK_MODEL=deepseek-v4-flash
 
 Keep `DEEPSEEK_API_KEY` server-side. Variables prefixed with `VITE_` are bundled into the browser and must not contain secrets.
 
-## Verification
+## Testing
+
+Run the Vitest unit and component test suite:
 
 ```bash
-npm run build
-npm run lint
+npm test
 ```
 
-GitHub Actions runs dependency installation, linting, and the production build for every pull request and every push to `main`.
+Install Playwright's Chromium browser once, then run the end-to-end application flow:
+
+```bash
+npx playwright install chromium
+npm run test:e2e
+```
+
+The end-to-end test starts the Vite development server automatically. It disables Supabase configuration and mocks the AI response, so it uses isolated browser storage and does not write to a configured Supabase project or call a real AI provider.
+
+## Full verification
+
+```bash
+npm ci
+npm test
+npm run test:e2e
+npm run lint
+npm run build
+```
+
+GitHub Actions runs dependency installation, the Vitest suite, the Playwright Chromium end-to-end test, linting, and the production build for every pull request and every push to `main`.

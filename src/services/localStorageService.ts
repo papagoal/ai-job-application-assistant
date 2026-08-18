@@ -16,7 +16,14 @@ function readJson<T>(key: string, fallback: T): T {
 }
 
 export function getProfile(): Profile | null {
-  return readJson<Profile | null>(PROFILE_KEY, null)
+  const profile = readJson<Profile | null>(PROFILE_KEY, null)
+  if (!profile) return null
+
+  return {
+    ...profile,
+    phone: profile.phone ?? '',
+    location: profile.location ?? '',
+  }
 }
 
 export function saveProfile(profile: Profile): void {

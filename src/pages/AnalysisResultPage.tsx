@@ -99,6 +99,8 @@ function AnalysisResultPage() {
   const [tailoredResumeSaveError, setTailoredResumeSaveError] = useState('')
   const [candidateName, setCandidateName] = useState('')
   const [candidateEmail, setCandidateEmail] = useState('')
+  const [candidatePhone, setCandidatePhone] = useState('')
+  const [candidateLocation, setCandidateLocation] = useState('')
   const [isProfileLoading, setIsProfileLoading] = useState(true)
   const [savedNotes, setSavedNotes] = useState('')
   const [notesDraft, setNotesDraft] = useState('')
@@ -136,6 +138,8 @@ function AnalysisResultPage() {
       .then((profile) => {
         setCandidateName(profile?.fullName.trim() ?? '')
         setCandidateEmail(profile?.email.trim() ?? '')
+        setCandidatePhone(profile?.phone.trim() ?? '')
+        setCandidateLocation(profile?.location.trim() ?? '')
       })
       .catch(() => undefined)
       .finally(() => setIsProfileLoading(false))
@@ -630,11 +634,15 @@ function AnalysisResultPage() {
                     <article className="tailored-resume-document">
                       <header className="tailored-resume-document-header">
                         <h1>{candidateName || 'Complete your profile'}</h1>
-                        {candidateEmail ? (
-                          <a href={`mailto:${candidateEmail}`}>{candidateEmail}</a>
-                        ) : (
-                          <span>Add your email to Profile</span>
-                        )}
+                        <div className="tailored-resume-contact-details">
+                          {candidateEmail ? (
+                            <a href={`mailto:${candidateEmail}`}>{candidateEmail}</a>
+                          ) : (
+                            <span>Add your email to Profile</span>
+                          )}
+                          {candidatePhone && <a href={`tel:${candidatePhone}`}>{candidatePhone}</a>}
+                          {candidateLocation && <span>{candidateLocation}</span>}
+                        </div>
                       </header>
                       <TailoredResumeContent content={analysis.tailoredResume} />
                     </article>

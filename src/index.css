@@ -491,6 +491,13 @@ h1 {
   font-weight: 700;
 }
 
+.optional-label {
+  margin-left: 4px;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
 .form-field input,
 .form-field textarea {
   width: 100%;
@@ -1110,6 +1117,20 @@ h1 {
   font-size: 0.9rem;
 }
 
+.tailored-resume-contact-details {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px 16px;
+}
+
+.tailored-resume-contact-details > * + *::before {
+  margin-right: 16px;
+  color: #98a2b3;
+  content: '·';
+  text-decoration: none;
+}
+
 .tailored-resume-document h3 {
   margin: 24px 0 8px;
   padding-bottom: 5px;
@@ -1338,6 +1359,14 @@ h1 {
   .tailored-resume-document-header a,
   .tailored-resume-document-header span {
     font-size: 8.5pt;
+  }
+
+  .tailored-resume-contact-details {
+    gap: 2pt 10pt;
+  }
+
+  .tailored-resume-contact-details > * + *::before {
+    margin-right: 10pt;
   }
 
   .tailored-resume-document h3 {

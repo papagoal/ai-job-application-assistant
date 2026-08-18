@@ -56,6 +56,8 @@ describe('NewApplicationPage', () => {
     mockedGetProfile.mockResolvedValue({
       fullName: 'Test Candidate',
       email: 'candidate@example.com',
+      phone: '',
+      location: '',
       professionalSummary: 'Frontend developer',
       resumeText: 'Saved React and TypeScript resume.',
     })

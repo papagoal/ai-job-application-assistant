@@ -5,6 +5,8 @@ import type { Profile } from '../types/profile'
 const initialProfile: Profile = {
   fullName: '',
   email: '',
+  phone: '',
+  location: '',
   professionalSummary: '',
   resumeText: '',
 }
@@ -109,6 +111,32 @@ function ProfilePage() {
                 aria-describedby={errors.email ? 'email-error' : undefined}
               />
               {errors.email && <p className="field-error" id="email-error">{errors.email}</p>}
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="phone">Phone <span className="optional-label">Optional</span></label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                value={profile.phone}
+                onChange={handleChange}
+                placeholder="+1 416 555 0123"
+              />
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="location">Location <span className="optional-label">Optional</span></label>
+              <input
+                id="location"
+                name="location"
+                type="text"
+                autoComplete="address-level2"
+                value={profile.location}
+                onChange={handleChange}
+                placeholder="Toronto, ON"
+              />
             </div>
           </div>
 

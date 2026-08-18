@@ -86,6 +86,8 @@ async function migrateLocalData(user: User): Promise<void> {
       user_id: user.id,
       full_name: profile.fullName,
       email: profile.email,
+      phone: profile.phone,
+      location: profile.location,
       professional_summary: profile.professionalSummary,
       resume_text: profile.resumeText,
     }, { onConflict: 'user_id', ignoreDuplicates: true })
@@ -119,7 +121,7 @@ export async function getProfile(): Promise<Profile | null> {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('full_name,email,professional_summary,resume_text')
+    .select('full_name,email,phone,location,professional_summary,resume_text')
     .eq('user_id', user.id)
     .maybeSingle()
   if (error) throw error
@@ -128,6 +130,8 @@ export async function getProfile(): Promise<Profile | null> {
   return {
     fullName: data.full_name,
     email: data.email,
+    phone: data.phone ?? '',
+    location: data.location ?? '',
     professionalSummary: data.professional_summary,
     resumeText: data.resume_text,
   }
@@ -144,6 +148,8 @@ export async function saveProfile(profile: Profile): Promise<void> {
     user_id: user.id,
     full_name: profile.fullName,
     email: profile.email,
+    phone: profile.phone,
+    location: profile.location,
     professional_summary: profile.professionalSummary,
     resume_text: profile.resumeText,
     updated_at: new Date().toISOString(),

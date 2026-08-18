@@ -649,46 +649,6 @@ function AnalysisResultPage() {
             )}
           </section>
 
-          <section className="analysis-panel">
-            <div className="analysis-panel-heading">
-              <div>
-                <p className="analysis-label">Application notes</p>
-                <h2>Private notes</h2>
-              </div>
-            </div>
-            <div className="notes-editor">
-              <label htmlFor="application-notes">Notes</label>
-              <textarea
-                id="application-notes"
-                value={notesDraft}
-                disabled={isSavingNotes}
-                rows={7}
-                placeholder="Add contacts, follow-ups, interview feedback, or next steps."
-                onChange={(event) => {
-                  setNotesDraft(event.target.value)
-                  setNotesSaveMessage('')
-                  setNotesSaveError('')
-                }}
-              />
-              <div className="notes-actions">
-                <button
-                  className="primary-action"
-                  type="button"
-                  disabled={isSavingNotes || notesDraft === savedNotes}
-                  onClick={handleSaveNotes}
-                >
-                  {isSavingNotes ? 'Saving…' : 'Save notes'}
-                </button>
-                {notesSaveMessage && (
-                  <p className="notes-success" role="status">{notesSaveMessage}</p>
-                )}
-                {notesSaveError && (
-                  <p className="notes-error" role="alert">{notesSaveError}</p>
-                )}
-              </div>
-            </div>
-          </section>
-
           <section className="analysis-panel cover-letter-panel">
             <div className="print-cover-letter-heading">
               <p>Cover letter</p>
@@ -777,6 +737,46 @@ function AnalysisResultPage() {
                 <p>{analysis.coverLetter}</p>
               </div>
             )}
+          </section>
+
+          <section className="analysis-panel">
+            <div className="analysis-panel-heading">
+              <div>
+                <p className="analysis-label">Application notes</p>
+                <h2>Private notes</h2>
+              </div>
+            </div>
+            <div className="notes-editor">
+              <label htmlFor="application-notes">Notes</label>
+              <textarea
+                id="application-notes"
+                value={notesDraft}
+                disabled={isSavingNotes}
+                rows={7}
+                placeholder="Add contacts, follow-ups, interview feedback, or next steps."
+                onChange={(event) => {
+                  setNotesDraft(event.target.value)
+                  setNotesSaveMessage('')
+                  setNotesSaveError('')
+                }}
+              />
+              <div className="notes-actions">
+                <button
+                  className="primary-action"
+                  type="button"
+                  disabled={isSavingNotes || notesDraft === savedNotes}
+                  onClick={handleSaveNotes}
+                >
+                  {isSavingNotes ? 'Saving…' : 'Save notes'}
+                </button>
+                {notesSaveMessage && (
+                  <p className="notes-success" role="status">{notesSaveMessage}</p>
+                )}
+                {notesSaveError && (
+                  <p className="notes-error" role="alert">{notesSaveError}</p>
+                )}
+              </div>
+            </div>
           </section>
         </div>
       </div>

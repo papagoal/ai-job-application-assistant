@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { analyzeJob } from '../services/jobAnalysisService'
+import { getProfile, saveApplication } from '../services/localStorageService'
 import type { JobDescriptionInput } from '../types/jobApplication'
 
 const initialJobDescription: JobDescriptionInput = {
@@ -14,7 +15,10 @@ type JobDescriptionErrors = Partial<Record<keyof JobDescriptionInput, string>>
 
 function NewApplicationPage() {
   const navigate = useNavigate()
-  const [job, setJob] = useState(initialJobDescription)
+  const [job, setJob] = useState(() => ({
+    ...initialJobDescription,
+    resumeText: getProfile()?.resumeText ?? '',
+  }))
   const [errors, setErrors] = useState<JobDescriptionErrors>({})
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [submissionError, setSubmissionError] = useState('')
@@ -51,8 +55,9 @@ function NewApplicationPage() {
 
     try {
       const analysis = await analyzeJob(job)
+      const application = saveApplication(job, analysis)
 
-      navigate('/applications/new-analysis', {
+      navigate(`/applications/${application.id}`, {
         state: { analysis },
       })
     } catch {
@@ -163,7 +168,7 @@ function NewApplicationPage() {
             />
             <div className="field-details">
               <p className="field-hint">
-                A saved profile will replace this manual step after persistence is added.
+                Loaded from your saved profile when one is available.
               </p>
               <p className="character-count" id="resumeText-count">
                 {job.resumeText.length.toLocaleString()} characters

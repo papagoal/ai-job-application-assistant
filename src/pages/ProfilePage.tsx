@@ -1,4 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
+import { getProfile, saveProfile } from '../services/localStorageService'
 import type { Profile } from '../types/profile'
 
 const initialProfile: Profile = {
@@ -11,7 +12,7 @@ const initialProfile: Profile = {
 type ProfileErrors = Partial<Record<keyof Profile, string>>
 
 function ProfilePage() {
-  const [profile, setProfile] = useState(initialProfile)
+  const [profile, setProfile] = useState(() => getProfile() ?? initialProfile)
   const [errors, setErrors] = useState<ProfileErrors>({})
   const [isSaved, setIsSaved] = useState(false)
 
@@ -36,7 +37,11 @@ function ProfilePage() {
     if (!profile.resumeText.trim()) nextErrors.resumeText = 'Paste your resume text.'
 
     setErrors(nextErrors)
-    setIsSaved(Object.keys(nextErrors).length === 0)
+
+    if (Object.keys(nextErrors).length === 0) {
+      saveProfile(profile)
+      setIsSaved(true)
+    }
   }
 
   return (
@@ -120,7 +125,7 @@ function ProfilePage() {
               placeholder="Paste your work experience, education, skills, and projects."
             />
             <p className="field-hint" id="resumeText-hint">
-              File upload and document parsing will be added later.
+              This resume will be prefilled when you create a new application.
             </p>
             {errors.resumeText && <p className="field-error" id="resumeText-error">{errors.resumeText}</p>}
           </div>
@@ -129,7 +134,7 @@ function ProfilePage() {
         <div className="form-actions">
           {isSaved && (
             <p className="save-message" role="status">
-              Profile is valid. Persistent saving will be added later.
+              Profile saved on this device.
             </p>
           )}
           <button className="submit-button" type="submit">Save profile</button>

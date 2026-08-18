@@ -72,3 +72,5 @@ Keep `DEEPSEEK_API_KEY` server-side. Variables prefixed with `VITE_` are bundled
 npm run build
 npm run lint
 ```
+
+GitHub Actions runs dependency installation, linting, and the production build for every pull request and every push to `main`.

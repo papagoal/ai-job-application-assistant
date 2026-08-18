@@ -907,6 +907,24 @@ h1 {
   white-space: pre-line;
 }
 
+.cover-letter-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: -8px 0 16px;
+}
+
+.copy-button {
+  cursor: pointer;
+}
+
+.copy-error {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
 .cover-letter-preview p {
   margin: 0 0 16px;
 }

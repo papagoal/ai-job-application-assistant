@@ -27,6 +27,8 @@ function AnalysisResultPage() {
   const [statusError, setStatusError] = useState('')
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState('')
+  const [isCoverLetterCopied, setIsCoverLetterCopied] = useState(false)
+  const [copyError, setCopyError] = useState('')
 
   useEffect(() => {
     if (!id) {
@@ -87,6 +89,21 @@ function AnalysisResultPage() {
     } catch {
       setDeleteError('Application could not be deleted. Please try again.')
       setIsDeleting(false)
+    }
+  }
+
+  async function handleCopyCoverLetter() {
+    if (!analysis) return
+
+    setCopyError('')
+    setIsCoverLetterCopied(false)
+
+    try {
+      if (!navigator.clipboard) throw new Error('Clipboard unavailable.')
+      await navigator.clipboard.writeText(analysis.coverLetter)
+      setIsCoverLetterCopied(true)
+    } catch {
+      setCopyError('Cover letter could not be copied. Please select and copy it manually.')
     }
   }
 
@@ -213,6 +230,16 @@ function AnalysisResultPage() {
                 <p className="analysis-label">Cover letter</p>
                 <h2>Generated draft</h2>
               </div>
+            </div>
+            <div className="cover-letter-actions">
+              <button
+                className="secondary-action copy-button"
+                type="button"
+                onClick={handleCopyCoverLetter}
+              >
+                {isCoverLetterCopied ? 'Copied!' : 'Copy cover letter'}
+              </button>
+              {copyError && <p className="copy-error" role="alert">{copyError}</p>}
             </div>
             <div className="cover-letter-preview">
               <p>{analysis.coverLetter}</p>

@@ -28,6 +28,8 @@ const input: JobDescriptionInput = {
 const profile: Profile = {
   fullName: 'Test Candidate',
   email: 'candidate@example.com',
+  phone: '+1 416 555 0123',
+  location: 'Toronto, ON',
   professionalSummary: 'Frontend developer',
   resumeText: input.resumeText,
 }
@@ -82,6 +84,15 @@ describe('profile persistence', () => {
     saveProfile(profile)
 
     expect(getProfile()).toEqual(profile)
+  })
+
+  it('normalizes legacy profiles without optional contact fields', () => {
+    const legacyProfile = { ...profile } as Partial<Profile>
+    delete legacyProfile.phone
+    delete legacyProfile.location
+    localStorage.setItem('job-assistant.profile.v1', JSON.stringify(legacyProfile))
+
+    expect(getProfile()).toEqual({ ...profile, phone: '', location: '' })
   })
 })
 

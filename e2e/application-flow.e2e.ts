@@ -34,10 +34,15 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await page.goto('/profile')
   await page.getByLabel('Full name').fill('Test Candidate')
   await page.getByLabel('Email').fill('candidate@example.com')
+  await page.getByLabel(/Phone/).fill('+1 416 555 0123')
+  await page.getByLabel(/Location/).fill('Toronto, ON')
   await page.getByLabel('Professional summary').fill('Frontend developer')
   await page.getByLabel('Resume text').fill('React and TypeScript experience.')
   await page.getByRole('button', { name: 'Save profile' }).click()
   await expect(page.getByRole('status')).toHaveText('Profile saved.')
+  await page.reload()
+  await expect(page.getByLabel(/Phone/)).toHaveValue('+1 416 555 0123')
+  await expect(page.getByLabel(/Location/)).toHaveValue('Toronto, ON')
 
   await page.getByRole('link', { name: 'New Application' }).click()
   await expect(page.getByLabel('Resume text')).toHaveValue(
@@ -64,6 +69,8 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   const tailoredResume = page.locator('.tailored-resume-document')
   await expect(tailoredResume.getByRole('heading', { name: 'Test Candidate' })).toBeVisible()
   await expect(tailoredResume.getByText('candidate@example.com')).toBeVisible()
+  await expect(tailoredResume.getByText('+1 416 555 0123')).toBeVisible()
+  await expect(tailoredResume.getByText('Toronto, ON')).toBeVisible()
   await expect(tailoredResume.getByRole('heading', { name: 'SKILLS' })).toBeVisible()
   await expect(tailoredResume.locator('li').filter({ hasText: /^React$/ })).toBeVisible()
 

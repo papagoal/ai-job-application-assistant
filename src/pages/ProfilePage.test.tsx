@@ -31,6 +31,8 @@ describe('ProfilePage', () => {
 
     await user.type(screen.getByLabelText('Full name'), 'Test Candidate')
     await user.type(screen.getByLabelText('Email'), 'candidate@example.com')
+    await user.type(screen.getByLabelText(/Phone/), '+1 416 555 0123')
+    await user.type(screen.getByLabelText(/Location/), 'Toronto, ON')
     await user.type(
       screen.getByLabelText('Professional summary'),
       'Frontend developer',
@@ -45,6 +47,8 @@ describe('ProfilePage', () => {
     expect(mockedSaveProfile).toHaveBeenCalledWith({
       fullName: 'Test Candidate',
       email: 'candidate@example.com',
+      phone: '+1 416 555 0123',
+      location: 'Toronto, ON',
       professionalSummary: 'Frontend developer',
       resumeText: 'React and TypeScript experience.',
     })

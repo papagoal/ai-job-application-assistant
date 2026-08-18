@@ -4,7 +4,7 @@ A React application that compares a job description with a resume, produces an A
 
 ## Features
 
-- Candidate profile and reusable resume
+- Candidate profile with reusable resume and optional phone/location details
 - Job-to-resume match analysis
 - Matching and missing skills
 - Resume suggestions and cover-letter draft

@@ -16,6 +16,8 @@ function NewApplicationPage() {
   const navigate = useNavigate()
   const [job, setJob] = useState(initialJobDescription)
   const [errors, setErrors] = useState<JobDescriptionErrors>({})
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [submissionError, setSubmissionError] = useState('')
 
   function handleChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const field = event.target.name as keyof JobDescriptionInput
@@ -25,6 +27,7 @@ function NewApplicationPage() {
       [field]: event.target.value,
     }))
     setErrors((currentErrors) => ({ ...currentErrors, [field]: undefined }))
+    setSubmissionError('')
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -40,14 +43,25 @@ function NewApplicationPage() {
     if (!job.resumeText.trim()) nextErrors.resumeText = 'Paste your resume text.'
 
     setErrors(nextErrors)
+    setSubmissionError('')
 
     if (Object.keys(nextErrors).length > 0) return
 
-    const analysis = await analyzeJob(job)
+    setIsAnalyzing(true)
 
-    navigate('/applications/new-analysis', {
-      state: { analysis },
-    })
+    try {
+      const analysis = await analyzeJob(job)
+
+      navigate('/applications/new-analysis', {
+        state: { analysis },
+      })
+    } catch {
+      setSubmissionError(
+        'We could not analyze this application. Please check your connection and try again.',
+      )
+    } finally {
+      setIsAnalyzing(false)
+    }
   }
 
   return (
@@ -164,7 +178,17 @@ function NewApplicationPage() {
         <div className="form-actions form-actions-between">
           <Link className="secondary-action" to="/">Cancel</Link>
           <div className="form-submit-group">
-            <button className="submit-button" type="submit">Analyze match</button>
+            {submissionError && (
+              <p className="submission-error" role="alert">{submissionError}</p>
+            )}
+            <button
+              className="submit-button"
+              type="submit"
+              disabled={isAnalyzing}
+              aria-busy={isAnalyzing}
+            >
+              {isAnalyzing ? 'Analyzing…' : 'Analyze match'}
+            </button>
           </div>
         </div>
       </form>

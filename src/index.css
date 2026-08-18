@@ -923,11 +923,64 @@ h1 {
   cursor: pointer;
 }
 
-.copy-error {
+.cover-letter-error,
+.cover-letter-success {
   margin: 0;
-  color: #b42318;
   font-size: 0.82rem;
   font-weight: 600;
+}
+
+.cover-letter-error {
+  color: #b42318;
+}
+
+.cover-letter-success {
+  color: #067647;
+}
+
+.cover-letter-editor {
+  display: grid;
+  gap: 10px;
+}
+
+.cover-letter-editor label {
+  color: var(--color-text);
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.cover-letter-editor textarea {
+  width: 100%;
+  min-height: 260px;
+  resize: vertical;
+  border: 1px solid #cdd3de;
+  border-radius: 8px;
+  padding: 16px;
+  color: var(--color-text);
+  background: #ffffff;
+  font: inherit;
+  line-height: 1.65;
+}
+
+.cover-letter-editor textarea:focus {
+  border-color: var(--color-primary);
+  outline: 3px solid rgba(49, 87, 213, 0.14);
+}
+
+.cover-letter-editor textarea:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.cover-letter-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cover-letter-edit-actions button:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .cover-letter-preview p {

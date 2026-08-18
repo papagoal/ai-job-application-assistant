@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import {
   deleteApplication,
   getApplication,
+  updateApplicationCoverLetter,
   updateApplicationStatus,
 } from '../services/persistenceService'
 import type { ApplicationStatus } from '../types/application'
@@ -39,6 +40,11 @@ function AnalysisResultPage() {
   const [copyError, setCopyError] = useState('')
   const [isCoverLetterDownloaded, setIsCoverLetterDownloaded] = useState(false)
   const [downloadError, setDownloadError] = useState('')
+  const [isEditingCoverLetter, setIsEditingCoverLetter] = useState(false)
+  const [coverLetterDraft, setCoverLetterDraft] = useState(state?.analysis?.coverLetter ?? '')
+  const [isSavingCoverLetter, setIsSavingCoverLetter] = useState(false)
+  const [coverLetterSaveMessage, setCoverLetterSaveMessage] = useState('')
+  const [coverLetterSaveError, setCoverLetterSaveError] = useState('')
 
   useEffect(() => {
     if (!id) {
@@ -50,6 +56,7 @@ function AnalysisResultPage() {
       .then((application) => {
         if (application) {
           setAnalysis(application.analysis)
+          setCoverLetterDraft(application.analysis.coverLetter)
           setStatus(application.status)
         } else if (!state?.analysis) {
           setAnalysis(undefined)
@@ -142,6 +149,52 @@ function AnalysisResultPage() {
       setIsCoverLetterDownloaded(true)
     } catch {
       setDownloadError('Cover letter could not be downloaded. Please try again.')
+    }
+  }
+
+  function handleEditCoverLetter() {
+    if (!analysis) return
+
+    setCoverLetterDraft(analysis.coverLetter)
+    setCoverLetterSaveMessage('')
+    setCoverLetterSaveError('')
+    setIsEditingCoverLetter(true)
+  }
+
+  function handleCancelCoverLetterEdit() {
+    if (!analysis) return
+
+    setCoverLetterDraft(analysis.coverLetter)
+    setCoverLetterSaveError('')
+    setIsEditingCoverLetter(false)
+  }
+
+  async function handleSaveCoverLetter() {
+    if (!id || !analysis) return
+
+    const nextCoverLetter = coverLetterDraft.trim()
+    setCoverLetterSaveMessage('')
+    setCoverLetterSaveError('')
+
+    if (!nextCoverLetter) {
+      setCoverLetterSaveError('Cover letter cannot be empty.')
+      return
+    }
+
+    setIsSavingCoverLetter(true)
+
+    try {
+      await updateApplicationCoverLetter(id, nextCoverLetter)
+      setAnalysis({ ...analysis, coverLetter: nextCoverLetter })
+      setCoverLetterDraft(nextCoverLetter)
+      setIsEditingCoverLetter(false)
+      setCoverLetterSaveMessage('Cover letter saved.')
+      setIsCoverLetterCopied(false)
+      setIsCoverLetterDownloaded(false)
+    } catch {
+      setCoverLetterSaveError('Cover letter could not be saved. Please try again.')
+    } finally {
+      setIsSavingCoverLetter(false)
     }
   }
 
@@ -270,28 +323,74 @@ function AnalysisResultPage() {
               </div>
             </div>
             <div className="cover-letter-actions">
-              <div className="cover-letter-buttons">
-                <button
-                  className="secondary-action cover-letter-action"
-                  type="button"
-                  onClick={handleCopyCoverLetter}
-                >
-                  {isCoverLetterCopied ? 'Copied!' : 'Copy cover letter'}
-                </button>
-                <button
-                  className="secondary-action cover-letter-action"
-                  type="button"
-                  onClick={handleDownloadCoverLetter}
-                >
-                  {isCoverLetterDownloaded ? 'Downloaded!' : 'Download cover letter'}
-                </button>
+              {!isEditingCoverLetter && (
+                <div className="cover-letter-buttons">
+                  <button
+                    className="secondary-action cover-letter-action"
+                    type="button"
+                    onClick={handleEditCoverLetter}
+                  >
+                    Edit cover letter
+                  </button>
+                  <button
+                    className="secondary-action cover-letter-action"
+                    type="button"
+                    onClick={handleCopyCoverLetter}
+                  >
+                    {isCoverLetterCopied ? 'Copied!' : 'Copy cover letter'}
+                  </button>
+                  <button
+                    className="secondary-action cover-letter-action"
+                    type="button"
+                    onClick={handleDownloadCoverLetter}
+                  >
+                    {isCoverLetterDownloaded ? 'Downloaded!' : 'Download cover letter'}
+                  </button>
+                </div>
+              )}
+              {copyError && <p className="cover-letter-error" role="alert">{copyError}</p>}
+              {downloadError && <p className="cover-letter-error" role="alert">{downloadError}</p>}
+              {coverLetterSaveMessage && (
+                <p className="cover-letter-success" role="status">{coverLetterSaveMessage}</p>
+              )}
+              {coverLetterSaveError && (
+                <p className="cover-letter-error" role="alert">{coverLetterSaveError}</p>
+              )}
+            </div>
+            {isEditingCoverLetter ? (
+              <div className="cover-letter-editor">
+                <label htmlFor="cover-letter-draft">Cover letter draft</label>
+                <textarea
+                  id="cover-letter-draft"
+                  value={coverLetterDraft}
+                  disabled={isSavingCoverLetter}
+                  rows={14}
+                  onChange={(event) => setCoverLetterDraft(event.target.value)}
+                />
+                <div className="cover-letter-edit-actions">
+                  <button
+                    className="primary-action"
+                    type="button"
+                    disabled={isSavingCoverLetter}
+                    onClick={handleSaveCoverLetter}
+                  >
+                    {isSavingCoverLetter ? 'Saving…' : 'Save changes'}
+                  </button>
+                  <button
+                    className="secondary-action"
+                    type="button"
+                    disabled={isSavingCoverLetter}
+                    onClick={handleCancelCoverLetterEdit}
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
-              {copyError && <p className="copy-error" role="alert">{copyError}</p>}
-              {downloadError && <p className="copy-error" role="alert">{downloadError}</p>}
-            </div>
-            <div className="cover-letter-preview">
-              <p>{analysis.coverLetter}</p>
-            </div>
+            ) : (
+              <div className="cover-letter-preview">
+                <p>{analysis.coverLetter}</p>
+              </div>
+            )}
           </section>
         </div>
       </div>

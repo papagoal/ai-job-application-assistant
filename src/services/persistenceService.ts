@@ -10,6 +10,7 @@ import {
   getProfile as getLocalProfile,
   saveApplication as saveLocalApplication,
   saveProfile as saveLocalProfile,
+  updateApplicationCoverLetter as updateLocalApplicationCoverLetter,
   updateApplicationStatus as updateLocalApplicationStatus,
 } from './localStorageService'
 import { isSupabaseConfigured, supabase } from './supabaseClient'
@@ -211,6 +212,39 @@ export async function updateApplicationStatus(
   const { data, error } = await supabase
     .from('applications')
     .update({ status })
+    .eq('id', id)
+    .select('id')
+    .maybeSingle()
+  if (error) throw error
+  if (!data) throw new Error('Application not found.')
+}
+
+export async function updateApplicationCoverLetter(
+  id: string,
+  coverLetter: string,
+): Promise<void> {
+  const user = await getReadyCloudUser()
+  if (!supabase || !user) {
+    updateLocalApplicationCoverLetter(id, coverLetter)
+    return
+  }
+
+  const { data: application, error: loadError } = await supabase
+    .from('applications')
+    .select('analysis')
+    .eq('id', id)
+    .maybeSingle()
+  if (loadError) throw loadError
+  if (!application) throw new Error('Application not found.')
+
+  const { data, error } = await supabase
+    .from('applications')
+    .update({
+      analysis: {
+        ...(application.analysis as JobAnalysis),
+        coverLetter,
+      },
+    })
     .eq('id', id)
     .select('id')
     .maybeSingle()

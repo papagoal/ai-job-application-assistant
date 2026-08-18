@@ -1,5 +1,5 @@
 import type { User } from '@supabase/supabase-js'
-import type { SavedApplication } from '../types/application'
+import type { ApplicationStatus, SavedApplication } from '../types/application'
 import type { JobAnalysis } from '../types/jobAnalysis'
 import type { JobDescriptionInput } from '../types/jobApplication'
 import type { Profile } from '../types/profile'
@@ -9,6 +9,7 @@ import {
   getProfile as getLocalProfile,
   saveApplication as saveLocalApplication,
   saveProfile as saveLocalProfile,
+  updateApplicationStatus as updateLocalApplicationStatus,
 } from './localStorageService'
 import { isSupabaseConfigured, supabase } from './supabaseClient'
 
@@ -194,4 +195,24 @@ export async function saveApplication(
     .insert(toApplicationRow(application, user.id))
   if (error) throw error
   return application
+}
+
+export async function updateApplicationStatus(
+  id: string,
+  status: ApplicationStatus,
+): Promise<void> {
+  const user = await getReadyCloudUser()
+  if (!supabase || !user) {
+    updateLocalApplicationStatus(id, status)
+    return
+  }
+
+  const { data, error } = await supabase
+    .from('applications')
+    .update({ status })
+    .eq('id', id)
+    .select('id')
+    .maybeSingle()
+  if (error) throw error
+  if (!data) throw new Error('Application not found.')
 }

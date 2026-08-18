@@ -1,7 +1,7 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { analyzeJob } from '../services/jobAnalysisService'
-import { getProfile, saveApplication } from '../services/localStorageService'
+import { getProfile, saveApplication } from '../services/persistenceService'
 import type { JobDescriptionInput } from '../types/jobApplication'
 
 const initialJobDescription: JobDescriptionInput = {
@@ -15,13 +15,20 @@ type JobDescriptionErrors = Partial<Record<keyof JobDescriptionInput, string>>
 
 function NewApplicationPage() {
   const navigate = useNavigate()
-  const [job, setJob] = useState(() => ({
-    ...initialJobDescription,
-    resumeText: getProfile()?.resumeText ?? '',
-  }))
+  const [job, setJob] = useState(initialJobDescription)
   const [errors, setErrors] = useState<JobDescriptionErrors>({})
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [submissionError, setSubmissionError] = useState('')
+
+  useEffect(() => {
+    void getProfile()
+      .then((profile) => {
+        if (profile?.resumeText) {
+          setJob((currentJob) => ({ ...currentJob, resumeText: profile.resumeText }))
+        }
+      })
+      .catch(() => undefined)
+  }, [])
 
   function handleChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const field = event.target.name as keyof JobDescriptionInput
@@ -55,7 +62,7 @@ function NewApplicationPage() {
 
     try {
       const analysis = await analyzeJob(job)
-      const application = saveApplication(job, analysis)
+      const application = await saveApplication(job, analysis)
 
       navigate(`/applications/${application.id}`, {
         state: { analysis },

@@ -21,10 +21,13 @@ Return this exact JSON shape:
   "matchingSkills": ["string"],
   "missingSkills": ["string"],
   "suggestions": ["string"],
-  "coverLetter": "string"
+  "coverLetter": "string",
+  "tailoredResume": "string"
 }
 
-The matchScore must be a number from 0 to 100. Base every claim on the supplied resume and job description. Do not invent candidate experience.`,
+The matchScore must be a number from 0 to 100. Base every claim on the supplied resume and job description. Do not invent candidate experience.
+
+The tailoredResume must be a plain-text resume draft targeted to this job. Reorder and rephrase only facts found in the supplied resume. Never invent or embellish skills, employers, job titles, dates, education, certifications, achievements, or metrics.`,
     user: `Analyze this application and respond in JSON.
 
 COMPANY:

@@ -95,6 +95,25 @@ export function updateApplicationCoverLetter(id: string, coverLetter: string): v
   localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(applications))
 }
 
+export function updateApplicationTailoredResume(
+  id: string,
+  tailoredResume: string,
+): void {
+  const applications = getApplications()
+  const applicationIndex = applications.findIndex((application) => application.id === id)
+
+  if (applicationIndex === -1) throw new Error('Application not found.')
+
+  applications[applicationIndex] = {
+    ...applications[applicationIndex],
+    analysis: {
+      ...applications[applicationIndex].analysis,
+      tailoredResume,
+    },
+  }
+  localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(applications))
+}
+
 export function updateApplicationNotes(id: string, notes: string): void {
   const applications = getApplications()
   const applicationIndex = applications.findIndex((application) => application.id === id)

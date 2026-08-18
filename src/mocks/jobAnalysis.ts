@@ -22,4 +22,17 @@ I would welcome the opportunity to bring my frontend development skills and prod
 
 Sincerely,
 Your Name`,
+  tailoredResume: `YOUR NAME
+Frontend Developer
+
+PROFESSIONAL SUMMARY
+Frontend developer experienced in building responsive React and TypeScript applications with a product-focused approach.
+
+CORE SKILLS
+React · TypeScript · Responsive design · Git
+
+SELECTED EXPERIENCE
+- Built responsive frontend interfaces using React and TypeScript.
+- Collaborated through Git-based development workflows.
+- Focused on clear, maintainable user experiences.`,
 }

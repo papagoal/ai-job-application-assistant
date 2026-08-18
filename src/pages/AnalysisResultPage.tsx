@@ -6,6 +6,7 @@ import {
   updateApplicationCoverLetter,
   updateApplicationNotes,
   updateApplicationStatus,
+  updateApplicationTailoredResume,
 } from '../services/persistenceService'
 import type { ApplicationStatus } from '../types/application'
 import type { JobAnalysis } from '../types/jobAnalysis'
@@ -52,6 +53,17 @@ function AnalysisResultPage() {
   const [isSavingCoverLetter, setIsSavingCoverLetter] = useState(false)
   const [coverLetterSaveMessage, setCoverLetterSaveMessage] = useState('')
   const [coverLetterSaveError, setCoverLetterSaveError] = useState('')
+  const [isTailoredResumeCopied, setIsTailoredResumeCopied] = useState(false)
+  const [tailoredResumeCopyError, setTailoredResumeCopyError] = useState('')
+  const [isTailoredResumeDownloaded, setIsTailoredResumeDownloaded] = useState(false)
+  const [tailoredResumeDownloadError, setTailoredResumeDownloadError] = useState('')
+  const [isEditingTailoredResume, setIsEditingTailoredResume] = useState(false)
+  const [tailoredResumeDraft, setTailoredResumeDraft] = useState(
+    state?.analysis?.tailoredResume ?? '',
+  )
+  const [isSavingTailoredResume, setIsSavingTailoredResume] = useState(false)
+  const [tailoredResumeSaveMessage, setTailoredResumeSaveMessage] = useState('')
+  const [tailoredResumeSaveError, setTailoredResumeSaveError] = useState('')
   const [savedNotes, setSavedNotes] = useState('')
   const [notesDraft, setNotesDraft] = useState('')
   const [isSavingNotes, setIsSavingNotes] = useState(false)
@@ -69,6 +81,7 @@ function AnalysisResultPage() {
         if (application) {
           setAnalysis(application.analysis)
           setCoverLetterDraft(application.analysis.coverLetter)
+          setTailoredResumeDraft(application.analysis.tailoredResume ?? '')
           setStatus(application.status)
           setSavedNotes(application.notes ?? '')
           setNotesDraft(application.notes ?? '')
@@ -216,6 +229,103 @@ function AnalysisResultPage() {
     }
   }
 
+  async function handleCopyTailoredResume() {
+    if (!analysis?.tailoredResume) return
+
+    setTailoredResumeCopyError('')
+    setIsTailoredResumeCopied(false)
+
+    try {
+      if (!navigator.clipboard) throw new Error('Clipboard unavailable.')
+      await navigator.clipboard.writeText(analysis.tailoredResume)
+      setIsTailoredResumeCopied(true)
+    } catch {
+      setTailoredResumeCopyError(
+        'Tailored resume could not be copied. Please select and copy it manually.',
+      )
+    }
+  }
+
+  function handleDownloadTailoredResume() {
+    if (!analysis?.tailoredResume) return
+
+    setTailoredResumeDownloadError('')
+    setIsTailoredResumeDownloaded(false)
+
+    try {
+      const fileName = [
+        toFileNamePart(analysis.companyName),
+        toFileNamePart(analysis.jobTitle),
+        'tailored-resume.txt',
+      ].join('-')
+      const file = new Blob([analysis.tailoredResume], {
+        type: 'text/plain;charset=utf-8',
+      })
+      const downloadUrl = URL.createObjectURL(file)
+      const downloadLink = document.createElement('a')
+
+      downloadLink.href = downloadUrl
+      downloadLink.download = fileName
+      document.body.append(downloadLink)
+      downloadLink.click()
+      downloadLink.remove()
+      URL.revokeObjectURL(downloadUrl)
+      setIsTailoredResumeDownloaded(true)
+    } catch {
+      setTailoredResumeDownloadError(
+        'Tailored resume could not be downloaded. Please try again.',
+      )
+    }
+  }
+
+  function handleEditTailoredResume() {
+    if (!analysis?.tailoredResume) return
+
+    setTailoredResumeDraft(analysis.tailoredResume)
+    setTailoredResumeSaveMessage('')
+    setTailoredResumeSaveError('')
+    setIsEditingTailoredResume(true)
+  }
+
+  function handleCancelTailoredResumeEdit() {
+    if (!analysis?.tailoredResume) return
+
+    setTailoredResumeDraft(analysis.tailoredResume)
+    setTailoredResumeSaveError('')
+    setIsEditingTailoredResume(false)
+  }
+
+  async function handleSaveTailoredResume() {
+    if (!id || !analysis) return
+
+    const nextTailoredResume = tailoredResumeDraft.trim()
+    setTailoredResumeSaveMessage('')
+    setTailoredResumeSaveError('')
+
+    if (!nextTailoredResume) {
+      setTailoredResumeSaveError('Tailored resume cannot be empty.')
+      return
+    }
+
+    setIsSavingTailoredResume(true)
+
+    try {
+      await updateApplicationTailoredResume(id, nextTailoredResume)
+      setAnalysis({ ...analysis, tailoredResume: nextTailoredResume })
+      setTailoredResumeDraft(nextTailoredResume)
+      setIsEditingTailoredResume(false)
+      setTailoredResumeSaveMessage('Tailored resume saved.')
+      setIsTailoredResumeCopied(false)
+      setIsTailoredResumeDownloaded(false)
+    } catch {
+      setTailoredResumeSaveError(
+        'Tailored resume could not be saved. Please try again.',
+      )
+    } finally {
+      setIsSavingTailoredResume(false)
+    }
+  }
+
   async function handleSaveNotes() {
     if (!id) return
 
@@ -351,6 +461,107 @@ function AnalysisResultPage() {
                 <li key={suggestion}>{suggestion}</li>
               ))}
             </ol>
+          </section>
+
+          <section className="analysis-panel tailored-resume-panel">
+            <div className="analysis-panel-heading">
+              <div>
+                <p className="analysis-label">Tailored resume</p>
+                <h2>Job-targeted draft</h2>
+              </div>
+            </div>
+            {analysis.tailoredResume ? (
+              <>
+                <div className="tailored-resume-actions">
+                  {!isEditingTailoredResume && (
+                    <div className="tailored-resume-buttons">
+                      <button
+                        className="secondary-action tailored-resume-action"
+                        type="button"
+                        onClick={handleEditTailoredResume}
+                      >
+                        Edit tailored resume
+                      </button>
+                      <button
+                        className="secondary-action tailored-resume-action"
+                        type="button"
+                        onClick={handleCopyTailoredResume}
+                      >
+                        {isTailoredResumeCopied ? 'Copied!' : 'Copy tailored resume'}
+                      </button>
+                      <button
+                        className="secondary-action tailored-resume-action"
+                        type="button"
+                        onClick={handleDownloadTailoredResume}
+                      >
+                        {isTailoredResumeDownloaded
+                          ? 'Downloaded!'
+                          : 'Download tailored resume'}
+                      </button>
+                    </div>
+                  )}
+                  {tailoredResumeCopyError && (
+                    <p className="tailored-resume-error" role="alert">
+                      {tailoredResumeCopyError}
+                    </p>
+                  )}
+                  {tailoredResumeDownloadError && (
+                    <p className="tailored-resume-error" role="alert">
+                      {tailoredResumeDownloadError}
+                    </p>
+                  )}
+                  {tailoredResumeSaveMessage && (
+                    <p className="tailored-resume-success" role="status">
+                      {tailoredResumeSaveMessage}
+                    </p>
+                  )}
+                  {tailoredResumeSaveError && (
+                    <p className="tailored-resume-error" role="alert">
+                      {tailoredResumeSaveError}
+                    </p>
+                  )}
+                </div>
+                {isEditingTailoredResume ? (
+                  <div className="tailored-resume-editor">
+                    <label htmlFor="tailored-resume-draft">Tailored resume draft</label>
+                    <textarea
+                      id="tailored-resume-draft"
+                      value={tailoredResumeDraft}
+                      disabled={isSavingTailoredResume}
+                      rows={18}
+                      onChange={(event) => setTailoredResumeDraft(event.target.value)}
+                    />
+                    <div className="tailored-resume-edit-actions">
+                      <button
+                        className="primary-action"
+                        type="button"
+                        disabled={isSavingTailoredResume}
+                        onClick={handleSaveTailoredResume}
+                      >
+                        {isSavingTailoredResume ? 'Saving…' : 'Save tailored resume'}
+                      </button>
+                      <button
+                        className="secondary-action"
+                        type="button"
+                        disabled={isSavingTailoredResume}
+                        onClick={handleCancelTailoredResumeEdit}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="tailored-resume-preview">
+                    <p>{analysis.tailoredResume}</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="tailored-resume-unavailable">
+                This application was created before tailored resume drafts were
+                available. Create a new analysis to generate one.
+              </p>
+            )}
           </section>
 
           <section className="analysis-panel">

@@ -12,6 +12,7 @@ import {
   updateApplicationCoverLetter,
   updateApplicationNotes,
   updateApplicationStatus,
+  updateApplicationTailoredResume,
 } from './localStorageService'
 
 const APPLICATIONS_KEY = 'job-assistant.applications.v1'
@@ -117,6 +118,16 @@ describe('application persistence', () => {
 
     expect(getApplication(APPLICATION_ID)?.analysis.coverLetter).toBe(
       'Updated cover letter',
+    )
+  })
+
+  it('updates the tailored resume draft', () => {
+    createApplication()
+
+    updateApplicationTailoredResume(APPLICATION_ID, 'Updated tailored resume')
+
+    expect(getApplication(APPLICATION_ID)?.analysis.tailoredResume).toBe(
+      'Updated tailored resume',
     )
   })
 

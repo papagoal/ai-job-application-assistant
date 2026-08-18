@@ -8,4 +8,5 @@ export interface JobAnalysis {
   missingSkills: string[]
   suggestions: string[]
   coverLetter: string
+  tailoredResume?: string
 }

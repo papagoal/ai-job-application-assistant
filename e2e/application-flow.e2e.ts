@@ -10,9 +10,15 @@ const analysis = {
   missingSkills: ['Playwright'],
   suggestions: ['Highlight automated testing experience.'],
   coverLetter: 'Dear Hiring Manager, I am excited to apply.',
+  tailoredResume: `TEST CANDIDATE
+Frontend Developer
+
+SKILLS
+React · TypeScript`,
 }
 
 test('completes the profile-to-application workflow', async ({ page }) => {
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
   await page.route('**/api/analyze-job', async (route) => {
     expect(route.request().method()).toBe('POST')
     expect(route.request().postDataJSON()).toEqual({
@@ -49,6 +55,31 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   ).toBeVisible()
   await expect(page.getByLabel('82 percent match')).toBeVisible()
   await expect(page.getByText('Strong overall match')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Job-targeted draft' })).toBeVisible()
+  await expect(page.getByText('TEST CANDIDATE')).toBeVisible()
+
+  await page.getByRole('button', { name: 'Edit tailored resume' }).click()
+  await page
+    .getByLabel('Tailored resume draft')
+    .fill('TEST CANDIDATE\nFrontend Developer\n\nUpdated tailored resume')
+  await page.getByRole('button', { name: 'Save tailored resume' }).click()
+  await expect(page.getByRole('status')).toHaveText('Tailored resume saved.')
+
+  await page.getByRole('button', { name: 'Copy tailored resume' }).click()
+  await expect(page.getByRole('button', { name: 'Copied!' })).toBeVisible()
+  await expect
+    .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+    .toContain('Updated tailored resume')
+
+  const downloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Download tailored resume' }).click()
+  const download = await downloadPromise
+  expect(download.suggestedFilename()).toBe(
+    'Northstar-Labs-Frontend-Developer-tailored-resume.txt',
+  )
+
+  await page.reload()
+  await expect(page.getByText('Updated tailored resume')).toBeVisible()
 
   await page.getByRole('link', { name: 'Back to Dashboard' }).click()
   await expect(page.getByRole('heading', { name: 'Your applications' })).toBeVisible()

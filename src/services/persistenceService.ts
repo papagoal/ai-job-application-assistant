@@ -13,6 +13,7 @@ import {
   updateApplicationCoverLetter as updateLocalApplicationCoverLetter,
   updateApplicationNotes as updateLocalApplicationNotes,
   updateApplicationStatus as updateLocalApplicationStatus,
+  updateApplicationTailoredResume as updateLocalApplicationTailoredResume,
 } from './localStorageService'
 import { isSupabaseConfigured, supabase } from './supabaseClient'
 
@@ -248,6 +249,39 @@ export async function updateApplicationCoverLetter(
       analysis: {
         ...(application.analysis as JobAnalysis),
         coverLetter,
+      },
+    })
+    .eq('id', id)
+    .select('id')
+    .maybeSingle()
+  if (error) throw error
+  if (!data) throw new Error('Application not found.')
+}
+
+export async function updateApplicationTailoredResume(
+  id: string,
+  tailoredResume: string,
+): Promise<void> {
+  const user = await getReadyCloudUser()
+  if (!supabase || !user) {
+    updateLocalApplicationTailoredResume(id, tailoredResume)
+    return
+  }
+
+  const { data: application, error: loadError } = await supabase
+    .from('applications')
+    .select('analysis')
+    .eq('id', id)
+    .maybeSingle()
+  if (loadError) throw loadError
+  if (!application) throw new Error('Application not found.')
+
+  const { data, error } = await supabase
+    .from('applications')
+    .update({
+      analysis: {
+        ...(application.analysis as JobAnalysis),
+        tailoredResume,
       },
     })
     .eq('id', id)

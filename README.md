@@ -8,6 +8,7 @@ A React application that compares a job description with a resume, produces an A
 - Job-to-resume match analysis
 - Matching and missing skills
 - Resume suggestions and cover-letter draft
+- Editable tailored-resume drafts with copy and download actions
 - Editable saved cover-letter drafts
 - One-click copying for generated cover letters
 - Plain-text downloads for generated cover letters

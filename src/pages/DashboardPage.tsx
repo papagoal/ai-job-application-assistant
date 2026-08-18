@@ -45,6 +45,26 @@ function DashboardPage() {
     ))
   })()
 
+  const averageMatchScore = applications.length > 0
+    ? Math.round(
+        applications.reduce((total, application) => total + application.matchScore, 0)
+        / applications.length,
+      )
+    : 0
+
+  const applicationSummary = [
+    { label: 'Total applications', value: applications.length },
+    { label: 'Average match', value: `${averageMatchScore}%` },
+    {
+      label: 'Applied',
+      value: applications.filter((application) => application.status === 'Applied').length,
+    },
+    {
+      label: 'Interviews',
+      value: applications.filter((application) => application.status === 'Interview').length,
+    },
+  ]
+
   function resetDashboardView() {
     setSearchQuery('')
     setStatusFilter('All')
@@ -62,6 +82,17 @@ function DashboardPage() {
           </p>
         </div>
       </div>
+
+      {!isLoading && !loadError && applications.length > 0 && (
+        <dl className="application-summary" aria-label="Application summary">
+          {applicationSummary.map((item) => (
+            <div className="summary-card" key={item.label}>
+              <dt>{item.label}</dt>
+              <dd>{item.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
 
       {!isLoading && !loadError && applications.length > 0 && (
         <div className="dashboard-controls">

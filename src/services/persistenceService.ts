@@ -11,6 +11,7 @@ import {
   saveApplication as saveLocalApplication,
   saveProfile as saveLocalProfile,
   updateApplicationCoverLetter as updateLocalApplicationCoverLetter,
+  updateApplicationNotes as updateLocalApplicationNotes,
   updateApplicationStatus as updateLocalApplicationStatus,
 } from './localStorageService'
 import { isSupabaseConfigured, supabase } from './supabaseClient'
@@ -25,6 +26,7 @@ interface ApplicationRow {
   analysis: JobAnalysis
   job_description: string
   resume_text: string
+  notes: string
 }
 
 async function getCloudUser(): Promise<User | null> {
@@ -51,6 +53,7 @@ function fromApplicationRow(row: ApplicationRow): SavedApplication {
     analysis: row.analysis,
     jobDescription: row.job_description,
     resumeText: row.resume_text,
+    notes: row.notes ?? '',
   }
 }
 
@@ -65,6 +68,7 @@ function toApplicationRow(application: SavedApplication, userId: string) {
     analysis: application.analysis,
     job_description: application.jobDescription,
     resume_text: application.resumeText,
+    notes: application.notes ?? '',
   }
 }
 
@@ -152,7 +156,7 @@ export async function getApplications(): Promise<SavedApplication[]> {
 
   const { data, error } = await supabase
     .from('applications')
-    .select('id,company_name,job_title,match_score,status,created_at,analysis,job_description,resume_text')
+    .select('id,company_name,job_title,match_score,status,created_at,analysis,job_description,resume_text,notes')
     .order('created_at', { ascending: false })
   if (error) throw error
   return (data as ApplicationRow[]).map(fromApplicationRow)
@@ -164,7 +168,7 @@ export async function getApplication(id: string): Promise<SavedApplication | und
 
   const { data, error } = await supabase
     .from('applications')
-    .select('id,company_name,job_title,match_score,status,created_at,analysis,job_description,resume_text')
+    .select('id,company_name,job_title,match_score,status,created_at,analysis,job_description,resume_text,notes')
     .eq('id', id)
     .maybeSingle()
   if (error) throw error
@@ -190,6 +194,7 @@ export async function saveApplication(
     analysis,
     jobDescription: input.jobDescription,
     resumeText: input.resumeText,
+    notes: '',
   }
 
   const { error } = await supabase
@@ -245,6 +250,23 @@ export async function updateApplicationCoverLetter(
         coverLetter,
       },
     })
+    .eq('id', id)
+    .select('id')
+    .maybeSingle()
+  if (error) throw error
+  if (!data) throw new Error('Application not found.')
+}
+
+export async function updateApplicationNotes(id: string, notes: string): Promise<void> {
+  const user = await getReadyCloudUser()
+  if (!supabase || !user) {
+    updateLocalApplicationNotes(id, notes)
+    return
+  }
+
+  const { data, error } = await supabase
+    .from('applications')
+    .update({ notes })
     .eq('id', id)
     .select('id')
     .maybeSingle()

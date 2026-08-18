@@ -24,7 +24,10 @@ export function saveProfile(profile: Profile): void {
 }
 
 export function getApplications(): SavedApplication[] {
-  return readJson<SavedApplication[]>(APPLICATIONS_KEY, [])
+  return readJson<SavedApplication[]>(APPLICATIONS_KEY, []).map((application) => ({
+    ...application,
+    notes: application.notes ?? '',
+  }))
 }
 
 export function getApplication(id: string): SavedApplication | undefined {
@@ -49,6 +52,7 @@ export function saveApplication(
     analysis,
     jobDescription: input.jobDescription,
     resumeText: input.resumeText,
+    notes: '',
   }
 
   localStorage.setItem(
@@ -87,6 +91,19 @@ export function updateApplicationCoverLetter(id: string, coverLetter: string): v
       ...applications[applicationIndex].analysis,
       coverLetter,
     },
+  }
+  localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(applications))
+}
+
+export function updateApplicationNotes(id: string, notes: string): void {
+  const applications = getApplications()
+  const applicationIndex = applications.findIndex((application) => application.id === id)
+
+  if (applicationIndex === -1) throw new Error('Application not found.')
+
+  applications[applicationIndex] = {
+    ...applications[applicationIndex],
+    notes,
   }
   localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(applications))
 }

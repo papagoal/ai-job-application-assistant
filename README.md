@@ -19,6 +19,7 @@ A React application that compares a job description with a resume, produces an A
 - Dashboard sorting by creation order and match score
 - Dashboard summary metrics for saved applications
 - CSV export for application tracking data
+- Private notes for contacts, follow-ups, and interview feedback
 - Confirmed deletion of saved applications
 - Local browser persistence for profiles and applications
 - Optional Supabase cloud persistence with per-user Row Level Security
@@ -40,7 +41,7 @@ Use `npm run dev` only when working on the frontend without the analysis API.
 ## Supabase setup
 
 1. Create a Supabase project.
-2. Run `supabase/migrations/202608180001_initial_schema.sql` in its SQL Editor.
+2. Run the files in `supabase/migrations` in filename order in its SQL Editor.
 3. Enable anonymous sign-ins and the Email provider under Authentication settings.
 4. Enable manual identity linking so a guest account can be connected to an email.
 5. Add `http://localhost:3000/account` and your deployed `/account` URL to the allowed redirect URLs.

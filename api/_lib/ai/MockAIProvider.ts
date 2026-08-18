@@ -5,10 +5,14 @@ import type { AIProvider } from './AIProvider'
 
 export class MockAIProvider implements AIProvider {
   analyze(input: JobDescriptionInput): Promise<JobAnalysis> {
+    const companyName = input.companyName.trim()
+    const jobTitle = input.jobTitle.trim()
+
     return Promise.resolve({
       ...mockJobAnalysis,
-      companyName: input.companyName.trim(),
-      jobTitle: input.jobTitle.trim(),
+      companyName,
+      jobTitle,
+      tailoredResume: `PROFESSIONAL SUMMARY\n${input.resumeText.trim()}\n\nTARGET ROLE\n${jobTitle} at ${companyName}`,
     })
   }
 }

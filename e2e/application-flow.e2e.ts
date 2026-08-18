@@ -10,9 +10,16 @@ const analysis = {
   missingSkills: ['Playwright'],
   suggestions: ['Highlight automated testing experience.'],
   coverLetter: 'Dear Hiring Manager, I am excited to apply.',
+  tailoredResume: `PROFESSIONAL SUMMARY
+Frontend developer experienced with React and TypeScript.
+
+SKILLS
+- React
+- TypeScript`,
 }
 
 test('completes the profile-to-application workflow', async ({ page }) => {
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
   await page.route('**/api/analyze-job', async (route) => {
     expect(route.request().method()).toBe('POST')
     expect(route.request().postDataJSON()).toEqual({
@@ -49,6 +56,58 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   ).toBeVisible()
   await expect(page.getByLabel('82 percent match')).toBeVisible()
   await expect(page.getByText('Strong overall match')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Job-targeted draft' })).toBeVisible()
+  const tailoredResume = page.locator('.tailored-resume-document')
+  await expect(tailoredResume.getByRole('heading', { name: 'Test Candidate' })).toBeVisible()
+  await expect(tailoredResume.getByText('candidate@example.com')).toBeVisible()
+  await expect(tailoredResume.getByRole('heading', { name: 'SKILLS' })).toBeVisible()
+  await expect(tailoredResume.locator('li').filter({ hasText: /^React$/ })).toBeVisible()
+
+  await page.evaluate(() => {
+    window.print = () => document.body.setAttribute('data-print-invoked', 'true')
+  })
+  await page.locator('.tailored-resume-panel')
+    .getByRole('button', { name: 'Print / Save as PDF' })
+    .click()
+  await expect.poll(() => page.evaluate(() => document.body.dataset.printTarget))
+    .toBe('tailored-resume')
+  await expect.poll(() => page.evaluate(() => document.body.dataset.printInvoked))
+    .toBe('true')
+  await page.emulateMedia({ media: 'print' })
+  await expect(page.locator('.tailored-resume-panel')).toBeVisible()
+  await expect(
+    page.locator('.tailored-resume-document').getByRole('heading', {
+      name: 'PROFESSIONAL SUMMARY',
+    }),
+  ).toBeVisible()
+  await expect(page.locator('.cover-letter-panel')).toBeHidden()
+  const resumePdf = await page.pdf({ format: 'Letter', printBackground: true })
+  const resumePageCount = resumePdf.toString('latin1').match(/\/Type\s*\/Page\b/g)?.length ?? 0
+  expect(resumePageCount).toBe(1)
+  await page.emulateMedia({ media: 'screen' })
+
+  await page.getByRole('button', { name: 'Edit tailored resume' }).click()
+  await page
+    .getByLabel('Tailored resume draft')
+    .fill('TEST CANDIDATE\nFrontend Developer\n\nUpdated tailored resume')
+  await page.getByRole('button', { name: 'Save tailored resume' }).click()
+  await expect(page.getByRole('status')).toHaveText('Tailored resume saved.')
+
+  await page.getByRole('button', { name: 'Copy tailored resume' }).click()
+  await expect(page.getByRole('button', { name: 'Copied!' })).toBeVisible()
+  await expect
+    .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+    .toContain('Updated tailored resume')
+
+  const downloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Download tailored resume' }).click()
+  const download = await downloadPromise
+  expect(download.suggestedFilename()).toBe(
+    'Northstar-Labs-Frontend-Developer-tailored-resume.txt',
+  )
+
+  await page.reload()
+  await expect(page.getByText('Updated tailored resume')).toBeVisible()
 
   await page.getByRole('link', { name: 'Back to Dashboard' }).click()
   await expect(page.getByRole('heading', { name: 'Your applications' })).toBeVisible()

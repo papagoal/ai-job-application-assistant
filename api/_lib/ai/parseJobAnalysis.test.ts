@@ -39,6 +39,15 @@ describe('parseJobAnalysis', () => {
     )
   })
 
+  it('rejects a response without a tailored resume', () => {
+    const analysisWithoutTailoredResume = { ...mockJobAnalysis }
+    delete analysisWithoutTailoredResume.tailoredResume
+
+    expect(() => parseJobAnalysis(JSON.stringify(analysisWithoutTailoredResume))).toThrow(
+      'DeepSeek returned an analysis with missing fields.',
+    )
+  })
+
   it('rejects empty entries in string arrays', () => {
     const content = JSON.stringify({
       ...mockJobAnalysis,

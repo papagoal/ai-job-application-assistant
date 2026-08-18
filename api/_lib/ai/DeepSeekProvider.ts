@@ -37,7 +37,7 @@ export class DeepSeekProvider implements AIProvider {
         ],
         thinking: { type: 'disabled' },
         response_format: { type: 'json_object' },
-        max_tokens: 2500,
+        max_tokens: 5000,
         stream: false,
       }),
     })

@@ -35,7 +35,8 @@ export function parseJobAnalysis(content: string): JobAnalysis {
     isStringArray(value.matchingSkills) &&
     isStringArray(value.missingSkills) &&
     isStringArray(value.suggestions) &&
-    isNonEmptyString(value.coverLetter)
+    isNonEmptyString(value.coverLetter) &&
+    isNonEmptyString(value.tailoredResume)
 
   if (!isValid) throw new Error('DeepSeek returned an analysis with missing fields.')
 

@@ -76,5 +76,6 @@ describe('/api/analyze-job', () => {
     expect(analysis.companyName).toBe(validInput.companyName)
     expect(analysis.jobTitle).toBe(validInput.jobTitle)
     expect(analysis.matchScore).toBeTypeOf('number')
+    expect(analysis.tailoredResume).toContain(validInput.resumeText)
   })
 })

@@ -4,6 +4,7 @@ import type { JobAnalysis } from '../types/jobAnalysis'
 import type { JobDescriptionInput } from '../types/jobApplication'
 import type { Profile } from '../types/profile'
 import {
+  deleteApplication as deleteLocalApplication,
   getApplication as getLocalApplication,
   getApplications as getLocalApplications,
   getProfile as getLocalProfile,
@@ -210,6 +211,23 @@ export async function updateApplicationStatus(
   const { data, error } = await supabase
     .from('applications')
     .update({ status })
+    .eq('id', id)
+    .select('id')
+    .maybeSingle()
+  if (error) throw error
+  if (!data) throw new Error('Application not found.')
+}
+
+export async function deleteApplication(id: string): Promise<void> {
+  const user = await getReadyCloudUser()
+  if (!supabase || !user) {
+    deleteLocalApplication(id)
+    return
+  }
+
+  const { data, error } = await supabase
+    .from('applications')
+    .delete()
     .eq('id', id)
     .select('id')
     .maybeSingle()

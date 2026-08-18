@@ -1,6 +1,10 @@
 import { useEffect, useState, type ChangeEvent } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
-import { getApplication, updateApplicationStatus } from '../services/persistenceService'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import {
+  deleteApplication,
+  getApplication,
+  updateApplicationStatus,
+} from '../services/persistenceService'
 import type { ApplicationStatus } from '../types/application'
 import type { JobAnalysis } from '../types/jobAnalysis'
 
@@ -13,6 +17,7 @@ const applicationStatuses: ApplicationStatus[] = ['Draft', 'Applied', 'Interview
 function AnalysisResultPage() {
   const { id } = useParams()
   const location = useLocation()
+  const navigate = useNavigate()
   const state = location.state as AnalysisLocationState | null
   const [analysis, setAnalysis] = useState<JobAnalysis | undefined>(state?.analysis)
   const [isLoading, setIsLoading] = useState(!state?.analysis)
@@ -20,6 +25,8 @@ function AnalysisResultPage() {
   const [isSavingStatus, setIsSavingStatus] = useState(false)
   const [statusMessage, setStatusMessage] = useState('')
   const [statusError, setStatusError] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
 
   useEffect(() => {
     if (!id) {
@@ -63,6 +70,26 @@ function AnalysisResultPage() {
     }
   }
 
+  async function handleDelete() {
+    if (!id || !analysis) return
+
+    const shouldDelete = window.confirm(
+      `Delete ${analysis.jobTitle} at ${analysis.companyName}? This cannot be undone.`,
+    )
+    if (!shouldDelete) return
+
+    setDeleteError('')
+    setIsDeleting(true)
+
+    try {
+      await deleteApplication(id)
+      navigate('/', { replace: true })
+    } catch {
+      setDeleteError('Application could not be deleted. Please try again.')
+      setIsDeleting(false)
+    }
+  }
+
   if (isLoading) {
     return <section className="empty-state"><p>Loading analysis…</p></section>
   }
@@ -87,8 +114,20 @@ function AnalysisResultPage() {
             {analysis.companyName} · Application ID: {id}
           </p>
         </div>
-        <Link className="secondary-action" to="/">Back to Dashboard</Link>
+        <div className="analysis-heading-actions">
+          <Link className="secondary-action" to="/">Back to Dashboard</Link>
+          <button
+            className="danger-action"
+            type="button"
+            disabled={isDeleting}
+            onClick={handleDelete}
+          >
+            {isDeleting ? 'Deleting…' : 'Delete application'}
+          </button>
+        </div>
       </div>
+
+      {deleteError && <p className="delete-error" role="alert">{deleteError}</p>}
 
       <div className="analysis-layout">
         <aside className="analysis-score-card" aria-labelledby="match-score-heading">

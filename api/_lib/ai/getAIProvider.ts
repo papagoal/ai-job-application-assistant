@@ -1,6 +1,6 @@
 import type { AIProvider } from './AIProvider'
-import { DeepSeekProvider } from './DeepSeekProvider'
-import { MockAIProvider } from './MockAIProvider'
+import { DeepSeekProvider } from './DeepSeekProvider.js'
+import { MockAIProvider } from './MockAIProvider.js'
 
 const mockAIProvider = new MockAIProvider()
 

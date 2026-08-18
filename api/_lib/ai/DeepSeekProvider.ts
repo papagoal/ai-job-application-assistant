@@ -1,8 +1,8 @@
 import type { JobAnalysis } from '../../../src/types/jobAnalysis'
 import type { JobDescriptionInput } from '../../../src/types/jobApplication'
 import type { AIProvider } from './AIProvider'
-import { buildAnalysisPrompt } from './buildAnalysisPrompt'
-import { parseJobAnalysis } from './parseJobAnalysis'
+import { buildAnalysisPrompt } from './buildAnalysisPrompt.js'
+import { parseJobAnalysis } from './parseJobAnalysis.js'
 
 interface DeepSeekChatCompletion {
   choices?: Array<{

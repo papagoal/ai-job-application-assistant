@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ChangeEvent } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import { getApplication } from '../services/persistenceService'
+import { getApplication, updateApplicationStatus } from '../services/persistenceService'
+import type { ApplicationStatus } from '../types/application'
 import type { JobAnalysis } from '../types/jobAnalysis'
 
 interface AnalysisLocationState {
   analysis?: JobAnalysis
 }
+
+const applicationStatuses: ApplicationStatus[] = ['Draft', 'Applied', 'Interview']
 
 function AnalysisResultPage() {
   const { id } = useParams()
@@ -13,14 +16,52 @@ function AnalysisResultPage() {
   const state = location.state as AnalysisLocationState | null
   const [analysis, setAnalysis] = useState<JobAnalysis | undefined>(state?.analysis)
   const [isLoading, setIsLoading] = useState(!state?.analysis)
+  const [status, setStatus] = useState<ApplicationStatus>('Draft')
+  const [isSavingStatus, setIsSavingStatus] = useState(false)
+  const [statusMessage, setStatusMessage] = useState('')
+  const [statusError, setStatusError] = useState('')
 
   useEffect(() => {
-    if (analysis || !id) return
+    if (!id) {
+      setIsLoading(false)
+      return
+    }
+
     void getApplication(id)
-      .then((application) => setAnalysis(application?.analysis))
-      .catch(() => setAnalysis(undefined))
+      .then((application) => {
+        if (application) {
+          setAnalysis(application.analysis)
+          setStatus(application.status)
+        } else if (!state?.analysis) {
+          setAnalysis(undefined)
+        }
+      })
+      .catch(() => {
+        if (!state?.analysis) setAnalysis(undefined)
+      })
       .finally(() => setIsLoading(false))
-  }, [analysis, id])
+  }, [id, state?.analysis])
+
+  async function handleStatusChange(event: ChangeEvent<HTMLSelectElement>) {
+    if (!id) return
+
+    const previousStatus = status
+    const nextStatus = event.target.value as ApplicationStatus
+    setStatus(nextStatus)
+    setStatusMessage('')
+    setStatusError('')
+    setIsSavingStatus(true)
+
+    try {
+      await updateApplicationStatus(id, nextStatus)
+      setStatusMessage('Status saved.')
+    } catch {
+      setStatus(previousStatus)
+      setStatusError('Status could not be saved. Please try again.')
+    } finally {
+      setIsSavingStatus(false)
+    }
+  }
 
   if (isLoading) {
     return <section className="empty-state"><p>Loading analysis…</p></section>
@@ -61,6 +102,27 @@ function AnalysisResultPage() {
           </div>
           <p className="score-summary">{analysis.scoreSummary}</p>
           <p className="score-description">{analysis.scoreDescription}</p>
+
+          <div className="status-control">
+            <label htmlFor="application-status">Application status</label>
+            <select
+              id="application-status"
+              value={status}
+              disabled={isSavingStatus}
+              onChange={handleStatusChange}
+            >
+              {applicationStatuses.map((applicationStatus) => (
+                <option key={applicationStatus} value={applicationStatus}>
+                  {applicationStatus}
+                </option>
+              ))}
+            </select>
+            {isSavingStatus && <p className="status-feedback" role="status">Saving…</p>}
+            {!isSavingStatus && statusMessage && (
+              <p className="status-feedback status-save-success" role="status">{statusMessage}</p>
+            )}
+            {statusError && <p className="status-feedback status-save-error" role="alert">{statusError}</p>}
+          </div>
         </aside>
 
         <div className="analysis-content">

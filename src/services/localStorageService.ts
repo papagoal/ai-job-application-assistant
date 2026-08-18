@@ -1,4 +1,4 @@
-import type { SavedApplication } from '../types/application'
+import type { ApplicationStatus, SavedApplication } from '../types/application'
 import type { JobAnalysis } from '../types/jobAnalysis'
 import type { JobDescriptionInput } from '../types/jobApplication'
 import type { Profile } from '../types/profile'
@@ -57,4 +57,20 @@ export function saveApplication(
   )
 
   return application
+}
+
+export function updateApplicationStatus(
+  id: string,
+  status: ApplicationStatus,
+): void {
+  const applications = getApplications()
+  const applicationIndex = applications.findIndex((application) => application.id === id)
+
+  if (applicationIndex === -1) throw new Error('Application not found.')
+
+  applications[applicationIndex] = {
+    ...applications[applicationIndex],
+    status,
+  }
+  localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(applications))
 }

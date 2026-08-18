@@ -136,7 +136,8 @@ h1 {
 .page-description {
   max-width: 620px;
   margin: 12px 0 0;
-  color: var(--color-muted);
+  color: #475467;
+  font-weight: 500;
   line-height: 1.6;
 }
 

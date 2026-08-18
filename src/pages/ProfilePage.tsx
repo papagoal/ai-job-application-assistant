@@ -153,7 +153,7 @@ function ProfilePage() {
         <div className="form-actions">
           {isSaved && (
             <p className="save-message" role="status">
-              Profile saved on this device.
+              Profile saved.
             </p>
           )}
           {saveError && <p className="submission-error" role="alert">{saveError}</p>}

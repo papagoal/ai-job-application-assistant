@@ -140,6 +140,26 @@ h1 {
   flex-shrink: 0;
 }
 
+.dashboard-export {
+  display: grid;
+  flex-shrink: 0;
+  justify-items: end;
+  gap: 8px;
+}
+
+.dashboard-export-button {
+  cursor: pointer;
+}
+
+.dashboard-export p {
+  max-width: 280px;
+  margin: 0;
+  color: #b42318;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: right;
+}
+
 .application-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1095,6 +1115,15 @@ h1 {
     align-items: flex-start;
     flex-direction: column;
     gap: 20px;
+  }
+
+  .dashboard-export {
+    width: 100%;
+    justify-items: start;
+  }
+
+  .dashboard-export p {
+    text-align: left;
   }
 
   .analysis-heading-actions {

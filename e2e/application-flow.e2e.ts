@@ -32,6 +32,12 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   })
 
   await page.goto('/profile')
+  await expect.poll(() => page.locator('body').evaluate(
+    (body) => window.getComputedStyle(body).backgroundImage,
+  )).toContain('radial-gradient')
+  await expect.poll(() => page.locator('.page-description').evaluate(
+    (description) => window.getComputedStyle(description).color,
+  )).toBe('rgb(71, 84, 103)')
   await page.getByLabel('Full name').fill('Test Candidate')
   await page.getByLabel('Email').fill('candidate@example.com')
   await page.getByLabel(/Phone/).fill('+1 416 555 0123')
@@ -85,6 +91,9 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await expect.poll(() => page.evaluate(() => document.body.dataset.printInvoked))
     .toBe('true')
   await page.emulateMedia({ media: 'print' })
+  await expect.poll(() => page.locator('body').evaluate(
+    (body) => window.getComputedStyle(body).backgroundImage,
+  )).toBe('none')
   await expect(page.locator('.tailored-resume-panel')).toBeVisible()
   await expect(
     page.locator('.tailored-resume-document').getByRole('heading', {

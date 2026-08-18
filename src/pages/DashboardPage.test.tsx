@@ -1,0 +1,108 @@
+// @vitest-environment happy-dom
+
+import { cleanup, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
+import { mockJobAnalysis } from '../mocks/jobAnalysis'
+import { getApplications } from '../services/persistenceService'
+import type { SavedApplication } from '../types/application'
+import DashboardPage from './DashboardPage'
+
+vi.mock('../services/persistenceService', () => ({
+  getApplications: vi.fn(),
+}))
+
+const mockedGetApplications = vi.mocked(getApplications)
+
+const applications: SavedApplication[] = [
+  {
+    id: 'northstar-frontend',
+    companyName: 'Northstar Labs',
+    jobTitle: 'Frontend Developer',
+    matchScore: 82,
+    status: 'Draft',
+    createdAt: 'Aug 15, 2026',
+    analysis: mockJobAnalysis,
+    jobDescription: 'React role',
+    resumeText: 'React resume',
+    notes: '',
+  },
+  {
+    id: 'acme-react',
+    companyName: 'Acme Studio',
+    jobTitle: 'React Developer',
+    matchScore: 74,
+    status: 'Applied',
+    createdAt: 'Aug 12, 2026',
+    analysis: mockJobAnalysis,
+    jobDescription: 'React role',
+    resumeText: 'React resume',
+    notes: '',
+  },
+  {
+    id: 'pixelworks-ui',
+    companyName: 'Pixelworks',
+    jobTitle: 'UI Engineer',
+    matchScore: 91,
+    status: 'Interview',
+    createdAt: 'Aug 8, 2026',
+    analysis: mockJobAnalysis,
+    jobDescription: 'UI role',
+    resumeText: 'UI resume',
+    notes: '',
+  },
+]
+
+function renderPage() {
+  render(
+    <MemoryRouter>
+      <DashboardPage />
+    </MemoryRouter>,
+  )
+}
+
+beforeEach(() => {
+  mockedGetApplications.mockResolvedValue(applications)
+})
+
+afterEach(() => {
+  cleanup()
+  vi.clearAllMocks()
+})
+
+describe('DashboardPage', () => {
+  it('searches and filters saved applications', async () => {
+    const user = userEvent.setup()
+    renderPage()
+    await screen.findByText('Northstar Labs')
+
+    await user.type(screen.getByLabelText('Search applications'), 'Acme')
+
+    expect(screen.getByText('Acme Studio')).toBeTruthy()
+    expect(screen.queryByText('Northstar Labs')).toBeNull()
+    expect(screen.queryByText('Pixelworks')).toBeNull()
+
+    await user.click(screen.getByRole('button', { name: 'Clear' }))
+    await user.click(screen.getByRole('button', { name: 'Applied' }))
+
+    expect(screen.getByText('Acme Studio')).toBeTruthy()
+    expect(screen.queryByText('Northstar Labs')).toBeNull()
+    expect(screen.queryByText('Pixelworks')).toBeNull()
+  })
+
+  it('sorts applications by highest match score', async () => {
+    const user = userEvent.setup()
+    renderPage()
+    await screen.findByText('Northstar Labs')
+
+    await user.selectOptions(screen.getByLabelText('Sort by'), 'highest-match')
+
+    const cards = screen.getAllByRole('article')
+    expect(cards.map((card) => card.querySelector('.company-name')?.textContent)).toEqual([
+      'Pixelworks',
+      'Northstar Labs',
+      'Acme Studio',
+    ])
+  })
+})

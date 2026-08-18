@@ -1,5 +1,5 @@
 import { Link, useLocation, useParams } from 'react-router-dom'
-import { mockJobAnalysis } from '../mocks/jobAnalysis'
+import { getApplication } from '../services/localStorageService'
 import type { JobAnalysis } from '../types/jobAnalysis'
 
 interface AnalysisLocationState {
@@ -10,7 +10,18 @@ function AnalysisResultPage() {
   const { id } = useParams()
   const location = useLocation()
   const state = location.state as AnalysisLocationState | null
-  const analysis = state?.analysis ?? mockJobAnalysis
+  const savedApplication = id ? getApplication(id) : undefined
+  const analysis = state?.analysis ?? savedApplication?.analysis
+
+  if (!analysis) {
+    return (
+      <section className="empty-state">
+        <h1>Analysis not found</h1>
+        <p>This application may have been removed or saved in another browser.</p>
+        <Link className="primary-action" to="/">Back to Dashboard</Link>
+      </section>
+    )
+  }
 
   return (
     <section className="analysis-page">

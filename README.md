@@ -1,32 +1,42 @@
-# React + TypeScript + Vite
+# AI Job Application Assistant
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A React application that compares a job description with a resume, produces an AI match analysis, and tracks saved applications.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Candidate profile and reusable resume
+- Job-to-resume match analysis
+- Matching and missing skills
+- Resume suggestions and cover-letter draft
+- Saved application dashboard
+- Local browser persistence for profiles and applications
+- Mock and DeepSeek AI providers
 
-## React Compiler
+## Local development
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+cp .env.example .env.local
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+The default `AI_PROVIDER=mock` mode works without an external AI key.
+
+## DeepSeek setup
+
+To use live AI analysis, configure server environment variables:
+
+```dotenv
+AI_PROVIDER=deepseek
+DEEPSEEK_API_KEY=your-key
+DEEPSEEK_MODEL=deepseek-v4-flash
+```
+
+Keep `DEEPSEEK_API_KEY` server-side. Variables prefixed with `VITE_` are bundled into the browser and must not contain secrets.
+
+## Verification
+
+```bash
+npm run build
+npm run lint
+```

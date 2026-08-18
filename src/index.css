@@ -991,6 +991,81 @@ h1 {
   margin-bottom: 0;
 }
 
+.print-cover-letter-heading {
+  display: none;
+}
+
+@media print {
+  @page {
+    margin: 0.75in;
+  }
+
+  :root,
+  body {
+    min-width: 0;
+    color: #111827;
+    background: #ffffff;
+  }
+
+  .app-header,
+  .analysis-heading,
+  .delete-error,
+  .analysis-score-card,
+  .analysis-content > .analysis-panel:not(.cover-letter-panel),
+  .cover-letter-actions,
+  .cover-letter-editor {
+    display: none !important;
+  }
+
+  .page-content {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .analysis-layout,
+  .analysis-content {
+    display: block;
+  }
+
+  .cover-letter-panel {
+    border: 0;
+    padding: 0;
+  }
+
+  .cover-letter-panel .analysis-panel-heading {
+    display: none;
+  }
+
+  .print-cover-letter-heading {
+    display: block;
+    margin-bottom: 32px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #d0d5dd;
+  }
+
+  .print-cover-letter-heading p {
+    margin: 0;
+    color: #475467;
+    font-size: 10pt;
+  }
+
+  .print-cover-letter-heading h1 {
+    margin: 8px 0;
+    color: #111827;
+    font-size: 22pt;
+  }
+
+  .cover-letter-preview {
+    border: 0;
+    padding: 0;
+    color: #111827;
+    background: transparent;
+    font-size: 11pt;
+    line-height: 1.65;
+  }
+}
+
 @media (max-width: 720px) {
   .header-content {
     width: min(100% - 28px, 1120px);

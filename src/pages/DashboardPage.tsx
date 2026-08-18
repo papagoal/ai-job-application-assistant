@@ -1,9 +1,20 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ApplicationCard from '../components/ApplicationCard'
-import { getApplications } from '../services/localStorageService'
+import { getApplications } from '../services/persistenceService'
+import type { SavedApplication } from '../types/application'
 
 function DashboardPage() {
-  const applications = getApplications()
+  const [applications, setApplications] = useState<SavedApplication[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+
+  useEffect(() => {
+    void getApplications()
+      .then(setApplications)
+      .catch(() => setLoadError('Applications could not be loaded. Please try again.'))
+      .finally(() => setIsLoading(false))
+  }, [])
 
   return (
     <section>
@@ -17,7 +28,11 @@ function DashboardPage() {
         </div>
       </div>
 
-      {applications.length > 0 ? (
+      {isLoading ? (
+        <div className="empty-state"><p>Loading applications…</p></div>
+      ) : loadError ? (
+        <div className="empty-state"><h2>Unable to load applications</h2><p>{loadError}</p></div>
+      ) : applications.length > 0 ? (
         <div className="application-grid">
           {applications.map((application) => (
             <ApplicationCard key={application.id} application={application} />

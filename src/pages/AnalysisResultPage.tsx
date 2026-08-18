@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import { getApplication } from '../services/localStorageService'
+import { getApplication } from '../services/persistenceService'
 import type { JobAnalysis } from '../types/jobAnalysis'
 
 interface AnalysisLocationState {
@@ -10,8 +11,20 @@ function AnalysisResultPage() {
   const { id } = useParams()
   const location = useLocation()
   const state = location.state as AnalysisLocationState | null
-  const savedApplication = id ? getApplication(id) : undefined
-  const analysis = state?.analysis ?? savedApplication?.analysis
+  const [analysis, setAnalysis] = useState<JobAnalysis | undefined>(state?.analysis)
+  const [isLoading, setIsLoading] = useState(!state?.analysis)
+
+  useEffect(() => {
+    if (analysis || !id) return
+    void getApplication(id)
+      .then((application) => setAnalysis(application?.analysis))
+      .catch(() => setAnalysis(undefined))
+      .finally(() => setIsLoading(false))
+  }, [analysis, id])
+
+  if (isLoading) {
+    return <section className="empty-state"><p>Loading analysis…</p></section>
+  }
 
   if (!analysis) {
     return (

@@ -1,5 +1,5 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { getProfile, saveProfile } from '../services/localStorageService'
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { getProfile, saveProfile } from '../services/persistenceService'
 import type { Profile } from '../types/profile'
 
 const initialProfile: Profile = {
@@ -12,9 +12,19 @@ const initialProfile: Profile = {
 type ProfileErrors = Partial<Record<keyof Profile, string>>
 
 function ProfilePage() {
-  const [profile, setProfile] = useState(() => getProfile() ?? initialProfile)
+  const [profile, setProfile] = useState(initialProfile)
   const [errors, setErrors] = useState<ProfileErrors>({})
   const [isSaved, setIsSaved] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
+
+  useEffect(() => {
+    void getProfile()
+      .then((savedProfile) => {
+        if (savedProfile) setProfile(savedProfile)
+      })
+      .catch(() => setSaveError('Your saved profile could not be loaded.'))
+  }, [])
 
   function handleChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const field = event.target.name as keyof Profile
@@ -25,9 +35,10 @@ function ProfilePage() {
     }))
     setErrors((currentErrors) => ({ ...currentErrors, [field]: undefined }))
     setIsSaved(false)
+    setSaveError('')
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const nextErrors: ProfileErrors = {}
@@ -39,8 +50,16 @@ function ProfilePage() {
     setErrors(nextErrors)
 
     if (Object.keys(nextErrors).length === 0) {
-      saveProfile(profile)
-      setIsSaved(true)
+      setIsSaving(true)
+      setSaveError('')
+      try {
+        await saveProfile(profile)
+        setIsSaved(true)
+      } catch {
+        setSaveError('Your profile could not be saved. Please try again.')
+      } finally {
+        setIsSaving(false)
+      }
     }
   }
 
@@ -134,10 +153,13 @@ function ProfilePage() {
         <div className="form-actions">
           {isSaved && (
             <p className="save-message" role="status">
-              Profile saved on this device.
+              Profile saved.
             </p>
           )}
-          <button className="submit-button" type="submit">Save profile</button>
+          {saveError && <p className="submission-error" role="alert">{saveError}</p>}
+          <button className="submit-button" type="submit" disabled={isSaving}>
+            {isSaving ? 'Saving…' : 'Save profile'}
+          </button>
         </div>
       </form>
     </section>

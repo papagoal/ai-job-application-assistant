@@ -75,6 +75,22 @@ export function updateApplicationStatus(
   localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(applications))
 }
 
+export function updateApplicationCoverLetter(id: string, coverLetter: string): void {
+  const applications = getApplications()
+  const applicationIndex = applications.findIndex((application) => application.id === id)
+
+  if (applicationIndex === -1) throw new Error('Application not found.')
+
+  applications[applicationIndex] = {
+    ...applications[applicationIndex],
+    analysis: {
+      ...applications[applicationIndex].analysis,
+      coverLetter,
+    },
+  }
+  localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(applications))
+}
+
 export function deleteApplication(id: string): void {
   const applications = getApplications()
   const remainingApplications = applications.filter((application) => application.id !== id)

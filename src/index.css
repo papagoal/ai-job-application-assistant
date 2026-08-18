@@ -1257,8 +1257,8 @@ h1 {
     display: none !important;
   }
 
-  body[data-print-target='cover-letter'] .cover-letter-panel,
-  body[data-print-target='tailored-resume'] .tailored-resume-panel {
+  body[data-print-target='cover-letter'] .analysis-content > .cover-letter-panel,
+  body[data-print-target='tailored-resume'] .analysis-content > .tailored-resume-panel {
     display: block !important;
   }
 

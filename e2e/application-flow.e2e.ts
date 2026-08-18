@@ -73,6 +73,15 @@ test('completes the profile-to-application workflow', async ({ page }) => {
     .toBe('tailored-resume')
   await expect.poll(() => page.evaluate(() => document.body.dataset.printInvoked))
     .toBe('true')
+  await page.emulateMedia({ media: 'print' })
+  await expect(page.locator('.tailored-resume-panel')).toBeVisible()
+  await expect(
+    page.locator('.tailored-resume-document').getByRole('heading', {
+      name: 'PROFESSIONAL SUMMARY',
+    }),
+  ).toBeVisible()
+  await expect(page.locator('.cover-letter-panel')).toBeHidden()
+  await page.emulateMedia({ media: 'screen' })
 
   await page.getByRole('button', { name: 'Edit tailored resume' }).click()
   await page

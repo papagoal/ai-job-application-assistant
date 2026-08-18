@@ -2,12 +2,17 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ApplicationCard from '../components/ApplicationCard'
 import { getApplications } from '../services/persistenceService'
-import type { SavedApplication } from '../types/application'
+import type { ApplicationStatus, SavedApplication } from '../types/application'
+
+type StatusFilter = 'All' | ApplicationStatus
+
+const statusFilters: StatusFilter[] = ['All', 'Draft', 'Applied', 'Interview']
 
 function DashboardPage() {
   const [applications, setApplications] = useState<SavedApplication[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('All')
 
   useEffect(() => {
     void getApplications()
@@ -15,6 +20,10 @@ function DashboardPage() {
       .catch(() => setLoadError('Applications could not be loaded. Please try again.'))
       .finally(() => setIsLoading(false))
   }, [])
+
+  const filteredApplications = statusFilter === 'All'
+    ? applications
+    : applications.filter((application) => application.status === statusFilter)
 
   return (
     <section>
@@ -28,15 +37,43 @@ function DashboardPage() {
         </div>
       </div>
 
+      {!isLoading && !loadError && applications.length > 0 && (
+        <div className="status-filters" role="group" aria-label="Filter applications by status">
+          {statusFilters.map((filter) => (
+            <button
+              className="status-filter-button"
+              type="button"
+              key={filter}
+              aria-pressed={statusFilter === filter}
+              onClick={() => setStatusFilter(filter)}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
+      )}
+
       {isLoading ? (
         <div className="empty-state"><p>Loading applications…</p></div>
       ) : loadError ? (
         <div className="empty-state"><h2>Unable to load applications</h2><p>{loadError}</p></div>
-      ) : applications.length > 0 ? (
+      ) : filteredApplications.length > 0 ? (
         <div className="application-grid">
-          {applications.map((application) => (
+          {filteredApplications.map((application) => (
             <ApplicationCard key={application.id} application={application} />
           ))}
+        </div>
+      ) : applications.length > 0 ? (
+        <div className="empty-state">
+          <h2>No {statusFilter.toLowerCase()} applications</h2>
+          <p>Choose another status or show all saved applications.</p>
+          <button
+            className="secondary-action status-filter-reset"
+            type="button"
+            onClick={() => setStatusFilter('All')}
+          >
+            Show all applications
+          </button>
         </div>
       ) : (
         <div className="empty-state">

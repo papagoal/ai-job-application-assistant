@@ -146,6 +146,39 @@ h1 {
   gap: 20px;
 }
 
+.status-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -8px 0 24px;
+}
+
+.status-filter-button {
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: var(--color-muted);
+  background: var(--color-surface);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.status-filter-button:hover {
+  color: var(--color-text);
+  background: #f1f3f8;
+}
+
+.status-filter-button[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  color: #ffffff;
+  background: var(--color-primary);
+}
+
+.status-filter-reset {
+  cursor: pointer;
+}
+
 .empty-state {
   display: flex;
   min-height: 320px;

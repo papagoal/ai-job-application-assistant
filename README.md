@@ -11,6 +11,7 @@ A React application that compares a job description with a resume, produces an A
 - Editable saved cover-letter drafts
 - One-click copying for generated cover letters
 - Plain-text downloads for generated cover letters
+- Print-friendly cover letters with browser PDF saving
 - Saved application dashboard
 - Persistent application status tracking (Draft, Applied, and Interview)
 - Dashboard filtering by application status

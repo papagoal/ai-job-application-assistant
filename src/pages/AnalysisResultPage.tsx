@@ -152,6 +152,10 @@ function AnalysisResultPage() {
     }
   }
 
+  function handlePrintCoverLetter() {
+    window.print()
+  }
+
   function handleEditCoverLetter() {
     if (!analysis) return
 
@@ -315,7 +319,12 @@ function AnalysisResultPage() {
             </ol>
           </section>
 
-          <section className="analysis-panel">
+          <section className="analysis-panel cover-letter-panel">
+            <div className="print-cover-letter-heading">
+              <p>Cover letter</p>
+              <h1>{analysis.jobTitle}</h1>
+              <p>{analysis.companyName}</p>
+            </div>
             <div className="analysis-panel-heading">
               <div>
                 <p className="analysis-label">Cover letter</p>
@@ -345,6 +354,13 @@ function AnalysisResultPage() {
                     onClick={handleDownloadCoverLetter}
                   >
                     {isCoverLetterDownloaded ? 'Downloaded!' : 'Download cover letter'}
+                  </button>
+                  <button
+                    className="secondary-action cover-letter-action"
+                    type="button"
+                    onClick={handlePrintCoverLetter}
+                  >
+                    Print / Save as PDF
                   </button>
                 </div>
               )}

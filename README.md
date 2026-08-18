@@ -11,6 +11,7 @@ A React application that compares a job description with a resume, produces an A
 - Saved application dashboard
 - Local browser persistence for profiles and applications
 - Optional Supabase cloud persistence with per-user Row Level Security
+- Email account connection, Magic Link sign-in, and sign-out
 - Mock and DeepSeek AI providers
 
 ## Local development
@@ -29,8 +30,10 @@ Use `npm run dev` only when working on the frontend without the analysis API.
 
 1. Create a Supabase project.
 2. Run `supabase/migrations/202608180001_initial_schema.sql` in its SQL Editor.
-3. Enable anonymous sign-ins under Authentication settings.
-4. Add the project URL and publishable key to `.env.local`:
+3. Enable anonymous sign-ins and the Email provider under Authentication settings.
+4. Enable manual identity linking so a guest account can be connected to an email.
+5. Add `http://localhost:3000/account` and your deployed `/account` URL to the allowed redirect URLs.
+6. Add the project URL and publishable key to `.env.local`:
 
 ```dotenv
 VITE_SUPABASE_URL=https://your-project.supabase.co

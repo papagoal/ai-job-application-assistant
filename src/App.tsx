@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import AppLayout from './layouts/AppLayout'
+import AccountPage from './pages/AccountPage'
 import AnalysisResultPage from './pages/AnalysisResultPage'
 import DashboardPage from './pages/DashboardPage'
 import NewApplicationPage from './pages/NewApplicationPage'
@@ -12,6 +13,7 @@ function App() {
       <Route element={<AppLayout />}>
         <Route path="/" element={<DashboardPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/account" element={<AccountPage />} />
         <Route path="/applications/new" element={<NewApplicationPage />} />
         <Route path="/applications/:id" element={<AnalysisResultPage />} />
         <Route path="*" element={<NotFoundPage />} />

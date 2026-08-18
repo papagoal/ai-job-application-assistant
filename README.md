@@ -17,10 +17,12 @@ A React application that compares a job description with a resume, produces an A
 ```bash
 npm install
 cp .env.example .env.local
-npm run dev
+npx vercel dev
 ```
 
-The default `AI_PROVIDER=mock` mode works without an external AI key.
+Open the URL printed by Vercel CLI, normally `http://localhost:3000`. This runs both the Vite frontend and the `/api` functions. The default `AI_PROVIDER=mock` mode works without an external AI key.
+
+Use `npm run dev` only when working on the frontend without the analysis API.
 
 ## DeepSeek setup
 

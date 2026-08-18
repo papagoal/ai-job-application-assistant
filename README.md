@@ -12,6 +12,7 @@ A React application that compares a job description with a resume, produces an A
 - Persistent application status tracking (Draft, Applied, and Interview)
 - Dashboard filtering by application status
 - Dashboard search by company and job title
+- Dashboard sorting by creation order and match score
 - Confirmed deletion of saved applications
 - Local browser persistence for profiles and applications
 - Optional Supabase cloud persistence with per-user Row Level Security

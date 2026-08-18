@@ -152,9 +152,15 @@ h1 {
   margin: -8px 0 24px;
 }
 
+.dashboard-control-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
 .application-search {
   display: grid;
-  max-width: 520px;
+  width: min(520px, 100%);
   gap: 7px;
 }
 
@@ -195,6 +201,32 @@ h1 {
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
+}
+
+.application-sort {
+  display: grid;
+  flex: 0 0 190px;
+  gap: 7px;
+}
+
+.application-sort label {
+  color: var(--color-text);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.application-sort select {
+  width: 100%;
+  border: 1px solid #cdd3de;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.application-sort select:focus {
+  border-color: var(--color-primary);
+  outline: 3px solid rgba(49, 87, 213, 0.14);
 }
 
 .status-filters {
@@ -888,6 +920,16 @@ h1 {
   .analysis-heading-actions {
     width: 100%;
     flex-wrap: wrap;
+  }
+
+  .dashboard-control-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .application-sort {
+    width: 100%;
+    flex-basis: auto;
   }
 
   .application-grid {

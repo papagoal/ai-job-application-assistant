@@ -908,13 +908,18 @@ h1 {
 }
 
 .cover-letter-actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+  display: grid;
+  gap: 10px;
   margin: -8px 0 16px;
 }
 
-.copy-button {
+.cover-letter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cover-letter-action {
   cursor: pointer;
 }
 

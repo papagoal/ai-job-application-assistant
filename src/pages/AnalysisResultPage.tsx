@@ -14,6 +14,14 @@ interface AnalysisLocationState {
 
 const applicationStatuses: ApplicationStatus[] = ['Draft', 'Applied', 'Interview']
 
+function toFileNamePart(value: string) {
+  return value
+    .trim()
+    .replace(/[^\p{L}\p{N}]+/gu, '-')
+    .replace(/^-+|-+$/g, '')
+    || 'application'
+}
+
 function AnalysisResultPage() {
   const { id } = useParams()
   const location = useLocation()
@@ -29,6 +37,8 @@ function AnalysisResultPage() {
   const [deleteError, setDeleteError] = useState('')
   const [isCoverLetterCopied, setIsCoverLetterCopied] = useState(false)
   const [copyError, setCopyError] = useState('')
+  const [isCoverLetterDownloaded, setIsCoverLetterDownloaded] = useState(false)
+  const [downloadError, setDownloadError] = useState('')
 
   useEffect(() => {
     if (!id) {
@@ -104,6 +114,34 @@ function AnalysisResultPage() {
       setIsCoverLetterCopied(true)
     } catch {
       setCopyError('Cover letter could not be copied. Please select and copy it manually.')
+    }
+  }
+
+  function handleDownloadCoverLetter() {
+    if (!analysis) return
+
+    setDownloadError('')
+    setIsCoverLetterDownloaded(false)
+
+    try {
+      const fileName = [
+        toFileNamePart(analysis.companyName),
+        toFileNamePart(analysis.jobTitle),
+        'cover-letter.txt',
+      ].join('-')
+      const file = new Blob([analysis.coverLetter], { type: 'text/plain;charset=utf-8' })
+      const downloadUrl = URL.createObjectURL(file)
+      const downloadLink = document.createElement('a')
+
+      downloadLink.href = downloadUrl
+      downloadLink.download = fileName
+      document.body.append(downloadLink)
+      downloadLink.click()
+      downloadLink.remove()
+      URL.revokeObjectURL(downloadUrl)
+      setIsCoverLetterDownloaded(true)
+    } catch {
+      setDownloadError('Cover letter could not be downloaded. Please try again.')
     }
   }
 
@@ -232,14 +270,24 @@ function AnalysisResultPage() {
               </div>
             </div>
             <div className="cover-letter-actions">
-              <button
-                className="secondary-action copy-button"
-                type="button"
-                onClick={handleCopyCoverLetter}
-              >
-                {isCoverLetterCopied ? 'Copied!' : 'Copy cover letter'}
-              </button>
+              <div className="cover-letter-buttons">
+                <button
+                  className="secondary-action cover-letter-action"
+                  type="button"
+                  onClick={handleCopyCoverLetter}
+                >
+                  {isCoverLetterCopied ? 'Copied!' : 'Copy cover letter'}
+                </button>
+                <button
+                  className="secondary-action cover-letter-action"
+                  type="button"
+                  onClick={handleDownloadCoverLetter}
+                >
+                  {isCoverLetterDownloaded ? 'Downloaded!' : 'Download cover letter'}
+                </button>
+              </div>
               {copyError && <p className="copy-error" role="alert">{copyError}</p>}
+              {downloadError && <p className="copy-error" role="alert">{downloadError}</p>}
             </div>
             <div className="cover-letter-preview">
               <p>{analysis.coverLetter}</p>

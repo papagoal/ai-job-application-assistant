@@ -13,4 +13,5 @@ export interface SavedApplication extends ApplicationSummary {
   analysis: import('./jobAnalysis').JobAnalysis
   jobDescription: string
   resumeText: string
+  notes: string
 }

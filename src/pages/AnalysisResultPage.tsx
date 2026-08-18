@@ -4,6 +4,7 @@ import {
   deleteApplication,
   getApplication,
   updateApplicationCoverLetter,
+  updateApplicationNotes,
   updateApplicationStatus,
 } from '../services/persistenceService'
 import type { ApplicationStatus } from '../types/application'
@@ -51,6 +52,11 @@ function AnalysisResultPage() {
   const [isSavingCoverLetter, setIsSavingCoverLetter] = useState(false)
   const [coverLetterSaveMessage, setCoverLetterSaveMessage] = useState('')
   const [coverLetterSaveError, setCoverLetterSaveError] = useState('')
+  const [savedNotes, setSavedNotes] = useState('')
+  const [notesDraft, setNotesDraft] = useState('')
+  const [isSavingNotes, setIsSavingNotes] = useState(false)
+  const [notesSaveMessage, setNotesSaveMessage] = useState('')
+  const [notesSaveError, setNotesSaveError] = useState('')
 
   useEffect(() => {
     if (!id) {
@@ -64,6 +70,8 @@ function AnalysisResultPage() {
           setAnalysis(application.analysis)
           setCoverLetterDraft(application.analysis.coverLetter)
           setStatus(application.status)
+          setSavedNotes(application.notes ?? '')
+          setNotesDraft(application.notes ?? '')
         } else if (!state?.analysis) {
           setAnalysis(undefined)
         }
@@ -208,6 +216,26 @@ function AnalysisResultPage() {
     }
   }
 
+  async function handleSaveNotes() {
+    if (!id) return
+
+    const nextNotes = notesDraft.trim()
+    setNotesSaveMessage('')
+    setNotesSaveError('')
+    setIsSavingNotes(true)
+
+    try {
+      await updateApplicationNotes(id, nextNotes)
+      setSavedNotes(nextNotes)
+      setNotesDraft(nextNotes)
+      setNotesSaveMessage('Notes saved.')
+    } catch {
+      setNotesSaveError('Notes could not be saved. Please try again.')
+    } finally {
+      setIsSavingNotes(false)
+    }
+  }
+
   if (isLoading) {
     return <section className="empty-state"><p>Loading analysis…</p></section>
   }
@@ -323,6 +351,46 @@ function AnalysisResultPage() {
                 <li key={suggestion}>{suggestion}</li>
               ))}
             </ol>
+          </section>
+
+          <section className="analysis-panel">
+            <div className="analysis-panel-heading">
+              <div>
+                <p className="analysis-label">Application notes</p>
+                <h2>Private notes</h2>
+              </div>
+            </div>
+            <div className="notes-editor">
+              <label htmlFor="application-notes">Notes</label>
+              <textarea
+                id="application-notes"
+                value={notesDraft}
+                disabled={isSavingNotes}
+                rows={7}
+                placeholder="Add contacts, follow-ups, interview feedback, or next steps."
+                onChange={(event) => {
+                  setNotesDraft(event.target.value)
+                  setNotesSaveMessage('')
+                  setNotesSaveError('')
+                }}
+              />
+              <div className="notes-actions">
+                <button
+                  className="primary-action"
+                  type="button"
+                  disabled={isSavingNotes || notesDraft === savedNotes}
+                  onClick={handleSaveNotes}
+                >
+                  {isSavingNotes ? 'Saving…' : 'Save notes'}
+                </button>
+                {notesSaveMessage && (
+                  <p className="notes-success" role="status">{notesSaveMessage}</p>
+                )}
+                {notesSaveError && (
+                  <p className="notes-error" role="alert">{notesSaveError}</p>
+                )}
+              </div>
+            </div>
           </section>
 
           <section className="analysis-panel cover-letter-panel">

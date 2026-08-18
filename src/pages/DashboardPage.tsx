@@ -13,6 +13,7 @@ function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('All')
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     void getApplications()
@@ -21,9 +22,20 @@ function DashboardPage() {
       .finally(() => setIsLoading(false))
   }, [])
 
-  const filteredApplications = statusFilter === 'All'
-    ? applications
-    : applications.filter((application) => application.status === statusFilter)
+  const normalizedSearchQuery = searchQuery.trim().toLowerCase()
+  const filteredApplications = applications.filter((application) => {
+    const matchesStatus = statusFilter === 'All' || application.status === statusFilter
+    const matchesSearch = !normalizedSearchQuery
+      || application.companyName.toLowerCase().includes(normalizedSearchQuery)
+      || application.jobTitle.toLowerCase().includes(normalizedSearchQuery)
+
+    return matchesStatus && matchesSearch
+  })
+
+  function resetDashboardView() {
+    setSearchQuery('')
+    setStatusFilter('All')
+  }
 
   return (
     <section>
@@ -38,18 +50,38 @@ function DashboardPage() {
       </div>
 
       {!isLoading && !loadError && applications.length > 0 && (
-        <div className="status-filters" role="group" aria-label="Filter applications by status">
-          {statusFilters.map((filter) => (
-            <button
-              className="status-filter-button"
-              type="button"
-              key={filter}
-              aria-pressed={statusFilter === filter}
-              onClick={() => setStatusFilter(filter)}
-            >
-              {filter}
-            </button>
-          ))}
+        <div className="dashboard-controls">
+          <div className="application-search" role="search">
+            <label htmlFor="application-search">Search applications</label>
+            <div className="application-search-input">
+              <input
+                id="application-search"
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search company or job title"
+              />
+              {searchQuery && (
+                <button type="button" onClick={() => setSearchQuery('')}>
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="status-filters" role="group" aria-label="Filter applications by status">
+            {statusFilters.map((filter) => (
+              <button
+                className="status-filter-button"
+                type="button"
+                key={filter}
+                aria-pressed={statusFilter === filter}
+                onClick={() => setStatusFilter(filter)}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -65,14 +97,14 @@ function DashboardPage() {
         </div>
       ) : applications.length > 0 ? (
         <div className="empty-state">
-          <h2>No {statusFilter.toLowerCase()} applications</h2>
-          <p>Choose another status or show all saved applications.</p>
+          <h2>{normalizedSearchQuery ? 'No applications match your search' : `No ${statusFilter.toLowerCase()} applications`}</h2>
+          <p>Try another company, job title, or status.</p>
           <button
             className="secondary-action status-filter-reset"
             type="button"
-            onClick={() => setStatusFilter('All')}
+            onClick={resetDashboardView}
           >
-            Show all applications
+            Clear search and filters
           </button>
         </div>
       ) : (

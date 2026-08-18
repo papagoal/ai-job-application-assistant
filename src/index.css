@@ -146,11 +146,61 @@ h1 {
   gap: 20px;
 }
 
+.dashboard-controls {
+  display: grid;
+  gap: 18px;
+  margin: -8px 0 24px;
+}
+
+.application-search {
+  display: grid;
+  max-width: 520px;
+  gap: 7px;
+}
+
+.application-search label {
+  color: var(--color-text);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.application-search-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid #cdd3de;
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.application-search-input:focus-within {
+  border-color: var(--color-primary);
+  outline: 3px solid rgba(49, 87, 213, 0.14);
+}
+
+.application-search-input input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  padding: 11px 12px;
+  color: var(--color-text);
+  background: transparent;
+  outline: 0;
+}
+
+.application-search-input button {
+  border: 0;
+  padding: 8px 12px;
+  color: var(--color-primary);
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .status-filters {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: -8px 0 24px;
 }
 
 .status-filter-button {

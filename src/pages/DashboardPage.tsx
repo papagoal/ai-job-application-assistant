@@ -5,6 +5,7 @@ import { getApplications } from '../services/persistenceService'
 import type { ApplicationStatus, SavedApplication } from '../types/application'
 
 type StatusFilter = 'All' | ApplicationStatus
+type SortOrder = 'newest' | 'oldest' | 'highest-match' | 'lowest-match'
 
 const statusFilters: StatusFilter[] = ['All', 'Draft', 'Applied', 'Interview']
 
@@ -14,6 +15,7 @@ function DashboardPage() {
   const [loadError, setLoadError] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('All')
   const [searchQuery, setSearchQuery] = useState('')
+  const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
 
   useEffect(() => {
     void getApplications()
@@ -32,9 +34,21 @@ function DashboardPage() {
     return matchesStatus && matchesSearch
   })
 
+  const visibleApplications = (() => {
+    if (sortOrder === 'newest') return filteredApplications
+    if (sortOrder === 'oldest') return [...filteredApplications].reverse()
+
+    return [...filteredApplications].sort((firstApplication, secondApplication) => (
+      sortOrder === 'highest-match'
+        ? secondApplication.matchScore - firstApplication.matchScore
+        : firstApplication.matchScore - secondApplication.matchScore
+    ))
+  })()
+
   function resetDashboardView() {
     setSearchQuery('')
     setStatusFilter('All')
+    setSortOrder('newest')
   }
 
   return (
@@ -51,21 +65,37 @@ function DashboardPage() {
 
       {!isLoading && !loadError && applications.length > 0 && (
         <div className="dashboard-controls">
-          <div className="application-search" role="search">
-            <label htmlFor="application-search">Search applications</label>
-            <div className="application-search-input">
-              <input
-                id="application-search"
-                type="search"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search company or job title"
-              />
-              {searchQuery && (
-                <button type="button" onClick={() => setSearchQuery('')}>
-                  Clear
-                </button>
-              )}
+          <div className="dashboard-control-row">
+            <div className="application-search" role="search">
+              <label htmlFor="application-search">Search applications</label>
+              <div className="application-search-input">
+                <input
+                  id="application-search"
+                  type="search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search company or job title"
+                />
+                {searchQuery && (
+                  <button type="button" onClick={() => setSearchQuery('')}>
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="application-sort">
+              <label htmlFor="application-sort">Sort by</label>
+              <select
+                id="application-sort"
+                value={sortOrder}
+                onChange={(event) => setSortOrder(event.target.value as SortOrder)}
+              >
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="highest-match">Highest match</option>
+                <option value="lowest-match">Lowest match</option>
+              </select>
             </div>
           </div>
 
@@ -89,9 +119,9 @@ function DashboardPage() {
         <div className="empty-state"><p>Loading applications…</p></div>
       ) : loadError ? (
         <div className="empty-state"><h2>Unable to load applications</h2><p>{loadError}</p></div>
-      ) : filteredApplications.length > 0 ? (
+      ) : visibleApplications.length > 0 ? (
         <div className="application-grid">
-          {filteredApplications.map((application) => (
+          {visibleApplications.map((application) => (
             <ApplicationCard key={application.id} application={application} />
           ))}
         </div>

@@ -9,6 +9,13 @@ type SortOrder = 'newest' | 'oldest' | 'highest-match' | 'lowest-match'
 
 const statusFilters: StatusFilter[] = ['All', 'Draft', 'Applied', 'Interview']
 
+function encodeCsvCell(value: string | number) {
+  let cell = String(value)
+
+  if (/^[=+\-@\t\r]/.test(cell)) cell = `'${cell}`
+  return `"${cell.replace(/"/g, '""')}"`
+}
+
 function DashboardPage() {
   const [applications, setApplications] = useState<SavedApplication[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -16,6 +23,8 @@ function DashboardPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
+  const [isCsvExported, setIsCsvExported] = useState(false)
+  const [csvExportError, setCsvExportError] = useState('')
 
   useEffect(() => {
     void getApplications()
@@ -71,6 +80,40 @@ function DashboardPage() {
     setSortOrder('newest')
   }
 
+  function handleExportCsv() {
+    setIsCsvExported(false)
+    setCsvExportError('')
+
+    try {
+      const rows = [
+        ['Company', 'Job title', 'Status', 'Match score (%)', 'Created date'],
+        ...applications.map((application) => [
+          application.companyName,
+          application.jobTitle,
+          application.status,
+          application.matchScore,
+          application.createdAt,
+        ]),
+      ]
+      const csv = rows
+        .map((row) => row.map((cell) => encodeCsvCell(cell)).join(','))
+        .join('\r\n')
+      const file = new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' })
+      const downloadUrl = URL.createObjectURL(file)
+      const downloadLink = document.createElement('a')
+
+      downloadLink.href = downloadUrl
+      downloadLink.download = `job-applications-${new Date().toISOString().slice(0, 10)}.csv`
+      document.body.append(downloadLink)
+      downloadLink.click()
+      downloadLink.remove()
+      URL.revokeObjectURL(downloadUrl)
+      setIsCsvExported(true)
+    } catch {
+      setCsvExportError('Applications could not be exported. Please try again.')
+    }
+  }
+
   return (
     <section>
       <div className="page-heading">
@@ -81,6 +124,18 @@ function DashboardPage() {
             Review your job matches and continue working on saved applications.
           </p>
         </div>
+        {!isLoading && !loadError && applications.length > 0 && (
+          <div className="dashboard-export">
+            <button
+              className="secondary-action dashboard-export-button"
+              type="button"
+              onClick={handleExportCsv}
+            >
+              {isCsvExported ? 'Exported!' : 'Export CSV'}
+            </button>
+            {csvExportError && <p role="alert">{csvExportError}</p>}
+          </div>
+        )}
       </div>
 
       {!isLoading && !loadError && applications.length > 0 && (

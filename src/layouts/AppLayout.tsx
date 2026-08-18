@@ -14,6 +14,7 @@ function AppLayout() {
               Dashboard
             </NavLink>
             <NavLink to="/profile">Profile</NavLink>
+            <NavLink to="/account">Account</NavLink>
           </nav>
 
           <Link className="primary-action" to="/applications/new">

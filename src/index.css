@@ -450,6 +450,79 @@ h1 {
   background: var(--color-primary);
 }
 
+.account-loading {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.account-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.account-label {
+  margin: 0 0 5px;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.account-email {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.1rem;
+  font-weight: 750;
+}
+
+.account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.account-button {
+  cursor: pointer;
+}
+
+.account-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.account-warning,
+.account-feedback {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.account-warning {
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: #93370d;
+  background: #fffaeb;
+}
+
+.account-feedback {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.account-success {
+  color: #067647;
+  background: #ecfdf3;
+}
+
+.account-error {
+  color: #b42318;
+  background: #fef3f2;
+}
+
 .analysis-heading {
   display: flex;
   align-items: flex-end;

@@ -57,6 +57,10 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await expect(page.getByLabel('82 percent match')).toBeVisible()
   await expect(page.getByText('Strong overall match')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Job-targeted draft' })).toBeVisible()
+  const analysisPanelHeadings = await page
+    .locator('.analysis-content > .analysis-panel h2')
+    .allTextContents()
+  expect(analysisPanelHeadings.at(-1)).toBe('Private notes')
   const tailoredResume = page.locator('.tailored-resume-document')
   await expect(tailoredResume.getByRole('heading', { name: 'Test Candidate' })).toBeVisible()
   await expect(tailoredResume.getByText('candidate@example.com')).toBeVisible()

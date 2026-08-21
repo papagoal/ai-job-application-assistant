@@ -26,7 +26,7 @@ const applications: SavedApplication[] = [
     analysis: mockJobAnalysis,
     jobDescription: 'React role',
     resumeText: 'React resume',
-    notes: '',
+    notes: 'Follow up with Jane next Tuesday about the technical interview.',
   },
   {
     id: 'acme-react',
@@ -104,5 +104,26 @@ describe('DashboardPage', () => {
       'Northstar Labs',
       'Acme Studio',
     ])
+  })
+
+  it('switches between card and concise table views', async () => {
+    const user = userEvent.setup()
+    renderPage()
+    await screen.findByText('Northstar Labs')
+
+    await user.click(screen.getByRole('button', { name: 'Table view' }))
+
+    expect(screen.getByRole('region', { name: 'Application table' })).toBeTruthy()
+    expect(screen.getByRole('columnheader', { name: 'Company' })).toBeTruthy()
+    expect(screen.getByRole('columnheader', { name: 'Position' })).toBeTruthy()
+    expect(screen.getByRole('columnheader', { name: 'Status' })).toBeTruthy()
+    expect(screen.getByRole('columnheader', { name: 'Date' })).toBeTruthy()
+    expect(screen.getByRole('columnheader', { name: 'Notes' })).toBeTruthy()
+    expect(screen.getByText(/Follow up with Jane/)).toBeTruthy()
+    expect(screen.queryAllByRole('article')).toHaveLength(0)
+
+    await user.click(screen.getByRole('button', { name: 'Card view' }))
+    expect(screen.getAllByRole('article')).toHaveLength(3)
+    expect(screen.queryByRole('region', { name: 'Application table' })).toBeNull()
   })
 })

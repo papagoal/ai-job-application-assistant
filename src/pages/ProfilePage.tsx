@@ -66,10 +66,10 @@ function ProfilePage() {
   }
 
   return (
-    <section className="form-page">
-      <div className="page-heading">
+    <section className="form-page profile-page">
+      <div className="page-heading profile-page-heading">
         <div>
-          <p className="eyebrow">Candidate profile</p>
+          <p className="eyebrow">Career workspace</p>
           <h1>Profile and resume</h1>
           <p className="page-description">
             Add reusable information that will be compared with future job descriptions.
@@ -78,10 +78,13 @@ function ProfilePage() {
       </div>
 
       <form className="profile-form" onSubmit={handleSubmit} noValidate>
-        <div className="form-section">
-          <div className="form-section-heading">
-            <h2>Personal details</h2>
-            <p>Tell employers who you are and how they can contact you.</p>
+        <div className="form-section profile-section">
+          <div className="profile-section-header">
+            <span className="profile-section-index" aria-hidden="true">01</span>
+            <div className="form-section-heading">
+              <h2>Personal details</h2>
+              <p>Tell employers who you are and how they can contact you.</p>
+            </div>
           </div>
 
           <div className="form-grid">
@@ -140,7 +143,7 @@ function ProfilePage() {
             </div>
           </div>
 
-          <div className="form-field">
+          <div className="form-field profile-summary-field">
             <label htmlFor="professionalSummary">Professional summary</label>
             <textarea
               id="professionalSummary"
@@ -150,16 +153,25 @@ function ProfilePage() {
               onChange={handleChange}
               placeholder="Summarize your experience, strengths, and career goals."
             />
+            <div className="field-details">
+              <p className="field-hint">Keep this concise. AI will tailor it for each role.</p>
+              <p className="character-count" aria-live="polite">
+                {profile.professionalSummary.length.toLocaleString()} characters
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="form-section">
-          <div className="form-section-heading">
-            <h2>Resume</h2>
-            <p>Paste the plain-text version of your resume below.</p>
+        <div className="form-section profile-section profile-resume-section">
+          <div className="profile-section-header">
+            <span className="profile-section-index" aria-hidden="true">02</span>
+            <div className="form-section-heading">
+              <h2>Source resume</h2>
+              <p>Paste the plain-text version that AI should use as verified source material.</p>
+            </div>
           </div>
 
-          <div className="form-field">
+          <div className="form-field profile-resume-field">
             <label htmlFor="resumeText">Resume text</label>
             <textarea
               id="resumeText"
@@ -171,20 +183,27 @@ function ProfilePage() {
               aria-describedby={errors.resumeText ? 'resumeText-error' : 'resumeText-hint'}
               placeholder="Paste your work experience, education, skills, and projects."
             />
-            <p className="field-hint" id="resumeText-hint">
-              This resume will be prefilled when you create a new application.
-            </p>
+            <div className="field-details">
+              <p className="field-hint" id="resumeText-hint">
+                This resume will be prefilled when you create a new application.
+              </p>
+              <p className="character-count" aria-live="polite">
+                {profile.resumeText.length.toLocaleString()} characters
+              </p>
+            </div>
             {errors.resumeText && <p className="field-error" id="resumeText-error">{errors.resumeText}</p>}
           </div>
         </div>
 
-        <div className="form-actions">
-          {isSaved && (
-            <p className="save-message" role="status">
-              Profile saved.
-            </p>
-          )}
-          {saveError && <p className="submission-error" role="alert">{saveError}</p>}
+        <div className="form-actions profile-form-actions">
+          <div className="profile-save-feedback">
+            {isSaved && (
+              <p className="save-message" role="status">
+                Profile saved.
+              </p>
+            )}
+            {saveError && <p className="submission-error" role="alert">{saveError}</p>}
+          </div>
           <button className="submit-button" type="submit" disabled={isSaving}>
             {isSaving ? 'Saving…' : 'Save profile'}
           </button>

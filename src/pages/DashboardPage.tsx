@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ApplicationCard from '../components/ApplicationCard'
+import ApplicationTable from '../components/ApplicationTable'
 import { getApplications } from '../services/persistenceService'
 import type { ApplicationStatus, SavedApplication } from '../types/application'
 
 type StatusFilter = 'All' | ApplicationStatus
 type SortOrder = 'newest' | 'oldest' | 'highest-match' | 'lowest-match'
+type ViewMode = 'cards' | 'table'
 
 const statusFilters: StatusFilter[] = [
   'All',
@@ -32,6 +34,7 @@ function DashboardPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
   const [isCsvExported, setIsCsvExported] = useState(false)
   const [csvExportError, setCsvExportError] = useState('')
+  const [viewMode, setViewMode] = useState<ViewMode>('cards')
 
   useEffect(() => {
     void getApplications()
@@ -137,13 +140,25 @@ function DashboardPage() {
         </div>
         {!isLoading && !loadError && applications.length > 0 && (
           <div className="dashboard-export">
-            <button
-              className="secondary-action dashboard-export-button"
-              type="button"
-              onClick={handleExportCsv}
-            >
-              {isCsvExported ? 'Exported!' : 'Export CSV'}
-            </button>
+            <div className="dashboard-heading-actions">
+              <button
+                className="secondary-action dashboard-view-button"
+                type="button"
+                aria-pressed={viewMode === 'table'}
+                onClick={() => setViewMode((currentView) => (
+                  currentView === 'cards' ? 'table' : 'cards'
+                ))}
+              >
+                {viewMode === 'cards' ? 'Table view' : 'Card view'}
+              </button>
+              <button
+                className="secondary-action dashboard-export-button"
+                type="button"
+                onClick={handleExportCsv}
+              >
+                {isCsvExported ? 'Exported!' : 'Export CSV'}
+              </button>
+            </div>
             {csvExportError && <p role="alert">{csvExportError}</p>}
           </div>
         )}
@@ -217,11 +232,15 @@ function DashboardPage() {
       ) : loadError ? (
         <div className="empty-state"><h2>Unable to load applications</h2><p>{loadError}</p></div>
       ) : visibleApplications.length > 0 ? (
-        <div className="application-grid">
-          {visibleApplications.map((application) => (
-            <ApplicationCard key={application.id} application={application} />
-          ))}
-        </div>
+        viewMode === 'cards' ? (
+          <div className="application-grid">
+            {visibleApplications.map((application) => (
+              <ApplicationCard key={application.id} application={application} />
+            ))}
+          </div>
+        ) : (
+          <ApplicationTable applications={visibleApplications} />
+        )
       ) : applications.length > 0 ? (
         <div className="empty-state">
           <h2>{normalizedSearchQuery ? 'No applications match your search' : `No ${statusFilter.toLowerCase()} applications`}</h2>

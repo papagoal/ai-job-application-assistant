@@ -297,4 +297,13 @@ University degree with continued practical development in modern web engineering
   await expect(
     page.getByRole('link', { name: 'View Frontend Developer at Northstar Labs' }),
   ).toBeVisible()
+  await page.getByRole('button', { name: 'Table view' }).click()
+  await expect(page.getByRole('region', { name: 'Application table' })).toBeVisible()
+  await expect(page.getByRole('columnheader', { name: 'Company' })).toBeVisible()
+  await expect(page.getByRole('columnheader', { name: 'Notes' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Northstar Labs' })).toBeVisible()
+  await page.getByRole('button', { name: 'Card view' }).click()
+  await expect(
+    page.getByRole('link', { name: 'View Frontend Developer at Northstar Labs' }),
+  ).toBeVisible()
 })

@@ -1,4 +1,4 @@
-import type { JobAnalysis } from '../../../src/types/jobAnalysis'
+import type { InterviewPrep, JobAnalysis } from '../../../src/types/jobAnalysis'
 import type {
   ImportedJobDetails,
   JobDetailsExtractionInput,
@@ -10,4 +10,5 @@ export interface AIProvider {
   analyze(input: JobDescriptionInput): Promise<JobAnalysis>
   regenerateResume(input: ResumeRegenerationInput): Promise<string>
   extractJobDetails(input: JobDetailsExtractionInput): Promise<ImportedJobDetails>
+  generateInterviewPrep(input: JobDescriptionInput): Promise<InterviewPrep>
 }

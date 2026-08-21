@@ -71,4 +71,19 @@ Existing resume draft.`
       jobDescription: 'Public job listing text.',
     })
   })
+
+  it('returns localized interview preparation with exact question counts', async () => {
+    const result = await new MockAIProvider().generateInterviewPrep({
+      companyName: 'Northstar Labs',
+      jobTitle: 'Frontend Developer',
+      jobDescription: 'Build accessible React applications.',
+      resumeText: 'React and TypeScript experience.',
+      outputLanguage: 'zh',
+    })
+
+    expect(result.technicalQuestions).toHaveLength(5)
+    expect(result.behavioralQuestions).toHaveLength(3)
+    expect(result.technicalQuestions[0]?.question).toContain('技术问题')
+    expect(result.behavioralQuestions[0]?.answerFocus[0]).toContain('真实经历')
+  })
 })

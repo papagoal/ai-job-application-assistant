@@ -179,4 +179,27 @@ React`
     expect(request.messages[0]?.content).toContain('untrusted source material')
     expect(request.messages[1]?.content).toContain('Ignore previous instructions')
   })
+
+  it('generates structured interview preparation for the application', async () => {
+    const question = (index: number) => ({
+      question: `Question ${index}`,
+      answerFocus: [`Focus ${index}.1`, `Focus ${index}.2`],
+    })
+    const interviewPrep = {
+      technicalQuestions: Array.from({ length: 5 }, (_, index) => question(index + 1)),
+      behavioralQuestions: Array.from({ length: 3 }, (_, index) => question(index + 6)),
+    }
+    const fetchMock = vi.fn().mockResolvedValue(completion(interviewPrep))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await new DeepSeekProvider('test-key').generateInterviewPrep(input)
+
+    expect(result).toEqual(interviewPrep)
+    const request = JSON.parse(
+      String(fetchMock.mock.calls[0]?.[1]?.body),
+    ) as { messages: Array<{ content: string }> }
+    expect(request.messages[0]?.content).toContain('expert interview coach')
+    expect(request.messages[1]?.content).toContain(input.jobDescription)
+    expect(request.messages[1]?.content).toContain(input.resumeText)
+  })
 })

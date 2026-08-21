@@ -1,5 +1,5 @@
 import { mockJobAnalysis } from '../../../src/mocks/jobAnalysis.js'
-import type { JobAnalysis } from '../../../src/types/jobAnalysis'
+import type { InterviewPrep, JobAnalysis } from '../../../src/types/jobAnalysis'
 import type {
   ImportedJobDetails,
   JobDetailsExtractionInput,
@@ -57,5 +57,27 @@ export class MockAIProvider implements AIProvider {
       jobTitle: 'Frontend Developer',
       jobDescription: input.pageText.trim(),
     })
+  }
+
+  generateInterviewPrep(input: JobDescriptionInput): Promise<InterviewPrep> {
+    const isChinese = (input.outputLanguage ?? 'en') === 'zh'
+    const technicalQuestions = Array.from({ length: 5 }, (_, index) => ({
+      question: isChinese
+        ? `技术问题 ${index + 1}：你会如何处理 ${input.jobTitle} 职位的核心技术要求？`
+        : `Technical question ${index + 1}: How would you approach a core technical requirement of the ${input.jobTitle} role?`,
+      answerFocus: isChinese
+        ? ['结合简历中的真实项目说明方法。', '说明取舍、验证方式和最终结果。']
+        : ['Use a verified project from the resume to explain the approach.', 'Describe tradeoffs, validation, and the resulting outcome.'],
+    }))
+    const behavioralQuestions = Array.from({ length: 3 }, (_, index) => ({
+      question: isChinese
+        ? `行为问题 ${index + 1}：请介绍一次与团队解决问题的经历。`
+        : `Behavioral question ${index + 1}: Tell us about a time you solved a problem with a team.`,
+      answerFocus: isChinese
+        ? ['使用真实经历并说明个人责任。', '按情境、行动和结果组织回答。']
+        : ['Use a real example and clarify personal responsibility.', 'Structure the response around situation, action, and result.'],
+    }))
+
+    return Promise.resolve({ technicalQuestions, behavioralQuestions })
   }
 }

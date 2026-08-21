@@ -1,4 +1,8 @@
-import type { JobAnalysis } from '../types/jobAnalysis'
+import type {
+  InterviewPrep,
+  InterviewPrepQuestion,
+  JobAnalysis,
+} from '../types/jobAnalysis'
 import type {
   ImportedJobDetails,
   JobDescriptionInput,
@@ -7,6 +11,27 @@ import type {
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
+}
+
+function isInterviewQuestion(value: unknown): value is InterviewPrepQuestion {
+  if (typeof value !== 'object' || value === null) return false
+  const question = value as Record<string, unknown>
+  return isNonEmptyString(question.question)
+    && Array.isArray(question.answerFocus)
+    && question.answerFocus.length >= 2
+    && question.answerFocus.length <= 4
+    && question.answerFocus.every(isNonEmptyString)
+}
+
+function isInterviewPrep(value: unknown): value is InterviewPrep {
+  if (typeof value !== 'object' || value === null) return false
+  const prep = value as Record<string, unknown>
+  return Array.isArray(prep.technicalQuestions)
+    && prep.technicalQuestions.length === 5
+    && prep.technicalQuestions.every(isInterviewQuestion)
+    && Array.isArray(prep.behavioralQuestions)
+    && prep.behavioralQuestions.length === 3
+    && prep.behavioralQuestions.every(isInterviewQuestion)
 }
 
 export async function importJobDetails(url: string): Promise<ImportedJobDetails> {
@@ -36,6 +61,29 @@ export async function importJobDetails(url: string): Promise<ImportedJobDetails>
     jobTitle: result.jobTitle.trim(),
     jobDescription: result.jobDescription.trim(),
   }
+}
+
+export async function generateInterviewPrep(
+  input: JobDescriptionInput,
+): Promise<InterviewPrep> {
+  const response = await fetch('/api/generate-interview-prep', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(input),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Interview preparation failed with status ${response.status}.`)
+  }
+
+  const result = (await response.json()) as unknown
+  if (!isInterviewPrep(result)) {
+    throw new Error('Interview preparation returned an invalid result.')
+  }
+
+  return result
 }
 
 export async function analyzeJob(input: JobDescriptionInput): Promise<JobAnalysis> {

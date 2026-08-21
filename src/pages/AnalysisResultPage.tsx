@@ -1,17 +1,21 @@
 import { useEffect, useState, type ChangeEvent, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { regenerateTailoredResume } from '../services/jobAnalysisService'
+import {
+  generateInterviewPrep,
+  regenerateTailoredResume,
+} from '../services/jobAnalysisService'
 import {
   deleteApplication,
   getApplication,
   getProfile,
   updateApplicationCoverLetter,
+  updateApplicationInterviewPrep,
   updateApplicationNotes,
   updateApplicationStatus,
   updateApplicationTailoredResume,
 } from '../services/persistenceService'
 import type { ApplicationStatus } from '../types/application'
-import type { JobAnalysis } from '../types/jobAnalysis'
+import type { InterviewPrepQuestion, JobAnalysis } from '../types/jobAnalysis'
 
 interface AnalysisLocationState {
   analysis?: JobAnalysis
@@ -117,6 +121,31 @@ function TailoredResumeContent({ content }: { content: string }) {
   })
 }
 
+function InterviewQuestionGroup({
+  heading,
+  questions,
+}: {
+  heading: string
+  questions: InterviewPrepQuestion[]
+}) {
+  return (
+    <div className="interview-prep-group">
+      <h3>{heading}</h3>
+      <ol className="interview-question-list">
+        {questions.map((item) => (
+          <li key={item.question}>
+            <h4>{item.question}</h4>
+            <p>What to emphasize</p>
+            <ul>
+              {item.answerFocus.map((focus) => <li key={focus}>{focus}</li>)}
+            </ul>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
 function AnalysisResultPage() {
   const { id } = useParams()
   const location = useLocation()
@@ -157,6 +186,9 @@ function AnalysisResultPage() {
   const [isUndoingTailoredResume, setIsUndoingTailoredResume] = useState(false)
   const [tailoredResumeRegenerationError, setTailoredResumeRegenerationError] = useState('')
   const [previousTailoredResume, setPreviousTailoredResume] = useState<string | null>(null)
+  const [isGeneratingInterviewPrep, setIsGeneratingInterviewPrep] = useState(false)
+  const [interviewPrepMessage, setInterviewPrepMessage] = useState('')
+  const [interviewPrepError, setInterviewPrepError] = useState('')
   const [candidateName, setCandidateName] = useState('')
   const [candidateEmail, setCandidateEmail] = useState('')
   const [candidatePhone, setCandidatePhone] = useState('')
@@ -694,6 +726,41 @@ function AnalysisResultPage() {
     }
   }
 
+  async function handleGenerateInterviewPrep() {
+    if (
+      !id
+      || !analysis
+      || analysis.interviewPrep
+      || !sourceJobDescription
+      || !sourceResumeText
+    ) return
+
+    setInterviewPrepMessage('')
+    setInterviewPrepError('')
+    setIsGeneratingInterviewPrep(true)
+
+    try {
+      const interviewPrep = await generateInterviewPrep({
+        companyName: analysis.companyName,
+        jobTitle: analysis.jobTitle,
+        jobDescription: sourceJobDescription,
+        resumeText: sourceResumeText,
+        outputLanguage: analysis.outputLanguage ?? 'en',
+      })
+      await updateApplicationInterviewPrep(id, interviewPrep)
+      setAnalysis((currentAnalysis) => currentAnalysis
+        ? { ...currentAnalysis, interviewPrep }
+        : currentAnalysis)
+      setInterviewPrepMessage('Interview preparation generated and saved.')
+    } catch {
+      setInterviewPrepError(
+        'Interview preparation could not be generated. Your application was not changed.',
+      )
+    } finally {
+      setIsGeneratingInterviewPrep(false)
+    }
+  }
+
   async function handleSaveNotes() {
     if (!id) return
 
@@ -815,6 +882,59 @@ function AnalysisResultPage() {
                 </ul>
               </div>
             </div>
+          </section>
+
+          <section className="analysis-panel interview-prep-panel">
+            <div className="analysis-panel-heading">
+              <div>
+                <p className="analysis-label">Interview preparation</p>
+                <h2>Role-specific practice questions</h2>
+              </div>
+            </div>
+            {interviewPrepMessage && (
+              <p className="interview-prep-success" role="status">
+                {interviewPrepMessage}
+              </p>
+            )}
+            {interviewPrepError && (
+              <p className="interview-prep-error" role="alert">
+                {interviewPrepError}
+              </p>
+            )}
+            {analysis.interviewPrep ? (
+              <div className="interview-prep-groups">
+                <InterviewQuestionGroup
+                  heading="Technical questions"
+                  questions={analysis.interviewPrep.technicalQuestions}
+                />
+                <InterviewQuestionGroup
+                  heading="Behavioral questions"
+                  questions={analysis.interviewPrep.behavioralQuestions}
+                />
+              </div>
+            ) : (
+              <div className="interview-prep-empty">
+                <p>
+                  Generate questions and coaching points from this job description and
+                  your saved resume. Review each point before using it in an interview.
+                </p>
+                <button
+                  className="primary-action"
+                  type="button"
+                  disabled={
+                    isGeneratingInterviewPrep
+                    || !sourceJobDescription
+                    || !sourceResumeText
+                  }
+                  aria-busy={isGeneratingInterviewPrep}
+                  onClick={handleGenerateInterviewPrep}
+                >
+                  {isGeneratingInterviewPrep
+                    ? 'Generating interview prep…'
+                    : 'Generate interview prep'}
+                </button>
+              </div>
+            )}
           </section>
 
           <section className="analysis-panel">

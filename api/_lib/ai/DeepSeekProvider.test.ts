@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mockJobAnalysis } from '../../../src/mocks/jobAnalysis'
-import type { JobDescriptionInput } from '../../../src/types/jobApplication'
+import type {
+  JobDescriptionInput,
+  ResumeRegenerationInput,
+} from '../../../src/types/jobApplication'
 import { DeepSeekProvider } from './DeepSeekProvider'
 
 const input: JobDescriptionInput = {
@@ -11,7 +14,7 @@ const input: JobDescriptionInput = {
   outputLanguage: 'en',
 }
 
-function completion(analysis: typeof mockJobAnalysis) {
+function completion(analysis: unknown) {
   return new Response(JSON.stringify({
     choices: [{ message: { content: JSON.stringify(analysis) } }],
   }))
@@ -102,5 +105,56 @@ React`,
     await expect(new DeepSeekProvider('test-key').analyze(input)).rejects.toThrow(
       'DeepSeek returned a tailored resume without a professional summary.',
     )
+  })
+
+  it('regenerates only the tailored resume from the supplied application context', async () => {
+    const regeneratedResume = `PROFESSIONAL SUMMARY
+Frontend developer with targeted React and TypeScript experience for this role.
+
+SKILLS
+React, TypeScript`
+    const fetchMock = vi.fn().mockResolvedValue(completion({
+      tailoredResume: regeneratedResume,
+    }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const regenerationInput: ResumeRegenerationInput = {
+      ...input,
+      currentTailoredResume: mockJobAnalysis.tailoredResume ?? '',
+    }
+    const result = await new DeepSeekProvider('test-key').regenerateResume(
+      regenerationInput,
+    )
+
+    expect(result).toBe(regeneratedResume)
+    const request = JSON.parse(
+      String(fetchMock.mock.calls[0]?.[1]?.body),
+    ) as { messages: Array<{ content: string }> }
+    expect(request.messages[1]?.content).toContain('CURRENT TAILORED RESUME')
+    expect(request.messages[1]?.content).toContain(mockJobAnalysis.tailoredResume)
+  })
+
+  it('asks DeepSeek to correct a regenerated resume with an empty summary once', async () => {
+    const emptySummary = `PROFESSIONAL SUMMARY
+
+SKILLS
+React`
+    const correctedSummary = `PROFESSIONAL SUMMARY
+Frontend developer with role-specific React experience.
+
+SKILLS
+React`
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(completion({ tailoredResume: emptySummary }))
+      .mockResolvedValueOnce(completion({ tailoredResume: correctedSummary }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await new DeepSeekProvider('test-key').regenerateResume({
+      ...input,
+      currentTailoredResume: mockJobAnalysis.tailoredResume ?? '',
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(result).toBe(correctedSummary)
   })
 })

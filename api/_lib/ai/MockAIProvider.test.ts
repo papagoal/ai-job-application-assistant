@@ -41,4 +41,21 @@ Frontend Developer at Northstar Labs`,
     expect(result.tailoredResume).toContain('专业摘要')
     expect(result.coverLetter).toContain('尊敬的招聘经理')
   })
+
+  it('returns a refreshed tailored resume without returning a full analysis', async () => {
+    const currentTailoredResume = `PROFESSIONAL SUMMARY
+Existing resume draft.`
+    const result = await new MockAIProvider().regenerateResume({
+      companyName: 'Northstar Labs',
+      jobTitle: 'Frontend Developer',
+      jobDescription: 'Build accessible React applications.',
+      resumeText: 'React and TypeScript experience.',
+      currentTailoredResume,
+      outputLanguage: 'en',
+    })
+
+    expect(result).toContain('PROFESSIONAL SUMMARY')
+    expect(result).toContain('Frontend Developer role at Northstar Labs')
+    expect(result).not.toBe(currentTailoredResume)
+  })
 })

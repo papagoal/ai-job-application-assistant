@@ -7,3 +7,7 @@ export interface JobDescriptionInput {
   resumeText: string
   outputLanguage?: AIOutputLanguage
 }
+
+export interface ResumeRegenerationInput extends JobDescriptionInput {
+  currentTailoredResume: string
+}

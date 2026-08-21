@@ -88,3 +88,19 @@ export function parseJobAnalysis(content: string): JobAnalysis {
 
   return value as unknown as JobAnalysis
 }
+
+export function parseTailoredResume(content: string): string {
+  let value: unknown
+
+  try {
+    value = JSON.parse(content)
+  } catch {
+    throw new Error('DeepSeek returned invalid JSON.')
+  }
+
+  if (!isRecord(value) || !isNonEmptyString(value.tailoredResume)) {
+    throw new Error('DeepSeek returned an empty tailored resume.')
+  }
+
+  return value.tailoredResume.trim()
+}

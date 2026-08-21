@@ -11,7 +11,6 @@ const analysis = {
   suggestions: ['Highlight automated testing experience.'],
   coverLetter: 'Dear Hiring Manager, I am excited to apply.',
   tailoredResume: `PROFESSIONAL SUMMARY
-Frontend developer experienced with React and TypeScript.
 
 SKILLS
 - React
@@ -98,6 +97,11 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await expect(
     page.locator('.tailored-resume-document').getByRole('heading', {
       name: 'PROFESSIONAL SUMMARY',
+    }),
+  ).toBeVisible()
+  await expect(
+    page.locator('.tailored-resume-document').getByText('Frontend developer', {
+      exact: true,
     }),
   ).toBeVisible()
   await expect(page.locator('.cover-letter-panel')).toBeHidden()

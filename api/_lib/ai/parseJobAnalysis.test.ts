@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { mockJobAnalysis } from '../../../src/mocks/jobAnalysis'
-import { parseJobAnalysis } from './parseJobAnalysis'
+import { hasProfessionalSummary, parseJobAnalysis } from './parseJobAnalysis'
 
 describe('parseJobAnalysis', () => {
   it('parses a complete analysis response', () => {
@@ -57,5 +57,26 @@ describe('parseJobAnalysis', () => {
     expect(() => parseJobAnalysis(content)).toThrow(
       'DeepSeek returned an analysis with missing fields.',
     )
+  })
+})
+
+describe('hasProfessionalSummary', () => {
+  it('accepts a populated professional summary section', () => {
+    expect(hasProfessionalSummary(`PROFESSIONAL SUMMARY
+Frontend developer aligned with this role.
+
+SKILLS
+React`)).toBe(true)
+  })
+
+  it.each([
+    `PROFESSIONAL SUMMARY
+
+SKILLS
+React`,
+    `SKILLS
+React`,
+  ])('rejects a missing or empty professional summary', (tailoredResume) => {
+    expect(hasProfessionalSummary(tailoredResume)).toBe(false)
   })
 })

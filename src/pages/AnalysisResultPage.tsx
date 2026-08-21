@@ -11,7 +11,6 @@ import {
 } from '../services/persistenceService'
 import type { ApplicationStatus } from '../types/application'
 import type { JobAnalysis } from '../types/jobAnalysis'
-import { isSectionHeading, withProfessionalSummary } from '../utils/tailoredResume'
 
 interface AnalysisLocationState {
   analysis?: JobAnalysis
@@ -31,6 +30,14 @@ function toFileNamePart(value: string) {
     .replace(/[^\p{L}\p{N}]+/gu, '-')
     .replace(/^-+|-+$/g, '')
     || 'application'
+}
+
+function isSectionHeading(value: string) {
+  const heading = value.trim()
+  return heading.length > 0
+    && heading.length <= 60
+    && heading === heading.toUpperCase()
+    && /[A-Z]/.test(heading)
 }
 
 function TailoredResumeContent({ content }: { content: string }) {
@@ -100,7 +107,6 @@ function AnalysisResultPage() {
   const [candidateEmail, setCandidateEmail] = useState('')
   const [candidatePhone, setCandidatePhone] = useState('')
   const [candidateLocation, setCandidateLocation] = useState('')
-  const [candidateProfessionalSummary, setCandidateProfessionalSummary] = useState('')
   const [isProfileLoading, setIsProfileLoading] = useState(true)
   const [savedNotes, setSavedNotes] = useState('')
   const [notesDraft, setNotesDraft] = useState('')
@@ -140,7 +146,6 @@ function AnalysisResultPage() {
         setCandidateEmail(profile?.email.trim() ?? '')
         setCandidatePhone(profile?.phone.trim() ?? '')
         setCandidateLocation(profile?.location.trim() ?? '')
-        setCandidateProfessionalSummary(profile?.professionalSummary.trim() ?? '')
       })
       .catch(() => undefined)
       .finally(() => setIsProfileLoading(false))
@@ -645,12 +650,7 @@ function AnalysisResultPage() {
                           {candidateLocation && <span>{candidateLocation}</span>}
                         </div>
                       </header>
-                      <TailoredResumeContent
-                        content={withProfessionalSummary(
-                          analysis.tailoredResume,
-                          candidateProfessionalSummary,
-                        )}
-                      />
+                      <TailoredResumeContent content={analysis.tailoredResume} />
                     </article>
                   </div>
                 )}

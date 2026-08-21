@@ -215,7 +215,7 @@ function NewApplicationPage() {
             </div>
           </div>
 
-          <div className="form-grid">
+          <div className="form-grid ai-settings-grid">
             <div className="form-field">
               <label htmlFor="outputLanguage">AI output language</label>
               <select

@@ -122,6 +122,10 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await expect(page.getByLabel('Resume text')).toHaveValue(
     'React and TypeScript experience.',
   )
+  const languageSelectBox = await page.getByLabel('AI output language').boundingBox()
+  const modelSelectBox = await page.getByLabel('AI model').boundingBox()
+  expect(languageSelectBox?.y).toBe(modelSelectBox?.y)
+  expect(languageSelectBox?.height).toBe(modelSelectBox?.height)
   await page.getByLabel(/Job listing link/).fill(
     'https://jobs.example.com/frontend-developer',
   )

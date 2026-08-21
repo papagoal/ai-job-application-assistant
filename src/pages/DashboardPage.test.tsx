@@ -76,10 +76,12 @@ describe('DashboardPage', () => {
     const user = userEvent.setup()
     renderPage()
     await screen.findByText('Northstar Labs')
+    expect(screen.getByText('Showing 3 of 3')).toBeTruthy()
 
     await user.type(screen.getByLabelText('Search applications'), 'Acme')
 
     expect(screen.getByText('Acme Studio')).toBeTruthy()
+    expect(screen.getByText('Showing 1 of 3')).toBeTruthy()
     expect(screen.queryByText('Northstar Labs')).toBeNull()
     expect(screen.queryByText('Pixelworks')).toBeNull()
 

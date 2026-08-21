@@ -31,7 +31,12 @@ function ApplicationTable({ applications }: ApplicationTableProps) {
             return (
               <tr key={application.id}>
                 <td>
-                  <Link to={analysisUrl}>{application.companyName}</Link>
+                  <Link className="table-company-link" to={analysisUrl}>
+                    <span className="table-company-mark" aria-hidden="true">
+                      {application.companyName.trim().charAt(0).toUpperCase() || 'J'}
+                    </span>
+                    <span>{application.companyName}</span>
+                  </Link>
                 </td>
                 <td>
                   <Link to={analysisUrl}>{application.jobTitle}</Link>

@@ -41,6 +41,8 @@ describe('ProfilePage', () => {
       screen.getByLabelText('Resume text'),
       'React and TypeScript experience.',
     )
+    expect(screen.getByText('18 characters')).toBeTruthy()
+    expect(screen.getByText('32 characters')).toBeTruthy()
     await user.click(screen.getByRole('button', { name: 'Save profile' }))
 
     expect((await screen.findByRole('status')).textContent).toContain('Profile saved.')

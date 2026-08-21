@@ -836,9 +836,106 @@ h1 {
   max-width: 860px;
 }
 
+.profile-page {
+  max-width: 1040px;
+}
+
+.profile-page-heading {
+  margin-bottom: 28px;
+}
+
 .profile-form {
   display: grid;
-  gap: 20px;
+  gap: 22px;
+}
+
+.form-section.profile-section {
+  padding: 30px;
+  border-radius: 16px;
+}
+
+.profile-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.profile-section-index {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d4d4d8;
+  border-radius: 9px;
+  color: #52525b;
+  background: #fafafa;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.profile-section .form-grid {
+  gap: 18px;
+}
+
+.profile-page .form-field label {
+  font-size: 0.82rem;
+}
+
+.profile-page .form-field input,
+.profile-page .form-field textarea {
+  border-color: #d4d4d8;
+  border-radius: 9px;
+  background: #fafafa;
+}
+
+.profile-page .form-field input {
+  min-height: 46px;
+}
+
+.profile-page .form-field input:focus,
+.profile-page .form-field textarea:focus {
+  border-color: #71717a;
+  outline: 3px solid rgba(24, 24, 27, 0.08);
+  background: #ffffff;
+}
+
+.profile-summary-field textarea {
+  min-height: 126px;
+}
+
+.profile-resume-field textarea {
+  min-height: 440px;
+  line-height: 1.65;
+}
+
+.profile-form-actions {
+  position: sticky;
+  bottom: 16px;
+  z-index: 10;
+  min-height: 66px;
+  margin-top: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 8px 24px rgba(24, 24, 27, 0.12), 0 2px 6px rgba(24, 24, 27, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.profile-save-feedback {
+  min-width: 0;
+  margin-right: auto;
+}
+
+.profile-form-actions .submission-error {
+  text-align: left;
+}
+
+.profile-form-actions .submit-button {
+  min-width: 142px;
 }
 
 .form-section {
@@ -2255,6 +2352,34 @@ h1 {
 
   .form-section {
     padding: 20px;
+  }
+
+  .form-section.profile-section {
+    padding: 20px;
+  }
+
+  .profile-section-header {
+    gap: 11px;
+    padding-bottom: 18px;
+  }
+
+  .profile-resume-field textarea {
+    min-height: 360px;
+  }
+
+  .profile-page .field-details {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .profile-form-actions {
+    bottom: 8px;
+    padding: 12px;
+  }
+
+  .profile-save-feedback {
+    width: 100%;
   }
 
   .form-grid {

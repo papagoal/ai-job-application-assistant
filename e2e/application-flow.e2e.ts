@@ -28,6 +28,23 @@ SKILLS
 - TypeScript
 - Playwright`
 
+const interviewPrep = {
+  technicalQuestions: Array.from({ length: 5 }, (_, index) => ({
+    question: `How would you test an accessible React workflow ${index + 1}?`,
+    answerFocus: [
+      'Use the verified React and TypeScript experience.',
+      'Explain testing choices and measurable validation.',
+    ],
+  })),
+  behavioralQuestions: Array.from({ length: 3 }, (_, index) => ({
+    question: `Tell us about a collaborative delivery challenge ${index + 1}.`,
+    answerFocus: [
+      'Clarify personal responsibility in a real project.',
+      'Structure the example around situation, action, and result.',
+    ],
+  })),
+}
+
 test('completes the profile-to-application workflow', async ({ page }) => {
   await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
   await page.route('**/api/import-job', async (route) => {
@@ -65,6 +82,17 @@ test('completes the profile-to-application workflow', async ({ page }) => {
       outputLanguage: 'en',
     })
     await route.fulfill({ json: { tailoredResume: regeneratedResume } })
+  })
+  await page.route('**/api/generate-interview-prep', async (route) => {
+    expect(route.request().method()).toBe('POST')
+    expect(route.request().postDataJSON()).toEqual({
+      companyName: 'Northstar Labs',
+      jobTitle: 'Frontend Developer',
+      jobDescription: 'Build accessible React applications.',
+      resumeText: 'React and TypeScript experience.',
+      outputLanguage: 'en',
+    })
+    await route.fulfill({ json: interviewPrep })
   })
 
   await page.goto('/profile')
@@ -131,6 +159,19 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await expect(page.getByRole('status')).toHaveText('Previous resume restored.')
   await expect(tailoredResume.getByText(/Frontend developer experienced/)).toBeVisible()
 
+  const interviewPrepPanel = page.locator('.interview-prep-panel')
+  await interviewPrepPanel.getByRole('button', { name: 'Generate interview prep' }).click()
+  await expect(interviewPrepPanel.getByRole('status')).toHaveText(
+    'Interview preparation generated and saved.',
+  )
+  await expect(
+    interviewPrepPanel.getByRole('heading', { name: 'Technical questions' }),
+  ).toBeVisible()
+  await expect(interviewPrepPanel.locator('.interview-prep-group').first()
+    .locator('.interview-question-list > li')).toHaveCount(5)
+  await expect(interviewPrepPanel.getByText(/How would you test an accessible React/).first())
+    .toBeVisible()
+
   await page.evaluate(() => {
     window.print = () => document.body.setAttribute('data-print-invoked', 'true')
   })
@@ -183,7 +224,9 @@ SELECTED PROJECT
 EDUCATION
 University degree with continued practical development in modern web engineering.`)
   await page.getByRole('button', { name: 'Save tailored resume' }).click()
-  await expect(page.getByRole('status')).toHaveText('Tailored resume saved.')
+  await expect(tailoredResumePanel.getByRole('status')).toHaveText(
+    'Tailored resume saved.',
+  )
 
   await page.getByRole('button', { name: 'Copy as text' }).click()
   await expect(page.getByRole('button', { name: 'Copied!' })).toBeVisible()
@@ -205,6 +248,7 @@ University degree with continued practical development in modern web engineering
 
   await page.reload()
   await expect(page.getByText('Updated tailored resume')).toBeVisible()
+  await expect(page.getByText(/How would you test an accessible React/).first()).toBeVisible()
 
   await page.getByRole('link', { name: 'Back to Dashboard' }).click()
   await expect(page.getByRole('heading', { name: 'Your applications' })).toBeVisible()

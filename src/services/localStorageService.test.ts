@@ -10,6 +10,7 @@ import {
   saveApplication,
   saveProfile,
   updateApplicationCoverLetter,
+  updateApplicationInterviewPrep,
   updateApplicationNotes,
   updateApplicationStatus,
   updateApplicationTailoredResume,
@@ -32,6 +33,17 @@ const profile: Profile = {
   location: 'Toronto, ON',
   professionalSummary: 'Frontend developer',
   resumeText: input.resumeText,
+}
+
+const interviewPrep = {
+  technicalQuestions: Array.from({ length: 5 }, (_, index) => ({
+    question: `Technical question ${index + 1}`,
+    answerFocus: ['Use a verified example.', 'Explain the result.'],
+  })),
+  behavioralQuestions: Array.from({ length: 3 }, (_, index) => ({
+    question: `Behavioral question ${index + 1}`,
+    answerFocus: ['Clarify personal responsibility.', 'Use the STAR structure.'],
+  })),
 }
 
 class MemoryStorage implements Storage {
@@ -139,6 +151,16 @@ describe('application persistence', () => {
 
     expect(getApplication(APPLICATION_ID)?.analysis.tailoredResume).toBe(
       'Updated tailored resume',
+    )
+  })
+
+  it('saves generated interview preparation inside the analysis', () => {
+    createApplication()
+
+    updateApplicationInterviewPrep(APPLICATION_ID, interviewPrep)
+
+    expect(getApplication(APPLICATION_ID)?.analysis.interviewPrep).toEqual(
+      interviewPrep,
     )
   })
 

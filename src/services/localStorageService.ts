@@ -1,5 +1,5 @@
 import type { ApplicationStatus, SavedApplication } from '../types/application'
-import type { JobAnalysis } from '../types/jobAnalysis'
+import type { InterviewPrep, JobAnalysis } from '../types/jobAnalysis'
 import type { JobDescriptionInput } from '../types/jobApplication'
 import type { Profile } from '../types/profile'
 
@@ -116,6 +116,25 @@ export function updateApplicationTailoredResume(
     analysis: {
       ...applications[applicationIndex].analysis,
       tailoredResume,
+    },
+  }
+  localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(applications))
+}
+
+export function updateApplicationInterviewPrep(
+  id: string,
+  interviewPrep: InterviewPrep,
+): void {
+  const applications = getApplications()
+  const applicationIndex = applications.findIndex((application) => application.id === id)
+
+  if (applicationIndex === -1) throw new Error('Application not found.')
+
+  applications[applicationIndex] = {
+    ...applications[applicationIndex],
+    analysis: {
+      ...applications[applicationIndex].analysis,
+      interviewPrep,
     },
   }
   localStorage.setItem(APPLICATIONS_KEY, JSON.stringify(applications))

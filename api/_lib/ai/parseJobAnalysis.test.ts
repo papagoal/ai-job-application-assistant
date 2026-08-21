@@ -3,6 +3,7 @@ import { mockJobAnalysis } from '../../../src/mocks/jobAnalysis'
 import {
   hasProfessionalSummary,
   parseImportedJobDetails,
+  parseInterviewPrep,
   parseJobAnalysis,
   parseTailoredResume,
 } from './parseJobAnalysis'
@@ -137,5 +138,55 @@ describe('parseImportedJobDetails', () => {
       jobTitle: '',
       jobDescription: 'Build accessible React applications.',
     }))).toThrow('DeepSeek returned incomplete job details.')
+  })
+})
+
+describe('parseInterviewPrep', () => {
+  const question = (index: number) => ({
+    question: `Question ${index}`,
+    answerFocus: [`Focus ${index}.1`, `Focus ${index}.2`],
+  })
+  const validPrep = {
+    technicalQuestions: Array.from({ length: 5 }, (_, index) => question(index + 1)),
+    behavioralQuestions: Array.from(
+      { length: 3 },
+      (_, index) => question(index + 6),
+    ),
+  }
+
+  it('parses and trims complete interview preparation', () => {
+    const content = JSON.stringify({
+      ...validPrep,
+      technicalQuestions: [
+        { question: '  Trim me  ', answerFocus: ['  First  ', '  Second  '] },
+        ...validPrep.technicalQuestions.slice(1),
+      ],
+    })
+
+    const result = parseInterviewPrep(content)
+
+    expect(result.technicalQuestions).toHaveLength(5)
+    expect(result.behavioralQuestions).toHaveLength(3)
+    expect(result.technicalQuestions[0]).toEqual({
+      question: 'Trim me',
+      answerFocus: ['First', 'Second'],
+    })
+  })
+
+  it('rejects the wrong number of questions', () => {
+    expect(() => parseInterviewPrep(JSON.stringify({
+      ...validPrep,
+      technicalQuestions: validPrep.technicalQuestions.slice(0, 4),
+    }))).toThrow('DeepSeek returned invalid interview preparation.')
+  })
+
+  it('rejects duplicate questions and missing coaching points', () => {
+    expect(() => parseInterviewPrep(JSON.stringify({
+      technicalQuestions: Array.from({ length: 5 }, () => question(1)),
+      behavioralQuestions: [
+        { question: 'No focus', answerFocus: [] },
+        ...validPrep.behavioralQuestions.slice(1),
+      ],
+    }))).toThrow('DeepSeek returned invalid interview preparation.')
   })
 })

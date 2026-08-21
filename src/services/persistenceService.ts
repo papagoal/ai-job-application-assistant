@@ -1,6 +1,6 @@
 import type { User } from '@supabase/supabase-js'
 import type { ApplicationStatus, SavedApplication } from '../types/application'
-import type { JobAnalysis } from '../types/jobAnalysis'
+import type { InterviewPrep, JobAnalysis } from '../types/jobAnalysis'
 import type { JobDescriptionInput } from '../types/jobApplication'
 import type { Profile } from '../types/profile'
 import {
@@ -11,6 +11,7 @@ import {
   saveApplication as saveLocalApplication,
   saveProfile as saveLocalProfile,
   updateApplicationCoverLetter as updateLocalApplicationCoverLetter,
+  updateApplicationInterviewPrep as updateLocalApplicationInterviewPrep,
   updateApplicationNotes as updateLocalApplicationNotes,
   updateApplicationStatus as updateLocalApplicationStatus,
   updateApplicationTailoredResume as updateLocalApplicationTailoredResume,
@@ -288,6 +289,39 @@ export async function updateApplicationTailoredResume(
       analysis: {
         ...(application.analysis as JobAnalysis),
         tailoredResume,
+      },
+    })
+    .eq('id', id)
+    .select('id')
+    .maybeSingle()
+  if (error) throw error
+  if (!data) throw new Error('Application not found.')
+}
+
+export async function updateApplicationInterviewPrep(
+  id: string,
+  interviewPrep: InterviewPrep,
+): Promise<void> {
+  const user = await getReadyCloudUser()
+  if (!supabase || !user) {
+    updateLocalApplicationInterviewPrep(id, interviewPrep)
+    return
+  }
+
+  const { data: application, error: loadError } = await supabase
+    .from('applications')
+    .select('analysis')
+    .eq('id', id)
+    .maybeSingle()
+  if (loadError) throw loadError
+  if (!application) throw new Error('Application not found.')
+
+  const { data, error } = await supabase
+    .from('applications')
+    .update({
+      analysis: {
+        ...(application.analysis as JobAnalysis),
+        interviewPrep,
       },
     })
     .eq('id', id)

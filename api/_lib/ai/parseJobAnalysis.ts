@@ -1,4 +1,8 @@
-import type { JobAnalysis } from '../../../src/types/jobAnalysis'
+import type {
+  InterviewPrep,
+  InterviewPrepQuestion,
+  JobAnalysis,
+} from '../../../src/types/jobAnalysis'
 import type { ImportedJobDetails } from '../../../src/types/jobApplication'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -11,6 +15,24 @@ function isNonEmptyString(value: unknown): value is string {
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every(isNonEmptyString)
+}
+
+function isInterviewQuestion(value: unknown): value is InterviewPrepQuestion {
+  if (!isRecord(value)) return false
+  return isNonEmptyString(value.question)
+    && isStringArray(value.answerFocus)
+    && value.answerFocus.length >= 2
+    && value.answerFocus.length <= 4
+}
+
+function isQuestionArray(
+  value: unknown,
+  expectedLength: number,
+): value is InterviewPrepQuestion[] {
+  return Array.isArray(value)
+    && value.length === expectedLength
+    && value.every(isInterviewQuestion)
+    && new Set(value.map((item) => item.question.trim())).size === value.length
 }
 
 const chineseSectionHeadings = new Set([
@@ -128,5 +150,34 @@ export function parseImportedJobDetails(content: string): ImportedJobDetails {
     companyName: value.companyName.trim(),
     jobTitle: value.jobTitle.trim(),
     jobDescription: value.jobDescription.trim(),
+  }
+}
+
+export function parseInterviewPrep(content: string): InterviewPrep {
+  let value: unknown
+
+  try {
+    value = JSON.parse(content)
+  } catch {
+    throw new Error('DeepSeek returned invalid JSON.')
+  }
+
+  if (
+    !isRecord(value)
+    || !isQuestionArray(value.technicalQuestions, 5)
+    || !isQuestionArray(value.behavioralQuestions, 3)
+  ) {
+    throw new Error('DeepSeek returned invalid interview preparation.')
+  }
+
+  return {
+    technicalQuestions: value.technicalQuestions.map((item) => ({
+      question: item.question.trim(),
+      answerFocus: item.answerFocus.map((focus) => focus.trim()),
+    })),
+    behavioralQuestions: value.behavioralQuestions.map((item) => ({
+      question: item.question.trim(),
+      answerFocus: item.answerFocus.map((focus) => focus.trim()),
+    })),
   }
 }

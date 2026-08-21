@@ -102,7 +102,13 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await page.goto('/profile')
   await expect.poll(() => page.locator('body').evaluate(
     (body) => window.getComputedStyle(body).backgroundImage,
-  )).toContain('radial-gradient')
+  )).toBe('none')
+  await expect.poll(() => page.locator('body').evaluate(
+    (body) => window.getComputedStyle(body).backgroundColor,
+  )).toBe('rgb(247, 247, 245)')
+  await expect(page.getByRole('complementary', { name: 'Application sidebar' }))
+    .toBeVisible()
+  await expect(page.getByText('Local workspace')).toBeVisible()
   await expect.poll(() => page.locator('.page-description').evaluate(
     (description) => window.getComputedStyle(description).color,
   )).toBe('rgb(71, 84, 103)')

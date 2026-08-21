@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-08-21
+
+### Added
+
+- AI-generated interview preparation with likely questions, answer guidance, and questions for the interviewer.
+- Per-application DeepSeek V4 Flash and V4 Pro model selection reused across analysis, resume regeneration, and interview preparation.
+- A compact dashboard table view for company, role, private note, status, and creation date.
+- Google OAuth sign-in with identity linking for existing guest and Magic Link accounts.
+
+### Changed
+
+- Made analysis sections independently collapsible to keep long result pages easier to scan.
+- Aligned the AI language and model controls for a cleaner application form layout.
+
+### Security
+
+- Preserved the existing Supabase user ID and cloud data when connecting Google to an active account.
+- Kept the Google Client Secret in Supabase rather than exposing it to the browser or repository.
+
+### Quality
+
+- Expanded automated coverage to 106 unit, component, API, authentication, and end-to-end tests.
+- Verified the Google OAuth flow manually from account linking through sign-out and Google sign-in.
+
 ## [1.1.0] - 2026-08-21
 
 ### Added
@@ -62,5 +86,6 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Added GitHub Actions checks for tests, linting, end-to-end verification, and production builds.
 - Added Vercel SPA routing and serverless runtime compatibility.
 
+[1.2.0]: https://github.com/papagoal/ai-job-application-assistant/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/papagoal/ai-job-application-assistant/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/papagoal/ai-job-application-assistant/releases/tag/v1.0.0

@@ -128,10 +128,10 @@ function NewApplicationPage() {
   }
 
   return (
-    <section className="form-page">
-      <div className="page-heading">
+    <section className="form-page new-application-page">
+      <div className="page-heading new-application-heading">
         <div>
-          <p className="eyebrow">New application</p>
+          <p className="eyebrow">Analysis setup</p>
           <h1>Add application details</h1>
           <p className="page-description">
             Add the role and resume you want to compare in this analysis.
@@ -139,11 +139,14 @@ function NewApplicationPage() {
         </div>
       </div>
 
-      <form className="profile-form" onSubmit={handleSubmit} noValidate>
-        <div className="form-section">
-          <div className="form-section-heading">
-            <h2>Role details</h2>
-            <p>Enter the company and position exactly as they appear in the listing.</p>
+      <form className="profile-form new-application-form" onSubmit={handleSubmit} noValidate>
+        <div className="form-section new-application-section job-import-section">
+          <div className="form-step-header">
+            <span className="form-step-index" aria-hidden="true">01</span>
+            <div className="form-section-heading">
+              <h2>Import a job listing</h2>
+              <p>Start with a public URL, or skip this step and enter the role manually.</p>
+            </div>
           </div>
 
           <div className="job-import-block">
@@ -176,6 +179,16 @@ function NewApplicationPage() {
               </p>
               {importMessage && <p className="save-message" role="status">{importMessage}</p>}
               {importError && <p className="field-error" role="alert">{importError}</p>}
+            </div>
+          </div>
+        </div>
+
+        <div className="form-section new-application-section role-details-section">
+          <div className="form-step-header">
+            <span className="form-step-index" aria-hidden="true">02</span>
+            <div className="form-section-heading">
+              <h2>Role and analysis settings</h2>
+              <p>Review the role details and choose how AI should prepare the output.</p>
             </div>
           </div>
 
@@ -273,10 +286,13 @@ function NewApplicationPage() {
           </div>
         </div>
 
-        <div className="form-section">
-          <div className="form-section-heading">
-            <h2>Resume</h2>
-            <p>Paste the resume text that should be compared with this job.</p>
+        <div className="form-section new-application-section application-resume-section">
+          <div className="form-step-header">
+            <span className="form-step-index" aria-hidden="true">03</span>
+            <div className="form-section-heading">
+              <h2>Resume source</h2>
+              <p>Confirm the verified resume text that should be compared with this job.</p>
+            </div>
           </div>
 
           <div className="form-field">
@@ -305,7 +321,7 @@ function NewApplicationPage() {
           </div>
         </div>
 
-        <div className="form-actions form-actions-between">
+        <div className="form-actions form-actions-between new-application-actions">
           <Link className="secondary-action" to="/">Cancel</Link>
           <div className="form-submit-group">
             {submissionError && (

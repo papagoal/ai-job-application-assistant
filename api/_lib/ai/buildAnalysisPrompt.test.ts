@@ -18,11 +18,12 @@ describe('buildAnalysisPrompt', () => {
     )
     expect(prompt.system).toContain('The matchScore must be a number from 0 to 100.')
     expect(prompt.system).toContain(
-      'The tailoredResume must be a plain-text resume draft targeted to this job.',
+      'The tailoredResume must be a plain-text resume draft targeted to this job and designed to fill one A4 page.',
     )
     expect(prompt.system).toContain('Never invent or embellish skills')
-    expect(prompt.system).toContain('single Letter or A4 page')
-    expect(prompt.system).toContain('no longer than 450 words')
+    expect(prompt.system).toContain('designed to fill one A4 page')
+    expect(prompt.system).toContain('Aim for 350 to 450 words')
+    expect(prompt.system).toContain('shorter accurate resume instead of adding filler')
     expect(prompt.system).toContain('Begin with a non-empty PROFESSIONAL SUMMARY section')
     expect(prompt.system).toContain('two or three newly written, concise sentences')
     expect(prompt.system).toContain('Do not copy resume sentences verbatim')

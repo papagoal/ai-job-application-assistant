@@ -359,10 +359,10 @@ function AnalysisResultPage() {
         'tailored-resume.pdf',
       ].join('-')
       const { jsPDF } = await import('jspdf')
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' })
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' })
       const pageWidth = pdf.internal.pageSize.getWidth()
       const pageHeight = pdf.internal.pageSize.getHeight()
-      const margin = 42
+      const margin = 36
       const contentWidth = pageWidth - (margin * 2)
       const contentBottom = pageHeight - margin
       const blocks = toResumePdfBlocks(analysis.tailoredResume)
@@ -377,7 +377,7 @@ function AnalysisResultPage() {
       pdf.setTextColor('#101828')
       pdf.setFont('helvetica', 'bold')
       pdf.setFontSize(20)
-      pdf.text(candidateName, pageWidth / 2, 48, { align: 'center' })
+      pdf.text(candidateName, pageWidth / 2, 46, { align: 'center' })
       pdf.setFont('helvetica', 'normal')
       let contactFontSize = 8.5
       pdf.setFontSize(contactFontSize)
@@ -386,31 +386,31 @@ function AnalysisResultPage() {
         pdf.setFontSize(contactFontSize)
       }
       pdf.setTextColor('#475467')
-      pdf.text(contactDetails, pageWidth / 2, 65, { align: 'center' })
+      pdf.text(contactDetails, pageWidth / 2, 63, { align: 'center' })
       pdf.setDrawColor('#3157d5')
       pdf.setLineWidth(1.5)
-      pdf.line(margin, 76, pageWidth - margin, 76)
+      pdf.line(margin, 74, pageWidth - margin, 74)
 
       const measureBlocks = (fontSize: number) => blocks.reduce((height, block) => {
-        if (block.type === 'heading') return height + (fontSize * 2.35)
+        if (block.type === 'heading') return height + (fontSize * 2.5)
         const prefix = block.type === 'bullet' ? '- ' : ''
         pdf.setFont('times', 'normal')
         pdf.setFontSize(fontSize)
         const lines = pdf.splitTextToSize(`${prefix}${block.text}`, contentWidth) as string[]
         const blockSpacing = block.type === 'bullet' ? fontSize * 0.2 : fontSize * 0.55
-        return height + (lines.length * fontSize * 1.25) + blockSpacing
+        return height + (lines.length * fontSize * 1.3) + blockSpacing
       }, 0)
 
-      let bodyFontSize = 9.5
-      while (86 + measureBlocks(bodyFontSize) > contentBottom && bodyFontSize > 7.5) {
+      let bodyFontSize = 11
+      while (84 + measureBlocks(bodyFontSize) > contentBottom && bodyFontSize > 8.25) {
         bodyFontSize -= 0.25
       }
 
-      let y = 89
+      let y = 87
       for (const block of blocks) {
         if (block.type === 'heading') {
-          const headingFontSize = Math.max(7.5, bodyFontSize * 0.9)
-          y += bodyFontSize * 0.65
+          const headingFontSize = Math.max(8.5, bodyFontSize * 0.9)
+          y += bodyFontSize * 0.75
           pdf.setFont('helvetica', 'bold')
           pdf.setFontSize(headingFontSize)
           pdf.setTextColor('#2345a4')
@@ -428,11 +428,11 @@ function AnalysisResultPage() {
         pdf.setFontSize(bodyFontSize)
         pdf.setTextColor('#111827')
         const lines = pdf.splitTextToSize(`${prefix}${block.text}`, contentWidth) as string[]
-        pdf.text(lines, margin, y, { lineHeightFactor: 1.25 })
+        pdf.text(lines, margin, y, { lineHeightFactor: 1.3 })
         const blockSpacing = block.type === 'bullet'
           ? bodyFontSize * 0.2
           : bodyFontSize * 0.55
-        y += (lines.length * bodyFontSize * 1.25) + blockSpacing
+        y += (lines.length * bodyFontSize * 1.3) + blockSpacing
       }
 
       pdf.save(fileName)

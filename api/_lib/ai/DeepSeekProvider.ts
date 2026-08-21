@@ -55,6 +55,8 @@ export class DeepSeekProvider implements AIProvider {
   }
 
   async analyze(input: JobDescriptionInput): Promise<JobAnalysis> {
+    const outputLanguage = input.outputLanguage ?? 'en'
+    const summaryHeading = outputLanguage === 'zh' ? '专业摘要' : 'PROFESSIONAL SUMMARY'
     const prompt = buildAnalysisPrompt(input)
     const messages: DeepSeekMessage[] = [
       { role: 'system', content: prompt.system },
@@ -69,7 +71,7 @@ export class DeepSeekProvider implements AIProvider {
         { role: 'assistant', content },
         {
           role: 'user',
-          content: `Correct the complete JSON response. The tailoredResume must begin with a non-empty PROFESSIONAL SUMMARY containing two or three newly written sentences tailored to the supplied job description. Use only verified facts from the supplied resume and do not copy resume sentences verbatim. Return only the corrected complete JSON object.`,
+          content: `Correct the complete JSON response. The tailoredResume must begin with a non-empty ${summaryHeading} section containing two or three newly written sentences tailored to the supplied job description and written in the requested output language. Use only verified facts from the supplied resume and do not copy resume sentences verbatim. Return only the corrected complete JSON object.`,
         },
       ])
       analysis = parseJobAnalysis(content)
@@ -83,6 +85,7 @@ export class DeepSeekProvider implements AIProvider {
       ...analysis,
       companyName: input.companyName.trim(),
       jobTitle: input.jobTitle.trim(),
+      outputLanguage,
     }
   }
 }

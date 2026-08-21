@@ -18,11 +18,27 @@ describe('MockAIProvider', () => {
       ...mockJobAnalysis,
       companyName: 'Northstar Labs',
       jobTitle: 'Frontend Developer',
+      outputLanguage: 'en',
       tailoredResume: `PROFESSIONAL SUMMARY
 React and TypeScript experience.
 
 TARGET ROLE
 Frontend Developer at Northstar Labs`,
     })
+  })
+
+  it('returns Chinese mock content when requested', async () => {
+    const result = await new MockAIProvider().analyze({
+      companyName: 'Northstar Labs',
+      jobTitle: 'Frontend Developer',
+      jobDescription: 'Build accessible React applications.',
+      resumeText: 'React and TypeScript experience.',
+      outputLanguage: 'zh',
+    })
+
+    expect(result.outputLanguage).toBe('zh')
+    expect(result.scoreSummary).toBe('模拟匹配结果')
+    expect(result.tailoredResume).toContain('专业摘要')
+    expect(result.coverLetter).toContain('尊敬的招聘经理')
   })
 })

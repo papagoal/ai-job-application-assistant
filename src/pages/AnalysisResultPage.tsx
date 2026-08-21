@@ -29,6 +29,24 @@ const applicationStatuses: ApplicationStatus[] = [
   'Rejected',
 ]
 
+const chineseResumeSectionHeadings = new Set([
+  '专业摘要',
+  '核心技能',
+  '技术技能',
+  '专业技能',
+  '技能专长',
+  '工作经历',
+  '工作经验',
+  '职业经历',
+  '项目经历',
+  '项目经验',
+  '教育背景',
+  '教育经历',
+  '证书与认证',
+  '语言能力',
+  '目标职位',
+])
+
 function toFileNamePart(value: string) {
   return value
     .trim()
@@ -39,10 +57,11 @@ function toFileNamePart(value: string) {
 
 function isSectionHeading(value: string) {
   const heading = value.trim()
-  return heading.length > 0
+  return chineseResumeSectionHeadings.has(heading.replace(/:$/, ''))
+    || (heading.length > 0
     && heading.length <= 60
     && heading === heading.toUpperCase()
-    && /[A-Z]/.test(heading)
+    && /[A-Z]/.test(heading))
 }
 
 function toResumePdfBlocks(content: string): ResumePdfBlock[] {
@@ -362,6 +381,64 @@ function AnalysisResultPage() {
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' })
       const pageWidth = pdf.internal.pageSize.getWidth()
       const pageHeight = pdf.internal.pageSize.getHeight()
+
+      if (analysis.outputLanguage === 'zh') {
+        const resumeDocument = document.getElementById('tailored-resume-document')
+        if (!(resumeDocument instanceof HTMLElement)) {
+          throw new Error('Tailored resume preview is unavailable.')
+        }
+
+        const { default: html2canvas } = await import('html2canvas')
+        const renderDocument = resumeDocument.cloneNode(true) as HTMLElement
+        Object.assign(renderDocument.style, {
+          position: 'fixed',
+          top: '0',
+          left: '-10000px',
+          width: '760px',
+          maxWidth: 'none',
+          margin: '0',
+          padding: '36px',
+          boxSizing: 'border-box',
+          background: '#ffffff',
+        })
+        document.body.append(renderDocument)
+
+        try {
+          const canvas = await html2canvas(renderDocument, {
+            backgroundColor: '#ffffff',
+            logging: false,
+            scale: 2,
+          })
+          const margin = 18
+          const availableWidth = pageWidth - (margin * 2)
+          const availableHeight = pageHeight - (margin * 2)
+          const imageScale = Math.min(
+            availableWidth / canvas.width,
+            availableHeight / canvas.height,
+          )
+          const imageWidth = canvas.width * imageScale
+          const imageHeight = canvas.height * imageScale
+
+          pdf.setProperties({
+            title: `${candidateName} - ${analysis.jobTitle}`,
+            subject: `Tailored resume for ${analysis.jobTitle} at ${analysis.companyName}`,
+          })
+          pdf.addImage(
+            canvas.toDataURL('image/png'),
+            'PNG',
+            (pageWidth - imageWidth) / 2,
+            margin,
+            imageWidth,
+            imageHeight,
+          )
+          pdf.save(fileName)
+          setIsTailoredResumeDownloaded(true)
+          return
+        } finally {
+          renderDocument.remove()
+        }
+      }
+
       const margin = 40
       const contentWidth = pageWidth - (margin * 2)
       const contentBottom = pageHeight - margin
@@ -786,7 +863,10 @@ function AnalysisResultPage() {
                   </div>
                 ) : (
                   <div className="tailored-resume-preview">
-                    <article className="tailored-resume-document">
+                    <article
+                      className="tailored-resume-document"
+                      id="tailored-resume-document"
+                    >
                       <header className="tailored-resume-document-header">
                         <h1>{candidateName || 'Complete your profile'}</h1>
                         <div className="tailored-resume-contact-details">

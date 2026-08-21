@@ -1,3 +1,5 @@
+import type { AIOutputLanguage } from './jobApplication'
+
 export interface JobAnalysis {
   companyName: string
   jobTitle: string
@@ -9,4 +11,5 @@ export interface JobAnalysis {
   suggestions: string[]
   coverLetter: string
   tailoredResume?: string
+  outputLanguage?: AIOutputLanguage
 }

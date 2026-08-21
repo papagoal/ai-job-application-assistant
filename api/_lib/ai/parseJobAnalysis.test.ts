@@ -79,4 +79,12 @@ React`,
   ])('rejects a missing or empty professional summary', (tailoredResume) => {
     expect(hasProfessionalSummary(tailoredResume)).toBe(false)
   })
+
+  it('accepts a non-empty Chinese professional summary', () => {
+    expect(hasProfessionalSummary(`专业摘要
+具备 React 与 TypeScript 项目经验。
+
+技术技能
+React`)).toBe(true)
+  })
 })

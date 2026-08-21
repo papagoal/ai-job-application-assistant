@@ -7,6 +7,10 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
 }
 
+function isOutputLanguage(value: unknown) {
+  return value === undefined || value === 'en' || value === 'zh'
+}
+
 function isJobDescriptionInput(value: unknown): value is JobDescriptionInput {
   if (typeof value !== 'object' || value === null) return false
 
@@ -16,7 +20,8 @@ function isJobDescriptionInput(value: unknown): value is JobDescriptionInput {
     isNonEmptyString(input.companyName) &&
     isNonEmptyString(input.jobTitle) &&
     isNonEmptyString(input.jobDescription) &&
-    isNonEmptyString(input.resumeText)
+    isNonEmptyString(input.resumeText) &&
+    isOutputLanguage(input.outputLanguage)
   )
 }
 

@@ -9,6 +9,7 @@ const initialJobDescription: JobDescriptionInput = {
   jobTitle: '',
   jobDescription: '',
   resumeText: '',
+  outputLanguage: 'en',
 }
 
 type JobDescriptionErrors = Partial<Record<keyof JobDescriptionInput, string>>
@@ -30,7 +31,9 @@ function NewApplicationPage() {
       .catch(() => undefined)
   }, [])
 
-  function handleChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+  function handleChange(
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) {
     const field = event.target.name as keyof JobDescriptionInput
 
     setJob((currentJob) => ({
@@ -129,6 +132,22 @@ function NewApplicationPage() {
                 <p className="field-error" id="jobTitle-error">{errors.jobTitle}</p>
               )}
             </div>
+          </div>
+
+          <div className="form-field">
+            <label htmlFor="outputLanguage">AI output language</label>
+            <select
+              id="outputLanguage"
+              name="outputLanguage"
+              value={job.outputLanguage ?? 'en'}
+              onChange={handleChange}
+            >
+              <option value="en">English</option>
+              <option value="zh">中文</option>
+            </select>
+            <p className="field-hint">
+              Controls the language used for the analysis, tailored resume, and cover letter.
+            </p>
           </div>
 
           <div className="form-field">

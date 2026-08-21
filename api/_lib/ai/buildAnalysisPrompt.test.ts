@@ -7,6 +7,7 @@ const input: JobDescriptionInput = {
   jobTitle: 'Frontend Developer',
   jobDescription: 'Build accessible React applications.',
   resumeText: 'React and TypeScript experience.',
+  outputLanguage: 'en',
 }
 
 describe('buildAnalysisPrompt', () => {
@@ -28,7 +29,8 @@ describe('buildAnalysisPrompt', () => {
     expect(prompt.system).toContain('two or three newly written, concise sentences')
     expect(prompt.system).toContain('Do not copy resume sentences verbatim')
     expect(prompt.system).toContain('Do not include a candidate name, email address')
-    expect(prompt.system).toContain('uppercase section headings')
+    expect(prompt.system).toContain('uppercase English section headings')
+    expect(prompt.system).toContain('Write all generated content in English.')
     expect(prompt.user).toContain(`COMPANY:\n${input.companyName}`)
     expect(prompt.user).toContain(`JOB TITLE:\n${input.jobTitle}`)
     expect(prompt.user).toContain(`JOB DESCRIPTION:\n${input.jobDescription}`)
@@ -44,5 +46,14 @@ describe('buildAnalysisPrompt', () => {
 
     expect(prompt.user).toContain(untrustedText)
     expect(prompt.system).not.toContain(untrustedText)
+  })
+
+  it('requests Simplified Chinese content while keeping JSON keys in English', () => {
+    const prompt = buildAnalysisPrompt({ ...input, outputLanguage: 'zh' })
+
+    expect(prompt.system).toContain('in Simplified Chinese')
+    expect(prompt.system).toContain('The JSON property names must remain in English')
+    expect(prompt.system).toContain('专业摘要')
+    expect(prompt.system).toContain('technology names')
   })
 })

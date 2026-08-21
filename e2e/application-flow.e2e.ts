@@ -84,7 +84,7 @@ test('completes the profile-to-application workflow', async ({ page }) => {
     window.print = () => document.body.setAttribute('data-print-invoked', 'true')
   })
   await page.locator('.tailored-resume-panel')
-    .getByRole('button', { name: 'Print / Save as PDF' })
+    .getByRole('button', { name: 'Print', exact: true })
     .click()
   await expect.poll(() => page.evaluate(() => document.body.dataset.printTarget))
     .toBe('tailored-resume')
@@ -109,21 +109,26 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await page.getByRole('button', { name: 'Edit tailored resume' }).click()
   await page
     .getByLabel('Tailored resume draft')
-    .fill('TEST CANDIDATE\nFrontend Developer\n\nUpdated tailored resume')
+    .fill(`PROFESSIONAL SUMMARY
+Updated tailored resume for testing.
+
+SKILLS
+- React
+- TypeScript`)
   await page.getByRole('button', { name: 'Save tailored resume' }).click()
   await expect(page.getByRole('status')).toHaveText('Tailored resume saved.')
 
-  await page.getByRole('button', { name: 'Copy tailored resume' }).click()
+  await page.getByRole('button', { name: 'Copy as text' }).click()
   await expect(page.getByRole('button', { name: 'Copied!' })).toBeVisible()
   await expect
     .poll(() => page.evaluate(() => navigator.clipboard.readText()))
     .toContain('Updated tailored resume')
 
   const downloadPromise = page.waitForEvent('download')
-  await page.getByRole('button', { name: 'Download tailored resume' }).click()
+  await page.getByRole('button', { name: 'Download PDF' }).click()
   const download = await downloadPromise
   expect(download.suggestedFilename()).toBe(
-    'Northstar-Labs-Frontend-Developer-tailored-resume.txt',
+    'Northstar-Labs-Frontend-Developer-tailored-resume.pdf',
   )
 
   await page.reload()

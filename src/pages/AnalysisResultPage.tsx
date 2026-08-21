@@ -16,6 +16,11 @@ interface AnalysisLocationState {
   analysis?: JobAnalysis
 }
 
+interface ResumePdfBlock {
+  type: 'heading' | 'paragraph' | 'bullet'
+  text: string
+}
+
 const applicationStatuses: ApplicationStatus[] = [
   'Draft',
   'Applied',
@@ -38,6 +43,28 @@ function isSectionHeading(value: string) {
     && heading.length <= 60
     && heading === heading.toUpperCase()
     && /[A-Z]/.test(heading)
+}
+
+function toResumePdfBlocks(content: string): ResumePdfBlock[] {
+  return content.trim().split(/\n\s*\n/).flatMap((block) => {
+    const lines = block.split('\n').map((line) => line.trim()).filter(Boolean)
+    const blocks: ResumePdfBlock[] = []
+
+    if (lines.length > 0 && isSectionHeading(lines[0])) {
+      blocks.push({ type: 'heading', text: lines.shift() ?? '' })
+    }
+
+    if (lines.length > 0 && lines.every((line) => /^[-*•]\s+/.test(line))) {
+      blocks.push(...lines.map((line) => ({
+        type: 'bullet' as const,
+        text: line.replace(/^[-*•]\s+/, ''),
+      })))
+    } else if (lines.length > 0) {
+      blocks.push({ type: 'paragraph', text: lines.join(' ') })
+    }
+
+    return blocks
+  })
 }
 
 function TailoredResumeContent({ content }: { content: string }) {
@@ -95,6 +122,7 @@ function AnalysisResultPage() {
   const [isTailoredResumeCopied, setIsTailoredResumeCopied] = useState(false)
   const [tailoredResumeCopyError, setTailoredResumeCopyError] = useState('')
   const [isTailoredResumeDownloaded, setIsTailoredResumeDownloaded] = useState(false)
+  const [isDownloadingTailoredResume, setIsDownloadingTailoredResume] = useState(false)
   const [tailoredResumeDownloadError, setTailoredResumeDownloadError] = useState('')
   const [isEditingTailoredResume, setIsEditingTailoredResume] = useState(false)
   const [tailoredResumeDraft, setTailoredResumeDraft] = useState(
@@ -317,35 +345,104 @@ function AnalysisResultPage() {
     }
   }
 
-  function handleDownloadTailoredResume() {
-    if (!analysis?.tailoredResume) return
+  async function handleDownloadTailoredResume() {
+    if (!analysis?.tailoredResume || !candidateName || !candidateEmail) return
 
     setTailoredResumeDownloadError('')
     setIsTailoredResumeDownloaded(false)
+    setIsDownloadingTailoredResume(true)
 
     try {
       const fileName = [
         toFileNamePart(analysis.companyName),
         toFileNamePart(analysis.jobTitle),
-        'tailored-resume.txt',
+        'tailored-resume.pdf',
       ].join('-')
-      const file = new Blob([analysis.tailoredResume], {
-        type: 'text/plain;charset=utf-8',
-      })
-      const downloadUrl = URL.createObjectURL(file)
-      const downloadLink = document.createElement('a')
+      const { jsPDF } = await import('jspdf')
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'letter' })
+      const pageWidth = pdf.internal.pageSize.getWidth()
+      const pageHeight = pdf.internal.pageSize.getHeight()
+      const margin = 42
+      const contentWidth = pageWidth - (margin * 2)
+      const contentBottom = pageHeight - margin
+      const blocks = toResumePdfBlocks(analysis.tailoredResume)
+      const contactDetails = [candidateEmail, candidatePhone, candidateLocation]
+        .filter(Boolean)
+        .join('  |  ')
 
-      downloadLink.href = downloadUrl
-      downloadLink.download = fileName
-      document.body.append(downloadLink)
-      downloadLink.click()
-      downloadLink.remove()
-      URL.revokeObjectURL(downloadUrl)
+      pdf.setProperties({
+        title: `${candidateName} - ${analysis.jobTitle}`,
+        subject: `Tailored resume for ${analysis.jobTitle} at ${analysis.companyName}`,
+      })
+      pdf.setTextColor('#101828')
+      pdf.setFont('helvetica', 'bold')
+      pdf.setFontSize(20)
+      pdf.text(candidateName, pageWidth / 2, 48, { align: 'center' })
+      pdf.setFont('helvetica', 'normal')
+      let contactFontSize = 8.5
+      pdf.setFontSize(contactFontSize)
+      while (pdf.getTextWidth(contactDetails) > contentWidth && contactFontSize > 7) {
+        contactFontSize -= 0.25
+        pdf.setFontSize(contactFontSize)
+      }
+      pdf.setTextColor('#475467')
+      pdf.text(contactDetails, pageWidth / 2, 65, { align: 'center' })
+      pdf.setDrawColor('#3157d5')
+      pdf.setLineWidth(1.5)
+      pdf.line(margin, 76, pageWidth - margin, 76)
+
+      const measureBlocks = (fontSize: number) => blocks.reduce((height, block) => {
+        if (block.type === 'heading') return height + (fontSize * 2.35)
+        const prefix = block.type === 'bullet' ? '- ' : ''
+        pdf.setFont('times', 'normal')
+        pdf.setFontSize(fontSize)
+        const lines = pdf.splitTextToSize(`${prefix}${block.text}`, contentWidth) as string[]
+        const blockSpacing = block.type === 'bullet' ? fontSize * 0.2 : fontSize * 0.55
+        return height + (lines.length * fontSize * 1.25) + blockSpacing
+      }, 0)
+
+      let bodyFontSize = 9.5
+      while (86 + measureBlocks(bodyFontSize) > contentBottom && bodyFontSize > 7.5) {
+        bodyFontSize -= 0.25
+      }
+
+      let y = 89
+      for (const block of blocks) {
+        if (block.type === 'heading') {
+          const headingFontSize = Math.max(7.5, bodyFontSize * 0.9)
+          y += bodyFontSize * 0.65
+          pdf.setFont('helvetica', 'bold')
+          pdf.setFontSize(headingFontSize)
+          pdf.setTextColor('#2345a4')
+          pdf.text(block.text, margin, y)
+          y += headingFontSize * 0.55
+          pdf.setDrawColor('#d0d5dd')
+          pdf.setLineWidth(0.5)
+          pdf.line(margin, y, pageWidth - margin, y)
+          y += headingFontSize * 0.85
+          continue
+        }
+
+        const prefix = block.type === 'bullet' ? '- ' : ''
+        pdf.setFont('times', 'normal')
+        pdf.setFontSize(bodyFontSize)
+        pdf.setTextColor('#111827')
+        const lines = pdf.splitTextToSize(`${prefix}${block.text}`, contentWidth) as string[]
+        pdf.text(lines, margin, y, { lineHeightFactor: 1.25 })
+        const blockSpacing = block.type === 'bullet'
+          ? bodyFontSize * 0.2
+          : bodyFontSize * 0.55
+        y += (lines.length * bodyFontSize * 1.25) + blockSpacing
+      }
+
+      pdf.save(fileName)
       setIsTailoredResumeDownloaded(true)
     } catch {
       setTailoredResumeDownloadError(
-        'Tailored resume could not be downloaded. Please try again.',
+        'Tailored resume PDF could not be downloaded. Please try again.',
       )
+    } finally {
+      setIsDownloadingTailoredResume(false)
     }
   }
 
@@ -558,16 +655,24 @@ function AnalysisResultPage() {
                         type="button"
                         onClick={handleCopyTailoredResume}
                       >
-                        {isTailoredResumeCopied ? 'Copied!' : 'Copy tailored resume'}
+                        {isTailoredResumeCopied ? 'Copied!' : 'Copy as text'}
                       </button>
                       <button
                         className="secondary-action tailored-resume-action"
                         type="button"
+                        disabled={
+                          isDownloadingTailoredResume
+                          || isProfileLoading
+                          || !candidateName
+                          || !candidateEmail
+                        }
                         onClick={handleDownloadTailoredResume}
                       >
-                        {isTailoredResumeDownloaded
-                          ? 'Downloaded!'
-                          : 'Download tailored resume'}
+                        {isDownloadingTailoredResume
+                          ? 'Preparing PDF…'
+                          : isTailoredResumeDownloaded
+                            ? 'PDF downloaded!'
+                            : 'Download PDF'}
                       </button>
                       <button
                         className="secondary-action tailored-resume-action"
@@ -575,14 +680,14 @@ function AnalysisResultPage() {
                         disabled={isProfileLoading || !candidateName || !candidateEmail}
                         onClick={handlePrintTailoredResume}
                       >
-                        Print / Save as PDF
+                        Print
                       </button>
                     </div>
                   )}
                   {!isProfileLoading && (!candidateName || !candidateEmail) && (
                     <p className="tailored-resume-profile-warning" role="alert">
                       Add your name and email in <Link to="/profile">Profile</Link> before
-                      saving this resume as a PDF.
+                      downloading or printing this resume.
                     </p>
                   )}
                   {tailoredResumeCopyError && (

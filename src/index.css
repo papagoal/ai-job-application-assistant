@@ -785,6 +785,18 @@ h1 {
   align-items: start;
 }
 
+.analysis-panel-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin: -4px 0 16px;
+}
+
+.analysis-panel-controls .secondary-action:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
 .analysis-score-card,
 .analysis-panel {
   border: 1px solid var(--color-border);
@@ -909,6 +921,50 @@ h1 {
   margin: 7px 0 0;
   color: var(--color-text);
   font-size: 1.25rem;
+}
+
+.analysis-panel-collapsed .analysis-panel-heading {
+  margin-bottom: 0;
+}
+
+.collapsible-panel-heading > div {
+  width: 100%;
+}
+
+.collapsible-panel-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  font-weight: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.collapsible-panel-toggle:focus-visible {
+  border-radius: 4px;
+  outline: 3px solid rgba(49, 87, 213, 0.2);
+  outline-offset: 5px;
+}
+
+.collapsible-panel-chevron {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  border-right: 2px solid var(--color-primary);
+  border-bottom: 2px solid var(--color-primary);
+  transform: rotate(45deg);
+  transition: transform 160ms ease;
+}
+
+.collapsible-panel-toggle[aria-expanded='true'] .collapsible-panel-chevron {
+  transform: rotate(225deg);
 }
 
 .skills-columns {
@@ -1399,6 +1455,7 @@ h1 {
   body[data-print-target] .app-header,
   body[data-print-target] .analysis-heading,
   body[data-print-target] .delete-error,
+  body[data-print-target] .analysis-panel-controls,
   body[data-print-target] .analysis-score-card,
   body[data-print-target] .analysis-content > .analysis-panel,
   body[data-print-target='cover-letter'] .cover-letter-actions,
@@ -1410,6 +1467,11 @@ h1 {
 
   body[data-print-target='cover-letter'] .analysis-content > .cover-letter-panel,
   body[data-print-target='tailored-resume'] .analysis-content > .tailored-resume-panel {
+    display: block !important;
+  }
+
+  body[data-print-target='cover-letter'] #coverLetter-content,
+  body[data-print-target='tailored-resume'] #tailoredResume-content {
     display: block !important;
   }
 
@@ -1638,6 +1700,14 @@ h1 {
   .analysis-heading {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .analysis-panel-controls {
+    justify-content: stretch;
+  }
+
+  .analysis-panel-controls .secondary-action {
+    flex: 1;
   }
 
   .analysis-layout,

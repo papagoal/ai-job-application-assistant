@@ -26,6 +26,25 @@ interface ResumePdfBlock {
   text: string
 }
 
+type AnalysisPanelId =
+  | 'skills'
+  | 'resumeImprovements'
+  | 'interviewPrep'
+  | 'tailoredResume'
+  | 'coverLetter'
+  | 'privateNotes'
+
+const defaultExpandedPanels: Record<AnalysisPanelId, boolean> = {
+  skills: true,
+  resumeImprovements: true,
+  interviewPrep: false,
+  tailoredResume: false,
+  coverLetter: false,
+  privateNotes: false,
+}
+
+const analysisPanelIds = Object.keys(defaultExpandedPanels) as AnalysisPanelId[]
+
 const applicationStatuses: ApplicationStatus[] = [
   'Draft',
   'Applied',
@@ -146,6 +165,40 @@ function InterviewQuestionGroup({
   )
 }
 
+function AnalysisPanelHeading({
+  panelId,
+  label,
+  title,
+  expanded,
+  onToggle,
+}: {
+  panelId: AnalysisPanelId
+  label: string
+  title: string
+  expanded: boolean
+  onToggle: (panelId: AnalysisPanelId) => void
+}) {
+  return (
+    <div className="analysis-panel-heading collapsible-panel-heading">
+      <div>
+        <p className="analysis-label">{label}</p>
+        <h2>
+          <button
+            className="collapsible-panel-toggle"
+            type="button"
+            aria-expanded={expanded}
+            aria-controls={`${panelId}-content`}
+            onClick={() => onToggle(panelId)}
+          >
+            <span>{title}</span>
+            <span className="collapsible-panel-chevron" aria-hidden="true" />
+          </button>
+        </h2>
+      </div>
+    </div>
+  )
+}
+
 function AnalysisResultPage() {
   const { id } = useParams()
   const location = useLocation()
@@ -199,6 +252,20 @@ function AnalysisResultPage() {
   const [isSavingNotes, setIsSavingNotes] = useState(false)
   const [notesSaveMessage, setNotesSaveMessage] = useState('')
   const [notesSaveError, setNotesSaveError] = useState('')
+  const [expandedPanels, setExpandedPanels] = useState(defaultExpandedPanels)
+
+  function togglePanel(panelId: AnalysisPanelId) {
+    setExpandedPanels((currentPanels) => ({
+      ...currentPanels,
+      [panelId]: !currentPanels[panelId],
+    }))
+  }
+
+  function setAllPanels(expanded: boolean) {
+    setExpandedPanels(Object.fromEntries(
+      analysisPanelIds.map((panelId) => [panelId, expanded]),
+    ) as Record<AnalysisPanelId, boolean>)
+  }
 
   useEffect(() => {
     if (!id) {
@@ -820,6 +887,25 @@ function AnalysisResultPage() {
 
       {deleteError && <p className="delete-error" role="alert">{deleteError}</p>}
 
+      <div className="analysis-panel-controls" aria-label="Analysis section controls">
+        <button
+          className="secondary-action"
+          type="button"
+          disabled={analysisPanelIds.every((panelId) => expandedPanels[panelId])}
+          onClick={() => setAllPanels(true)}
+        >
+          Expand all
+        </button>
+        <button
+          className="secondary-action"
+          type="button"
+          disabled={analysisPanelIds.every((panelId) => !expandedPanels[panelId])}
+          onClick={() => setAllPanels(false)}
+        >
+          Collapse all
+        </button>
+      </div>
+
       <div className="analysis-layout">
         <aside className="analysis-score-card" aria-labelledby="match-score-heading">
           <p className="analysis-label" id="match-score-heading">Match score</p>
@@ -856,15 +942,17 @@ function AnalysisResultPage() {
         </aside>
 
         <div className="analysis-content">
-          <section className="analysis-panel">
-            <div className="analysis-panel-heading">
-              <div>
-                <p className="analysis-label">Skills comparison</p>
-                <h2>What matches and what is missing</h2>
-              </div>
-            </div>
+          <section className={`analysis-panel${expandedPanels.skills ? '' : ' analysis-panel-collapsed'}`}>
+            <AnalysisPanelHeading
+              panelId="skills"
+              label="Skills comparison"
+              title="What matches and what is missing"
+              expanded={expandedPanels.skills}
+              onToggle={togglePanel}
+            />
 
-            <div className="skills-columns">
+            <div id="skills-content" hidden={!expandedPanels.skills}>
+              <div className="skills-columns">
               <div>
                 <h3>Matching skills</h3>
                 <ul className="skill-list matching-skills">
@@ -881,16 +969,19 @@ function AnalysisResultPage() {
                   ))}
                 </ul>
               </div>
+              </div>
             </div>
           </section>
 
-          <section className="analysis-panel interview-prep-panel">
-            <div className="analysis-panel-heading">
-              <div>
-                <p className="analysis-label">Interview preparation</p>
-                <h2>Role-specific practice questions</h2>
-              </div>
-            </div>
+          <section className={`analysis-panel interview-prep-panel${expandedPanels.interviewPrep ? '' : ' analysis-panel-collapsed'}`}>
+            <AnalysisPanelHeading
+              panelId="interviewPrep"
+              label="Interview preparation"
+              title="Role-specific practice questions"
+              expanded={expandedPanels.interviewPrep}
+              onToggle={togglePanel}
+            />
+            <div id="interviewPrep-content" hidden={!expandedPanels.interviewPrep}>
             {interviewPrepMessage && (
               <p className="interview-prep-success" role="status">
                 {interviewPrepMessage}
@@ -935,29 +1026,37 @@ function AnalysisResultPage() {
                 </button>
               </div>
             )}
+            </div>
           </section>
 
-          <section className="analysis-panel">
-            <div className="analysis-panel-heading">
-              <div>
-                <p className="analysis-label">Resume improvements</p>
-                <h2>Suggestions for this application</h2>
-              </div>
-            </div>
-            <ol className="suggestion-list">
+          <section className={`analysis-panel${expandedPanels.resumeImprovements ? '' : ' analysis-panel-collapsed'}`}>
+            <AnalysisPanelHeading
+              panelId="resumeImprovements"
+              label="Resume improvements"
+              title="Suggestions for this application"
+              expanded={expandedPanels.resumeImprovements}
+              onToggle={togglePanel}
+            />
+            <ol
+              className="suggestion-list"
+              id="resumeImprovements-content"
+              hidden={!expandedPanels.resumeImprovements}
+            >
               {analysis.suggestions.map((suggestion) => (
                 <li key={suggestion}>{suggestion}</li>
               ))}
             </ol>
           </section>
 
-          <section className="analysis-panel tailored-resume-panel">
-            <div className="analysis-panel-heading">
-              <div>
-                <p className="analysis-label">Tailored resume</p>
-                <h2>Job-targeted draft</h2>
-              </div>
-            </div>
+          <section className={`analysis-panel tailored-resume-panel${expandedPanels.tailoredResume ? '' : ' analysis-panel-collapsed'}`}>
+            <AnalysisPanelHeading
+              panelId="tailoredResume"
+              label="Tailored resume"
+              title="Job-targeted draft"
+              expanded={expandedPanels.tailoredResume}
+              onToggle={togglePanel}
+            />
+            <div id="tailoredResume-content" hidden={!expandedPanels.tailoredResume}>
             {analysis.tailoredResume ? (
               <>
                 <div className="tailored-resume-actions">
@@ -1120,20 +1219,23 @@ function AnalysisResultPage() {
                 available. Create a new analysis to generate one.
               </p>
             )}
+            </div>
           </section>
 
-          <section className="analysis-panel cover-letter-panel">
+          <section className={`analysis-panel cover-letter-panel${expandedPanels.coverLetter ? '' : ' analysis-panel-collapsed'}`}>
             <div className="print-cover-letter-heading">
               <p>Cover letter</p>
               <h1>{analysis.jobTitle}</h1>
               <p>{analysis.companyName}</p>
             </div>
-            <div className="analysis-panel-heading">
-              <div>
-                <p className="analysis-label">Cover letter</p>
-                <h2>Generated draft</h2>
-              </div>
-            </div>
+            <AnalysisPanelHeading
+              panelId="coverLetter"
+              label="Cover letter"
+              title="Generated draft"
+              expanded={expandedPanels.coverLetter}
+              onToggle={togglePanel}
+            />
+            <div id="coverLetter-content" hidden={!expandedPanels.coverLetter}>
             <div className="cover-letter-actions">
               {!isEditingCoverLetter && (
                 <div className="cover-letter-buttons">
@@ -1210,16 +1312,22 @@ function AnalysisResultPage() {
                 <p>{analysis.coverLetter}</p>
               </div>
             )}
+            </div>
           </section>
 
-          <section className="analysis-panel">
-            <div className="analysis-panel-heading">
-              <div>
-                <p className="analysis-label">Application notes</p>
-                <h2>Private notes</h2>
-              </div>
-            </div>
-            <div className="notes-editor">
+          <section className={`analysis-panel${expandedPanels.privateNotes ? '' : ' analysis-panel-collapsed'}`}>
+            <AnalysisPanelHeading
+              panelId="privateNotes"
+              label="Application notes"
+              title="Private notes"
+              expanded={expandedPanels.privateNotes}
+              onToggle={togglePanel}
+            />
+            <div
+              className="notes-editor"
+              id="privateNotes-content"
+              hidden={!expandedPanels.privateNotes}
+            >
               <label htmlFor="application-notes">Notes</label>
               <textarea
                 id="application-notes"

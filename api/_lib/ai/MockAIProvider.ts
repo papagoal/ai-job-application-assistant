@@ -1,6 +1,8 @@
 import { mockJobAnalysis } from '../../../src/mocks/jobAnalysis.js'
 import type { JobAnalysis } from '../../../src/types/jobAnalysis'
 import type {
+  ImportedJobDetails,
+  JobDetailsExtractionInput,
   JobDescriptionInput,
   ResumeRegenerationInput,
 } from '../../../src/types/jobApplication'
@@ -47,5 +49,13 @@ export class MockAIProvider implements AIProvider {
     return Promise.resolve(
       `PROFESSIONAL SUMMARY\nThis refreshed resume targets the ${jobTitle} role at ${companyName}.\n\nCORE SKILLS\n${input.resumeText.trim()}`,
     )
+  }
+
+  extractJobDetails(input: JobDetailsExtractionInput): Promise<ImportedJobDetails> {
+    return Promise.resolve({
+      companyName: 'Northstar Labs',
+      jobTitle: 'Frontend Developer',
+      jobDescription: input.pageText.trim(),
+    })
   }
 }

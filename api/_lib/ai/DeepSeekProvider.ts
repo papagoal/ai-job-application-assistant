@@ -1,13 +1,17 @@
 import type { JobAnalysis } from '../../../src/types/jobAnalysis'
 import type {
+  ImportedJobDetails,
+  JobDetailsExtractionInput,
   JobDescriptionInput,
   ResumeRegenerationInput,
 } from '../../../src/types/jobApplication'
 import type { AIProvider } from './AIProvider'
 import { buildAnalysisPrompt } from './buildAnalysisPrompt.js'
+import { buildJobDetailsPrompt } from './buildJobDetailsPrompt.js'
 import { buildResumeRegenerationPrompt } from './buildResumeRegenerationPrompt.js'
 import {
   hasProfessionalSummary,
+  parseImportedJobDetails,
   parseJobAnalysis,
   parseTailoredResume,
 } from './parseJobAnalysis.js'
@@ -125,5 +129,17 @@ export class DeepSeekProvider implements AIProvider {
     }
 
     return tailoredResume
+  }
+
+  async extractJobDetails(
+    input: JobDetailsExtractionInput,
+  ): Promise<ImportedJobDetails> {
+    const prompt = buildJobDetailsPrompt(input)
+    const content = await this.complete([
+      { role: 'system', content: prompt.system },
+      { role: 'user', content: prompt.user },
+    ])
+
+    return parseImportedJobDetails(content)
   }
 }

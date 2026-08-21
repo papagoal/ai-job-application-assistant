@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { mockJobAnalysis } from '../../../src/mocks/jobAnalysis'
 import {
   hasProfessionalSummary,
+  parseImportedJobDetails,
   parseJobAnalysis,
   parseTailoredResume,
 } from './parseJobAnalysis'
@@ -114,5 +115,27 @@ describe('parseTailoredResume', () => {
     expect(() => parseTailoredResume(JSON.stringify(response))).toThrow(
       'DeepSeek returned an empty tailored resume.',
     )
+  })
+})
+
+describe('parseImportedJobDetails', () => {
+  it('returns trimmed imported job fields', () => {
+    expect(parseImportedJobDetails(JSON.stringify({
+      companyName: ' Northstar Labs ',
+      jobTitle: ' Frontend Developer ',
+      jobDescription: ' Build accessible React applications. ',
+    }))).toEqual({
+      companyName: 'Northstar Labs',
+      jobTitle: 'Frontend Developer',
+      jobDescription: 'Build accessible React applications.',
+    })
+  })
+
+  it('rejects incomplete imported job fields', () => {
+    expect(() => parseImportedJobDetails(JSON.stringify({
+      companyName: 'Northstar Labs',
+      jobTitle: '',
+      jobDescription: 'Build accessible React applications.',
+    }))).toThrow('DeepSeek returned incomplete job details.')
   })
 })

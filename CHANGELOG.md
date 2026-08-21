@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-08-21
+
+### Added
+
+- English and Simplified Chinese AI output for match analysis, tailored resumes, and cover letters.
+- One-click tailored-resume regeneration with automatic saving and a single-session undo action.
+- Public job-listing link import for editable company, role, and job-description fields.
+
+### Changed
+
+- Required every generated tailored resume to begin with a newly written, role-specific professional summary based only on verified resume facts.
+- Separated tailored-resume actions into copy, direct A4 PDF download, and print workflows.
+- Improved one-page resume PDF typography, spacing, page usage, and Chinese text rendering.
+
+### Fixed
+
+- Routed direct `/account` visits through the Vercel SPA so email Magic Links no longer land on a platform 404.
+- Retried and rejected AI responses with an empty professional summary instead of saving incomplete resumes.
+- Removed browser-generated dates, URLs, titles, and page numbers from direct resume PDF downloads.
+
+### Security
+
+- Treated imported job pages as untrusted AI input and strictly validated the extracted fields.
+- Blocked job imports from localhost, private or reserved network addresses, unsafe redirects, unsupported content, oversized pages, and timed-out requests.
+
+### Quality
+
+- Expanded unit, component, API, security, and end-to-end coverage to 85 automated tests.
+
 ## [1.0.0] - 2026-08-18
 
 ### Added
@@ -33,4 +62,5 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Added GitHub Actions checks for tests, linting, end-to-end verification, and production builds.
 - Added Vercel SPA routing and serverless runtime compatibility.
 
+[1.1.0]: https://github.com/papagoal/ai-job-application-assistant/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/papagoal/ai-job-application-assistant/releases/tag/v1.0.0

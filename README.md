@@ -5,10 +5,13 @@ A React application that compares a job description with a resume, produces an A
 ## Features
 
 - Candidate profile with reusable resume and optional phone/location details
+- Public job-listing link import for company, role, and job-description fields
 - Job-to-resume match analysis
+- English and Simplified Chinese AI output
 - Matching and missing skills
 - Resume suggestions and cover-letter draft
 - Editable tailored-resume drafts with copy, download, and print-ready PDF export
+- One-click AI resume regeneration with automatic saving and undo
 - Editable saved cover-letter drafts
 - One-click copying for generated cover letters
 - Plain-text downloads for generated cover letters
@@ -38,6 +41,8 @@ npx vercel dev
 Open the URL printed by Vercel CLI, normally `http://localhost:3000`. This runs both the Vite frontend and the `/api` functions. The default `AI_PROVIDER=mock` mode works without an external AI key.
 
 Use `npm run dev` only when working on the frontend without the analysis API.
+
+Job-link import works with publicly accessible listing pages. Pages that require sign-in, rely entirely on protected client-side rendering, or block automated requests must be entered manually.
 
 ## Supabase setup
 

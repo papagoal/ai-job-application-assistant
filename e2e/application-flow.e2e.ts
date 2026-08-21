@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { readFile } from 'node:fs/promises'
 
 const analysis = {
   companyName: 'Northstar Labs',
@@ -84,7 +85,7 @@ test('completes the profile-to-application workflow', async ({ page }) => {
     window.print = () => document.body.setAttribute('data-print-invoked', 'true')
   })
   await page.locator('.tailored-resume-panel')
-    .getByRole('button', { name: 'Print / Save as PDF' })
+    .getByRole('button', { name: 'Print', exact: true })
     .click()
   await expect.poll(() => page.evaluate(() => document.body.dataset.printTarget))
     .toBe('tailored-resume')
@@ -109,22 +110,48 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await page.getByRole('button', { name: 'Edit tailored resume' }).click()
   await page
     .getByLabel('Tailored resume draft')
-    .fill('TEST CANDIDATE\nFrontend Developer\n\nUpdated tailored resume')
+    .fill(`PROFESSIONAL SUMMARY
+Updated tailored resume for testing. Frontend-focused developer experienced in building responsive, user-centered applications with React, TypeScript, and GraphQL. Brings practical experience across product delivery, testing, API integration, and cloud deployment for teams seeking reliable, maintainable software.
+
+TECHNICAL SKILLS
+- Frontend: React, TypeScript, JavaScript, HTML, CSS, responsive design
+- Backend: Node.js, REST APIs, GraphQL, PostgreSQL, authentication
+- Testing: Vitest, Testing Library, Playwright, automated regression testing
+- Delivery: Git, GitHub Actions, Docker, AWS, Vercel, CI workflows
+
+PROFESSIONAL EXPERIENCE
+- Developed and maintained full-stack product features using React, TypeScript, Node.js, GraphQL, and PostgreSQL, supporting customer-facing workflows and internal operational tools.
+- Built reusable interface components, integrated REST and GraphQL services, and diagnosed issues across frontend, backend, database, and third-party integrations.
+- Added automated unit and end-to-end testing to improve regression coverage, validate critical application flows, and support safer feature delivery.
+- Implemented authentication, authorization, and protected data access using secure session handling and role-aware application behavior.
+- Containerized application environments and used cloud deployment tools, logs, and monitoring workflows to validate production behavior.
+
+SELECTED PROJECT
+- Built an AI job application assistant with React, TypeScript, Vite, Supabase, and Vercel Functions, including resume analysis, job-specific summaries, cover letters, application tracking, authentication, and direct PDF export.
+- Used feature branches, conventional commits, draft pull requests, automated checks, and manual acceptance testing to deliver changes incrementally.
+
+EDUCATION
+University degree with continued practical development in modern web engineering.`)
   await page.getByRole('button', { name: 'Save tailored resume' }).click()
   await expect(page.getByRole('status')).toHaveText('Tailored resume saved.')
 
-  await page.getByRole('button', { name: 'Copy tailored resume' }).click()
+  await page.getByRole('button', { name: 'Copy as text' }).click()
   await expect(page.getByRole('button', { name: 'Copied!' })).toBeVisible()
   await expect
     .poll(() => page.evaluate(() => navigator.clipboard.readText()))
     .toContain('Updated tailored resume')
 
   const downloadPromise = page.waitForEvent('download')
-  await page.getByRole('button', { name: 'Download tailored resume' }).click()
+  await page.getByRole('button', { name: 'Download PDF' }).click()
   const download = await downloadPromise
   expect(download.suggestedFilename()).toBe(
-    'Northstar-Labs-Frontend-Developer-tailored-resume.txt',
+    'Northstar-Labs-Frontend-Developer-tailored-resume.pdf',
   )
+  const downloadPath = await download.path()
+  if (!downloadPath) throw new Error('Downloaded PDF path is unavailable.')
+  const downloadedPdf = (await readFile(downloadPath)).toString('latin1')
+  expect(downloadedPdf).toMatch(/\/MediaBox \[0 0 595\.\d+ 841\.\d+\]/)
+  expect(downloadedPdf.match(/\/Type \/Page\b/g)).toHaveLength(1)
 
   await page.reload()
   await expect(page.getByText('Updated tailored resume')).toBeVisible()

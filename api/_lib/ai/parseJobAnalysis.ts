@@ -12,6 +12,31 @@ function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every(isNonEmptyString)
 }
 
+function isSectionHeading(value: string) {
+  const heading = value.trim()
+  return heading.length > 0
+    && heading.length <= 60
+    && heading === heading.toUpperCase()
+    && /[A-Z]/.test(heading)
+}
+
+export function hasProfessionalSummary(tailoredResume: string) {
+  const lines = tailoredResume.trim().split('\n')
+  const headingIndex = lines.findIndex(
+    (line) => line.trim().replace(/:$/, '') === 'PROFESSIONAL SUMMARY',
+  )
+  if (headingIndex === -1) return false
+
+  const nextHeadingIndex = lines.findIndex(
+    (line, index) => index > headingIndex && isSectionHeading(line),
+  )
+  const sectionEnd = nextHeadingIndex === -1 ? lines.length : nextHeadingIndex
+
+  return lines
+    .slice(headingIndex + 1, sectionEnd)
+    .some((line) => line.trim().length > 0)
+}
+
 export function parseJobAnalysis(content: string): JobAnalysis {
   let value: unknown
 

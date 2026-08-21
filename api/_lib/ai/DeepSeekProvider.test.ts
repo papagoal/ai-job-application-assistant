@@ -36,6 +36,22 @@ describe('DeepSeekProvider', () => {
     expect(result.outputLanguage).toBe('en')
   })
 
+  it('uses and records the selected Pro model', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(completion(mockJobAnalysis))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await new DeepSeekProvider('test-key', 'deepseek-v4-pro').analyze({
+      ...input,
+      aiModel: 'deepseek-v4-pro',
+    })
+
+    const request = JSON.parse(
+      String(fetchMock.mock.calls[0]?.[1]?.body),
+    ) as { model: string }
+    expect(request.model).toBe('deepseek-v4-pro')
+    expect(result.aiModel).toBe('deepseek-v4-pro')
+  })
+
   it('accepts a Chinese professional summary and records the output language', async () => {
     const chineseAnalysis = {
       ...mockJobAnalysis,

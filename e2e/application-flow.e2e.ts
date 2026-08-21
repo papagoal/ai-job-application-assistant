@@ -12,6 +12,7 @@ const analysis = {
   suggestions: ['Highlight automated testing experience.'],
   coverLetter: 'Dear Hiring Manager, I am excited to apply.',
   outputLanguage: 'en' as const,
+  aiModel: 'deepseek-v4-pro' as const,
   tailoredResume: `PROFESSIONAL SUMMARY
 Frontend developer experienced with React and TypeScript.
 
@@ -68,6 +69,7 @@ test('completes the profile-to-application workflow', async ({ page }) => {
       jobDescription: 'Build accessible React applications.',
       resumeText: 'React and TypeScript experience.',
       outputLanguage: 'en',
+      aiModel: 'deepseek-v4-pro',
     })
     await route.fulfill({ json: analysis })
   })
@@ -80,6 +82,7 @@ test('completes the profile-to-application workflow', async ({ page }) => {
       resumeText: 'React and TypeScript experience.',
       currentTailoredResume: analysis.tailoredResume,
       outputLanguage: 'en',
+      aiModel: 'deepseek-v4-pro',
     })
     await route.fulfill({ json: { tailoredResume: regeneratedResume } })
   })
@@ -91,6 +94,7 @@ test('completes the profile-to-application workflow', async ({ page }) => {
       jobDescription: 'Build accessible React applications.',
       resumeText: 'React and TypeScript experience.',
       outputLanguage: 'en',
+      aiModel: 'deepseek-v4-pro',
     })
     await route.fulfill({ json: interviewPrep })
   })
@@ -118,6 +122,10 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await expect(page.getByLabel('Resume text')).toHaveValue(
     'React and TypeScript experience.',
   )
+  const languageSelectBox = await page.getByLabel('AI output language').boundingBox()
+  const modelSelectBox = await page.getByLabel('AI model').boundingBox()
+  expect(languageSelectBox?.y).toBe(modelSelectBox?.y)
+  expect(languageSelectBox?.height).toBe(modelSelectBox?.height)
   await page.getByLabel(/Job listing link/).fill(
     'https://jobs.example.com/frontend-developer',
   )
@@ -130,6 +138,7 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await expect(page.getByLabel('Job description')).toHaveValue(
     'Build accessible React applications.',
   )
+  await page.getByLabel('AI model').selectOption('deepseek-v4-pro')
   await page.getByRole('button', { name: 'Analyze match' }).click()
 
   await expect(page).toHaveURL(/\/applications\/[0-9a-f-]+$/)
@@ -138,6 +147,7 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   ).toBeVisible()
   await expect(page.getByLabel('82 percent match')).toBeVisible()
   await expect(page.getByText('Strong overall match')).toBeVisible()
+  await expect(page.getByText(/DeepSeek V4 Pro/)).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Job-targeted draft' })).toBeVisible()
   const analysisPanelHeadings = await page
     .locator('.analysis-content > .analysis-panel h2')

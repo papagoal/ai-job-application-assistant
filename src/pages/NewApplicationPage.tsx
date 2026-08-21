@@ -10,6 +10,7 @@ const initialJobDescription: JobDescriptionInput = {
   jobDescription: '',
   resumeText: '',
   outputLanguage: 'en',
+  aiModel: 'deepseek-v4-flash',
 }
 
 type JobDescriptionErrors = Partial<Record<keyof JobDescriptionInput, string>>
@@ -214,20 +215,38 @@ function NewApplicationPage() {
             </div>
           </div>
 
-          <div className="form-field">
-            <label htmlFor="outputLanguage">AI output language</label>
-            <select
-              id="outputLanguage"
-              name="outputLanguage"
-              value={job.outputLanguage ?? 'en'}
-              onChange={handleChange}
-            >
-              <option value="en">English</option>
-              <option value="zh">中文</option>
-            </select>
-            <p className="field-hint">
-              Controls the language used for the analysis, tailored resume, and cover letter.
-            </p>
+          <div className="form-grid ai-settings-grid">
+            <div className="form-field">
+              <label htmlFor="outputLanguage">AI output language</label>
+              <select
+                id="outputLanguage"
+                name="outputLanguage"
+                value={job.outputLanguage ?? 'en'}
+                onChange={handleChange}
+              >
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+              </select>
+              <p className="field-hint">
+                Controls the language used for generated content.
+              </p>
+            </div>
+
+            <div className="form-field">
+              <label htmlFor="aiModel">AI model</label>
+              <select
+                id="aiModel"
+                name="aiModel"
+                value={job.aiModel ?? 'deepseek-v4-flash'}
+                onChange={handleChange}
+              >
+                <option value="deepseek-v4-flash">DeepSeek V4 Flash — faster</option>
+                <option value="deepseek-v4-pro">DeepSeek V4 Pro — higher quality</option>
+              </select>
+              <p className="field-hint">
+                Pro may take longer and costs more. The choice is saved with this application.
+              </p>
+            </div>
           </div>
 
           <div className="form-field">

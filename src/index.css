@@ -485,6 +485,19 @@ h1 {
   gap: 20px;
 }
 
+.ai-settings-grid > .form-field {
+  grid-template-rows: auto 48px minmax(38px, auto);
+  align-content: start;
+}
+
+.ai-settings-grid select {
+  height: 48px;
+}
+
+.ai-settings-grid .field-hint {
+  line-height: 1.45;
+}
+
 .job-import-block {
   padding: 18px;
   border: 1px solid #dbe3f5;

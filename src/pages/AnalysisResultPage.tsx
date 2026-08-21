@@ -745,6 +745,7 @@ function AnalysisResultPage() {
         jobDescription: sourceJobDescription,
         resumeText: sourceResumeText,
         outputLanguage: analysis.outputLanguage ?? 'en',
+        aiModel: analysis.aiModel ?? 'deepseek-v4-flash',
         currentTailoredResume,
       })
 
@@ -813,6 +814,7 @@ function AnalysisResultPage() {
         jobDescription: sourceJobDescription,
         resumeText: sourceResumeText,
         outputLanguage: analysis.outputLanguage ?? 'en',
+        aiModel: analysis.aiModel ?? 'deepseek-v4-flash',
       })
       await updateApplicationInterviewPrep(id, interviewPrep)
       setAnalysis((currentAnalysis) => currentAnalysis
@@ -869,7 +871,9 @@ function AnalysisResultPage() {
           <p className="eyebrow">Application analysis</p>
           <h1>{analysis.jobTitle}</h1>
           <p className="page-description">
-            {analysis.companyName} · Application ID: {id}
+            {analysis.companyName} · {analysis.aiModel === 'deepseek-v4-pro'
+              ? 'DeepSeek V4 Pro'
+              : 'DeepSeek V4 Flash'} · Application ID: {id}
           </p>
         </div>
         <div className="analysis-heading-actions">

@@ -1,5 +1,6 @@
 import type { InterviewPrep, JobAnalysis } from '../../../src/types/jobAnalysis'
 import type {
+  DeepSeekModel,
   ImportedJobDetails,
   JobDetailsExtractionInput,
   JobDescriptionInput,
@@ -33,9 +34,9 @@ interface DeepSeekMessage {
 
 export class DeepSeekProvider implements AIProvider {
   private readonly apiKey: string
-  private readonly model: string
+  private readonly model: DeepSeekModel
 
-  constructor(apiKey: string, model = 'deepseek-v4-flash') {
+  constructor(apiKey: string, model: DeepSeekModel = 'deepseek-v4-flash') {
     this.apiKey = apiKey
     this.model = model
   }
@@ -100,6 +101,7 @@ export class DeepSeekProvider implements AIProvider {
       companyName: input.companyName.trim(),
       jobTitle: input.jobTitle.trim(),
       outputLanguage,
+      aiModel: this.model,
     }
   }
 

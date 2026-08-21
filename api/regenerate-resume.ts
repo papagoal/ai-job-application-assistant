@@ -1,7 +1,5 @@
-import type { ResumeRegenerationInput } from '../src/types/jobApplication'
+import type { DeepSeekModel, ResumeRegenerationInput } from '../src/types/jobApplication'
 import { getAIProvider } from './_lib/ai/getAIProvider.js'
-
-const aiProvider = getAIProvider()
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
@@ -9,6 +7,12 @@ function isNonEmptyString(value: unknown): value is string {
 
 function isOutputLanguage(value: unknown) {
   return value === undefined || value === 'en' || value === 'zh'
+}
+
+function isAIModel(value: unknown): value is DeepSeekModel | undefined {
+  return value === undefined
+    || value === 'deepseek-v4-flash'
+    || value === 'deepseek-v4-pro'
 }
 
 function isResumeRegenerationInput(value: unknown): value is ResumeRegenerationInput {
@@ -22,7 +26,8 @@ function isResumeRegenerationInput(value: unknown): value is ResumeRegenerationI
     isNonEmptyString(input.jobDescription) &&
     isNonEmptyString(input.resumeText) &&
     isNonEmptyString(input.currentTailoredResume) &&
-    isOutputLanguage(input.outputLanguage)
+    isOutputLanguage(input.outputLanguage) &&
+    isAIModel(input.aiModel)
   )
 }
 
@@ -50,7 +55,7 @@ export default {
       )
     }
 
-    const tailoredResume = await aiProvider.regenerateResume(body)
+    const tailoredResume = await getAIProvider(body.aiModel).regenerateResume(body)
 
     return Response.json({ tailoredResume })
   },

@@ -2,7 +2,7 @@ import type { ImportedJobDetails } from '../src/types/jobApplication'
 import { getAIProvider } from './_lib/ai/getAIProvider.js'
 import { fetchPublicJobPage } from './_lib/jobPage.js'
 
-const aiProvider = getAIProvider()
+const aiProvider = getAIProvider('deepseek-v4-flash')
 
 function isImportRequest(value: unknown): value is { url: string } {
   if (typeof value !== 'object' || value === null) return false

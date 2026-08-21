@@ -58,4 +58,17 @@ Existing resume draft.`
     expect(result).toContain('Frontend Developer role at Northstar Labs')
     expect(result).not.toBe(currentTailoredResume)
   })
+
+  it('returns stable imported job details for local development', async () => {
+    const result = await new MockAIProvider().extractJobDetails({
+      sourceUrl: 'https://jobs.example.com/frontend-developer',
+      pageText: 'Public job listing text.',
+    })
+
+    expect(result).toEqual({
+      companyName: 'Northstar Labs',
+      jobTitle: 'Frontend Developer',
+      jobDescription: 'Public job listing text.',
+    })
+  })
 })

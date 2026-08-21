@@ -30,6 +30,19 @@ SKILLS
 
 test('completes the profile-to-application workflow', async ({ page }) => {
   await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
+  await page.route('**/api/import-job', async (route) => {
+    expect(route.request().method()).toBe('POST')
+    expect(route.request().postDataJSON()).toEqual({
+      url: 'https://jobs.example.com/frontend-developer',
+    })
+    await route.fulfill({
+      json: {
+        companyName: 'Northstar Labs',
+        jobTitle: 'Frontend Developer',
+        jobDescription: 'Build accessible React applications.',
+      },
+    })
+  })
   await page.route('**/api/analyze-job', async (route) => {
     expect(route.request().method()).toBe('POST')
     expect(route.request().postDataJSON()).toEqual({
@@ -77,11 +90,18 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await expect(page.getByLabel('Resume text')).toHaveValue(
     'React and TypeScript experience.',
   )
-  await page.getByLabel('Company name').fill('Northstar Labs')
-  await page.getByLabel('Job title').fill('Frontend Developer')
-  await page
-    .getByLabel('Job description')
-    .fill('Build accessible React applications.')
+  await page.getByLabel(/Job listing link/).fill(
+    'https://jobs.example.com/frontend-developer',
+  )
+  await page.getByRole('button', { name: 'Import job details' }).click()
+  await expect(page.getByRole('status')).toHaveText(
+    'Job details imported. Review them before analyzing.',
+  )
+  await expect(page.getByLabel('Company name')).toHaveValue('Northstar Labs')
+  await expect(page.getByLabel('Job title')).toHaveValue('Frontend Developer')
+  await expect(page.getByLabel('Job description')).toHaveValue(
+    'Build accessible React applications.',
+  )
   await page.getByRole('button', { name: 'Analyze match' }).click()
 
   await expect(page).toHaveURL(/\/applications\/[0-9a-f-]+$/)

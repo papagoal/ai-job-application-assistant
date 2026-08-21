@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { analyzeJob } from '../services/jobAnalysisService'
+import { analyzeJob, importJobDetails } from '../services/jobAnalysisService'
 import { getProfile, saveApplication } from '../services/persistenceService'
 import type { JobDescriptionInput } from '../types/jobApplication'
 
@@ -18,6 +18,10 @@ function NewApplicationPage() {
   const navigate = useNavigate()
   const [job, setJob] = useState(initialJobDescription)
   const [errors, setErrors] = useState<JobDescriptionErrors>({})
+  const [jobUrl, setJobUrl] = useState('')
+  const [isImporting, setIsImporting] = useState(false)
+  const [importMessage, setImportMessage] = useState('')
+  const [importError, setImportError] = useState('')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [submissionError, setSubmissionError] = useState('')
 
@@ -42,6 +46,49 @@ function NewApplicationPage() {
     }))
     setErrors((currentErrors) => ({ ...currentErrors, [field]: undefined }))
     setSubmissionError('')
+  }
+
+  function handleJobUrlChange(event: ChangeEvent<HTMLInputElement>) {
+    setJobUrl(event.target.value)
+    setImportMessage('')
+    setImportError('')
+  }
+
+  async function handleImportJobDetails() {
+    const trimmedUrl = jobUrl.trim()
+    setImportMessage('')
+    setImportError('')
+
+    if (!trimmedUrl) {
+      setImportError('Enter a public job listing link.')
+      return
+    }
+
+    setIsImporting(true)
+
+    try {
+      const importedJob = await importJobDetails(trimmedUrl)
+      setJob((currentJob) => ({
+        ...currentJob,
+        companyName: importedJob.companyName,
+        jobTitle: importedJob.jobTitle,
+        jobDescription: importedJob.jobDescription,
+      }))
+      setErrors((currentErrors) => ({
+        ...currentErrors,
+        companyName: undefined,
+        jobTitle: undefined,
+        jobDescription: undefined,
+      }))
+      setSubmissionError('')
+      setImportMessage('Job details imported. Review them before analyzing.')
+    } catch {
+      setImportError(
+        'We could not import this listing. It may block access or require sign-in. Your existing details were kept.',
+      )
+    } finally {
+      setIsImporting(false)
+    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -96,6 +143,39 @@ function NewApplicationPage() {
           <div className="form-section-heading">
             <h2>Role details</h2>
             <p>Enter the company and position exactly as they appear in the listing.</p>
+          </div>
+
+          <div className="job-import-block">
+            <div className="form-field">
+              <label htmlFor="jobUrl">
+                Job listing link <span className="optional-label">(Optional)</span>
+              </label>
+              <div className="job-import-controls">
+                <input
+                  id="jobUrl"
+                  name="jobUrl"
+                  type="url"
+                  value={jobUrl}
+                  onChange={handleJobUrlChange}
+                  placeholder="https://company.com/jobs/frontend-developer"
+                  aria-describedby="jobUrl-hint"
+                />
+                <button
+                  className="secondary-action job-import-button"
+                  type="button"
+                  disabled={isImporting || isAnalyzing || !jobUrl.trim()}
+                  aria-busy={isImporting}
+                  onClick={handleImportJobDetails}
+                >
+                  {isImporting ? 'Importing…' : 'Import job details'}
+                </button>
+              </div>
+              <p className="field-hint" id="jobUrl-hint">
+                Works with public pages. Sign-in-only listings may need to be pasted manually.
+              </p>
+              {importMessage && <p className="save-message" role="status">{importMessage}</p>}
+              {importError && <p className="field-error" role="alert">{importError}</p>}
+            </div>
           </div>
 
           <div className="form-grid">
@@ -215,7 +295,7 @@ function NewApplicationPage() {
             <button
               className="submit-button"
               type="submit"
-              disabled={isAnalyzing}
+              disabled={isAnalyzing || isImporting}
               aria-busy={isAnalyzing}
             >
               {isAnalyzing ? 'Analyzing…' : 'Analyze match'}

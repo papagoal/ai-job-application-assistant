@@ -1,4 +1,5 @@
 import type { JobAnalysis } from '../../../src/types/jobAnalysis'
+import type { ImportedJobDetails } from '../../../src/types/jobApplication'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -103,4 +104,29 @@ export function parseTailoredResume(content: string): string {
   }
 
   return value.tailoredResume.trim()
+}
+
+export function parseImportedJobDetails(content: string): ImportedJobDetails {
+  let value: unknown
+
+  try {
+    value = JSON.parse(content)
+  } catch {
+    throw new Error('DeepSeek returned invalid JSON.')
+  }
+
+  if (
+    !isRecord(value)
+    || !isNonEmptyString(value.companyName)
+    || !isNonEmptyString(value.jobTitle)
+    || !isNonEmptyString(value.jobDescription)
+  ) {
+    throw new Error('DeepSeek returned incomplete job details.')
+  }
+
+  return {
+    companyName: value.companyName.trim(),
+    jobTitle: value.jobTitle.trim(),
+    jobDescription: value.jobDescription.trim(),
+  }
 }

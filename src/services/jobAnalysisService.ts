@@ -1,8 +1,42 @@
 import type { JobAnalysis } from '../types/jobAnalysis'
 import type {
+  ImportedJobDetails,
   JobDescriptionInput,
   ResumeRegenerationInput,
 } from '../types/jobApplication'
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0
+}
+
+export async function importJobDetails(url: string): Promise<ImportedJobDetails> {
+  const response = await fetch('/api/import-job', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ url }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Job import failed with status ${response.status}.`)
+  }
+
+  const result = (await response.json()) as Record<string, unknown>
+  if (
+    !isNonEmptyString(result.companyName)
+    || !isNonEmptyString(result.jobTitle)
+    || !isNonEmptyString(result.jobDescription)
+  ) {
+    throw new Error('Job import returned incomplete details.')
+  }
+
+  return {
+    companyName: result.companyName.trim(),
+    jobTitle: result.jobTitle.trim(),
+    jobDescription: result.jobDescription.trim(),
+  }
+}
 
 export async function analyzeJob(input: JobDescriptionInput): Promise<JobAnalysis> {
   const response = await fetch('/api/analyze-job', {

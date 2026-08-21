@@ -11,3 +11,14 @@ export interface JobDescriptionInput {
 export interface ResumeRegenerationInput extends JobDescriptionInput {
   currentTailoredResume: string
 }
+
+export interface JobDetailsExtractionInput {
+  sourceUrl: string
+  pageText: string
+}
+
+export interface ImportedJobDetails {
+  companyName: string
+  jobTitle: string
+  jobDescription: string
+}

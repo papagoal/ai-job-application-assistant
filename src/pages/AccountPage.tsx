@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import type { User } from '@supabase/supabase-js'
 import {
   connectGuestAccount,
+  continueWithGoogle,
   getCurrentUser,
   isSupabaseConfigured,
   sendExistingAccountMagicLink,
@@ -9,7 +10,7 @@ import {
   subscribeToAuthChanges,
 } from '../services/authService'
 
-type PendingAction = 'connect' | 'magic-link' | 'sign-out' | null
+type PendingAction = 'connect' | 'magic-link' | 'google' | 'sign-out' | null
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error && error.message.toLowerCase().includes('already registered')) {
@@ -88,6 +89,18 @@ function AccountPage() {
     }
   }
 
+  async function handleGoogleSignIn() {
+    resetFeedback()
+    setPendingAction('google')
+
+    try {
+      await continueWithGoogle(user)
+    } catch (googleError) {
+      setError(getErrorMessage(googleError))
+      setPendingAction(null)
+    }
+  }
+
   if (!isSupabaseConfigured) {
     return (
       <section className="form-page">
@@ -109,6 +122,9 @@ function AccountPage() {
   }
 
   const isConnectedAccount = user && !user.is_anonymous
+  const hasGoogleIdentity = user?.identities?.some(
+    (identity) => identity.provider === 'google',
+  ) ?? false
 
   return (
     <section className="form-page">
@@ -130,14 +146,29 @@ function AccountPage() {
             <p className="account-label">Signed in as</p>
             <p className="account-email">{user.email}</p>
           </div>
-          <button
-            className="secondary-action account-button"
-            type="button"
-            disabled={pendingAction !== null}
-            onClick={handleSignOut}
-          >
-            {pendingAction === 'sign-out' ? 'Signing out…' : 'Sign out'}
-          </button>
+          <div className="account-card-actions">
+            {hasGoogleIdentity ? (
+              <span className="google-connected-status">Google connected</span>
+            ) : (
+              <button
+                className="google-sign-in-button account-google-button"
+                type="button"
+                disabled={pendingAction !== null}
+                onClick={handleGoogleSignIn}
+              >
+                <span className="google-sign-in-mark" aria-hidden="true">G</span>
+                {pendingAction === 'google' ? 'Opening Google…' : 'Connect Google'}
+              </button>
+            )}
+            <button
+              className="secondary-action account-button"
+              type="button"
+              disabled={pendingAction !== null}
+              onClick={handleSignOut}
+            >
+              {pendingAction === 'sign-out' ? 'Signing out…' : 'Sign out'}
+            </button>
+          </div>
         </div>
       ) : (
         <form className="profile-form" onSubmit={handleConnect}>
@@ -178,8 +209,27 @@ function AccountPage() {
               </button>
             </div>
 
+            <div className="account-divider" aria-hidden="true"><span>or</span></div>
+
+            <button
+              className="google-sign-in-button"
+              type="button"
+              disabled={pendingAction !== null}
+              onClick={handleGoogleSignIn}
+            >
+              <span className="google-sign-in-mark" aria-hidden="true">G</span>
+              {pendingAction === 'google' ? 'Opening Google…' : 'Continue with Google'}
+            </button>
+            <p className="field-hint">
+              {user?.is_anonymous
+                ? 'Your current profile and applications stay with this account.'
+                : 'Sign in or create an account using your Google email.'}
+            </p>
+
             <p className="account-warning">
-              Signing in to an existing account switches to that account. It does not merge data from this guest account.
+              Magic Link sign-in to an existing account switches accounts and does not merge
+              guest data. Google sign-in keeps the current data when this browser is using a
+              guest account.
             </p>
           </div>
         </form>

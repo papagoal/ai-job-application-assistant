@@ -29,6 +29,7 @@ A React application that compares a job description with a resume, produces an A
 - Local browser persistence for profiles and applications
 - Optional Supabase cloud persistence with per-user Row Level Security
 - Email account connection, Magic Link sign-in, and sign-out
+- Google OAuth sign-in with guest-account identity linking
 - Mock and DeepSeek AI providers
 
 ## Local development
@@ -76,6 +77,18 @@ or V4 Pro in the form, and that choice is reused for resume regeneration and
 interview preparation. Public job-listing extraction always uses V4 Flash.
 
 Keep `DEEPSEEK_API_KEY` server-side. Variables prefixed with `VITE_` are bundled into the browser and must not contain secrets.
+
+## Google sign-in setup
+
+1. Create a Google OAuth client with the **Web application** type.
+2. Add the application origins for local development and production.
+3. Add `https://<project-ref>.supabase.co/auth/v1/callback` as an authorized redirect URI.
+4. Paste the Google Client ID and Client Secret into the Google provider settings in Supabase Auth.
+5. Add local, preview, and production `/account` URLs to the Supabase redirect allow list.
+
+The Google Client Secret belongs only in Supabase. Do not add it to this repository or to a
+`VITE_` environment variable. Manual identity linking must remain enabled so a guest user can
+connect Google without changing the user ID that owns the existing cloud data.
 
 ## Testing
 

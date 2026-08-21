@@ -144,6 +144,33 @@ test('completes the profile-to-application workflow', async ({ page }) => {
     .allTextContents()
   expect(analysisPanelHeadings.at(-1)).toBe('Private notes')
   const tailoredResume = page.locator('.tailored-resume-document')
+  const skillsPanelToggle = page.getByRole('button', {
+    name: 'What matches and what is missing',
+  })
+  const tailoredResumePanel = page.locator('.tailored-resume-panel')
+  const tailoredResumePanelToggle = tailoredResumePanel.getByRole('button', {
+    name: 'Job-targeted draft',
+  })
+  const resumeImprovementsToggle = page.getByRole('button', {
+    name: 'Suggestions for this application',
+  })
+  const privateNotesToggle = page.getByRole('button', { name: 'Private notes' })
+  await expect(skillsPanelToggle).toHaveAttribute('aria-expanded', 'true')
+  await expect(tailoredResumePanelToggle).toHaveAttribute('aria-expanded', 'false')
+  await expect(tailoredResume).toBeHidden()
+
+  await page.getByRole('button', { name: 'Expand all' }).click()
+  await expect(tailoredResume).toBeVisible()
+  await page.getByRole('button', { name: 'Collapse all' }).click()
+  await expect(skillsPanelToggle).toHaveAttribute('aria-expanded', 'false')
+  await expect(page.locator('.suggestion-list')).toBeHidden()
+  await expect(page.locator('.notes-editor')).toBeHidden()
+  await resumeImprovementsToggle.click()
+  await privateNotesToggle.click()
+  await expect(page.locator('.suggestion-list')).toBeVisible()
+  await expect(page.locator('.notes-editor')).toBeVisible()
+  await tailoredResumePanelToggle.click()
+
   await expect(tailoredResume.getByRole('heading', { name: 'Test Candidate' })).toBeVisible()
   await expect(tailoredResume.getByText('candidate@example.com')).toBeVisible()
   await expect(tailoredResume.getByText('+1 416 555 0123')).toBeVisible()
@@ -151,7 +178,6 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await expect(tailoredResume.getByRole('heading', { name: 'SKILLS' })).toBeVisible()
   await expect(tailoredResume.locator('li').filter({ hasText: /^React$/ })).toBeVisible()
 
-  const tailoredResumePanel = page.locator('.tailored-resume-panel')
   await tailoredResumePanel.getByRole('button', { name: 'Regenerate with AI' }).click()
   await expect(page.getByRole('status')).toHaveText('New AI resume generated and saved.')
   await expect(tailoredResume.getByText(/Newly regenerated resume/)).toBeVisible()
@@ -160,6 +186,9 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await expect(tailoredResume.getByText(/Frontend developer experienced/)).toBeVisible()
 
   const interviewPrepPanel = page.locator('.interview-prep-panel')
+  await interviewPrepPanel.getByRole('button', {
+    name: 'Role-specific practice questions',
+  }).click()
   await interviewPrepPanel.getByRole('button', { name: 'Generate interview prep' }).click()
   await expect(interviewPrepPanel.getByRole('status')).toHaveText(
     'Interview preparation generated and saved.',
@@ -247,6 +276,8 @@ University degree with continued practical development in modern web engineering
   expect(downloadedPdf.match(/\/Type \/Page\b/g)).toHaveLength(1)
 
   await page.reload()
+  await page.getByRole('button', { name: 'Job-targeted draft' }).click()
+  await page.getByRole('button', { name: 'Role-specific practice questions' }).click()
   await expect(page.getByText('Updated tailored resume')).toBeVisible()
   await expect(page.getByText(/How would you test an accessible React/).first()).toBeVisible()
 

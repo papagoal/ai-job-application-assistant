@@ -1,8 +1,16 @@
 import type { JobAnalysis } from '../../../src/types/jobAnalysis'
-import type { JobDescriptionInput } from '../../../src/types/jobApplication'
+import type {
+  JobDescriptionInput,
+  ResumeRegenerationInput,
+} from '../../../src/types/jobApplication'
 import type { AIProvider } from './AIProvider'
 import { buildAnalysisPrompt } from './buildAnalysisPrompt.js'
-import { hasProfessionalSummary, parseJobAnalysis } from './parseJobAnalysis.js'
+import { buildResumeRegenerationPrompt } from './buildResumeRegenerationPrompt.js'
+import {
+  hasProfessionalSummary,
+  parseJobAnalysis,
+  parseTailoredResume,
+} from './parseJobAnalysis.js'
 
 interface DeepSeekChatCompletion {
   choices?: Array<{
@@ -87,5 +95,35 @@ export class DeepSeekProvider implements AIProvider {
       jobTitle: input.jobTitle.trim(),
       outputLanguage,
     }
+  }
+
+  async regenerateResume(input: ResumeRegenerationInput): Promise<string> {
+    const outputLanguage = input.outputLanguage ?? 'en'
+    const summaryHeading = outputLanguage === 'zh' ? '专业摘要' : 'PROFESSIONAL SUMMARY'
+    const prompt = buildResumeRegenerationPrompt(input)
+    const messages: DeepSeekMessage[] = [
+      { role: 'system', content: prompt.system },
+      { role: 'user', content: prompt.user },
+    ]
+    let content = await this.complete(messages)
+    let tailoredResume = parseTailoredResume(content)
+
+    if (!hasProfessionalSummary(tailoredResume)) {
+      content = await this.complete([
+        ...messages,
+        { role: 'assistant', content },
+        {
+          role: 'user',
+          content: `Correct the JSON response. The tailoredResume must begin with a non-empty ${summaryHeading} section containing two or three newly written sentences in the requested output language. Use only verified facts from the supplied original resume. Return only the corrected complete JSON object.`,
+        },
+      ])
+      tailoredResume = parseTailoredResume(content)
+
+      if (!hasProfessionalSummary(tailoredResume)) {
+        throw new Error('DeepSeek returned a tailored resume without a professional summary.')
+      }
+    }
+
+    return tailoredResume
   }
 }

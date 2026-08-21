@@ -1,6 +1,9 @@
 import { mockJobAnalysis } from '../../../src/mocks/jobAnalysis.js'
 import type { JobAnalysis } from '../../../src/types/jobAnalysis'
-import type { JobDescriptionInput } from '../../../src/types/jobApplication'
+import type {
+  JobDescriptionInput,
+  ResumeRegenerationInput,
+} from '../../../src/types/jobApplication'
 import type { AIProvider } from './AIProvider'
 
 export class MockAIProvider implements AIProvider {
@@ -29,5 +32,20 @@ export class MockAIProvider implements AIProvider {
       tailoredResume,
       outputLanguage,
     })
+  }
+
+  regenerateResume(input: ResumeRegenerationInput): Promise<string> {
+    const companyName = input.companyName.trim()
+    const jobTitle = input.jobTitle.trim()
+
+    if ((input.outputLanguage ?? 'en') === 'zh') {
+      return Promise.resolve(
+        `专业摘要\n这是为 ${companyName} 的 ${jobTitle} 职位重新生成的简历版本。\n\n核心技能\n${input.resumeText.trim()}`,
+      )
+    }
+
+    return Promise.resolve(
+      `PROFESSIONAL SUMMARY\nThis refreshed resume targets the ${jobTitle} role at ${companyName}.\n\nCORE SKILLS\n${input.resumeText.trim()}`,
+    )
   }
 }

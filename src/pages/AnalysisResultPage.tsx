@@ -1,5 +1,6 @@
 import { useEffect, useState, type ChangeEvent, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { regenerateTailoredResume } from '../services/jobAnalysisService'
 import {
   deleteApplication,
   getApplication,
@@ -150,6 +151,12 @@ function AnalysisResultPage() {
   const [isSavingTailoredResume, setIsSavingTailoredResume] = useState(false)
   const [tailoredResumeSaveMessage, setTailoredResumeSaveMessage] = useState('')
   const [tailoredResumeSaveError, setTailoredResumeSaveError] = useState('')
+  const [sourceJobDescription, setSourceJobDescription] = useState('')
+  const [sourceResumeText, setSourceResumeText] = useState('')
+  const [isRegeneratingTailoredResume, setIsRegeneratingTailoredResume] = useState(false)
+  const [isUndoingTailoredResume, setIsUndoingTailoredResume] = useState(false)
+  const [tailoredResumeRegenerationError, setTailoredResumeRegenerationError] = useState('')
+  const [previousTailoredResume, setPreviousTailoredResume] = useState<string | null>(null)
   const [candidateName, setCandidateName] = useState('')
   const [candidateEmail, setCandidateEmail] = useState('')
   const [candidatePhone, setCandidatePhone] = useState('')
@@ -173,6 +180,8 @@ function AnalysisResultPage() {
           setAnalysis(application.analysis)
           setCoverLetterDraft(application.analysis.coverLetter)
           setTailoredResumeDraft(application.analysis.tailoredResume ?? '')
+          setSourceJobDescription(application.jobDescription)
+          setSourceResumeText(application.resumeText)
           setStatus(application.status)
           setSavedNotes(application.notes ?? '')
           setNotesDraft(application.notes ?? '')
@@ -602,6 +611,7 @@ function AnalysisResultPage() {
       await updateApplicationTailoredResume(id, nextTailoredResume)
       setAnalysis({ ...analysis, tailoredResume: nextTailoredResume })
       setTailoredResumeDraft(nextTailoredResume)
+      setPreviousTailoredResume(null)
       setIsEditingTailoredResume(false)
       setTailoredResumeSaveMessage('Tailored resume saved.')
       setIsTailoredResumeCopied(false)
@@ -612,6 +622,75 @@ function AnalysisResultPage() {
       )
     } finally {
       setIsSavingTailoredResume(false)
+    }
+  }
+
+  async function handleRegenerateTailoredResume() {
+    if (
+      !id
+      || !analysis?.tailoredResume
+      || !sourceJobDescription
+      || !sourceResumeText
+    ) return
+
+    const currentTailoredResume = analysis.tailoredResume
+    setTailoredResumeSaveMessage('')
+    setTailoredResumeSaveError('')
+    setTailoredResumeRegenerationError('')
+    setIsRegeneratingTailoredResume(true)
+
+    try {
+      const regeneratedResume = await regenerateTailoredResume({
+        companyName: analysis.companyName,
+        jobTitle: analysis.jobTitle,
+        jobDescription: sourceJobDescription,
+        resumeText: sourceResumeText,
+        outputLanguage: analysis.outputLanguage ?? 'en',
+        currentTailoredResume,
+      })
+
+      await updateApplicationTailoredResume(id, regeneratedResume)
+      setPreviousTailoredResume(currentTailoredResume)
+      setAnalysis((currentAnalysis) => currentAnalysis
+        ? { ...currentAnalysis, tailoredResume: regeneratedResume }
+        : currentAnalysis)
+      setTailoredResumeDraft(regeneratedResume)
+      setTailoredResumeSaveMessage('New AI resume generated and saved.')
+      setIsTailoredResumeCopied(false)
+      setIsTailoredResumeDownloaded(false)
+    } catch {
+      setTailoredResumeRegenerationError(
+        'A new resume could not be generated. Your current resume was kept.',
+      )
+    } finally {
+      setIsRegeneratingTailoredResume(false)
+    }
+  }
+
+  async function handleUndoTailoredResumeRegeneration() {
+    if (!id || !analysis || !previousTailoredResume) return
+
+    setTailoredResumeSaveMessage('')
+    setTailoredResumeSaveError('')
+    setTailoredResumeRegenerationError('')
+    setIsUndoingTailoredResume(true)
+
+    try {
+      await updateApplicationTailoredResume(id, previousTailoredResume)
+      setAnalysis((currentAnalysis) => currentAnalysis
+        ? { ...currentAnalysis, tailoredResume: previousTailoredResume }
+        : currentAnalysis)
+      setTailoredResumeDraft(previousTailoredResume)
+      setPreviousTailoredResume(null)
+      setTailoredResumeSaveMessage('Previous resume restored.')
+      setIsTailoredResumeCopied(false)
+      setIsTailoredResumeDownloaded(false)
+    } catch {
+      setTailoredResumeRegenerationError(
+        'The previous resume could not be restored. Please try again.',
+      )
+    } finally {
+      setIsUndoingTailoredResume(false)
     }
   }
 
@@ -767,10 +846,36 @@ function AnalysisResultPage() {
                       <button
                         className="secondary-action tailored-resume-action"
                         type="button"
+                        disabled={isRegeneratingTailoredResume || isUndoingTailoredResume}
                         onClick={handleEditTailoredResume}
                       >
                         Edit tailored resume
                       </button>
+                      <button
+                        className="secondary-action tailored-resume-action"
+                        type="button"
+                        disabled={
+                          isRegeneratingTailoredResume
+                          || isUndoingTailoredResume
+                          || !sourceJobDescription
+                          || !sourceResumeText
+                        }
+                        onClick={handleRegenerateTailoredResume}
+                      >
+                        {isRegeneratingTailoredResume
+                          ? 'Regenerating…'
+                          : 'Regenerate with AI'}
+                      </button>
+                      {previousTailoredResume && (
+                        <button
+                          className="secondary-action tailored-resume-action"
+                          type="button"
+                          disabled={isRegeneratingTailoredResume || isUndoingTailoredResume}
+                          onClick={handleUndoTailoredResumeRegeneration}
+                        >
+                          {isUndoingTailoredResume ? 'Restoring…' : 'Undo regeneration'}
+                        </button>
+                      )}
                       <button
                         className="secondary-action tailored-resume-action"
                         type="button"
@@ -829,6 +934,11 @@ function AnalysisResultPage() {
                   {tailoredResumeSaveError && (
                     <p className="tailored-resume-error" role="alert">
                       {tailoredResumeSaveError}
+                    </p>
+                  )}
+                  {tailoredResumeRegenerationError && (
+                    <p className="tailored-resume-error" role="alert">
+                      {tailoredResumeRegenerationError}
                     </p>
                   )}
                 </div>

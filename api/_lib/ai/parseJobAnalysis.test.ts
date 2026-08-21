@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { mockJobAnalysis } from '../../../src/mocks/jobAnalysis'
-import { hasProfessionalSummary, parseJobAnalysis } from './parseJobAnalysis'
+import {
+  hasProfessionalSummary,
+  parseJobAnalysis,
+  parseTailoredResume,
+} from './parseJobAnalysis'
 
 describe('parseJobAnalysis', () => {
   it('parses a complete analysis response', () => {
@@ -86,5 +90,29 @@ React`,
 
 技术技能
 React`)).toBe(true)
+  })
+})
+
+describe('parseTailoredResume', () => {
+  it('returns a trimmed tailored resume from a JSON response', () => {
+    expect(parseTailoredResume(JSON.stringify({
+      tailoredResume: '  PROFESSIONAL SUMMARY\nTargeted summary.  ',
+    }))).toBe('PROFESSIONAL SUMMARY\nTargeted summary.')
+  })
+
+  it('rejects invalid JSON', () => {
+    expect(() => parseTailoredResume('{not-json')).toThrow(
+      'DeepSeek returned invalid JSON.',
+    )
+  })
+
+  it.each([
+    {},
+    { tailoredResume: '' },
+    { tailoredResume: 42 },
+  ])('rejects a missing or invalid tailored resume', (response) => {
+    expect(() => parseTailoredResume(JSON.stringify(response))).toThrow(
+      'DeepSeek returned an empty tailored resume.',
+    )
   })
 })

@@ -20,6 +20,14 @@ SKILLS
 - TypeScript`,
 }
 
+const regeneratedResume = `PROFESSIONAL SUMMARY
+Newly regenerated resume for testing with role-specific React and TypeScript experience.
+
+SKILLS
+- React
+- TypeScript
+- Playwright`
+
 test('completes the profile-to-application workflow', async ({ page }) => {
   await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
   await page.route('**/api/analyze-job', async (route) => {
@@ -32,6 +40,18 @@ test('completes the profile-to-application workflow', async ({ page }) => {
       outputLanguage: 'en',
     })
     await route.fulfill({ json: analysis })
+  })
+  await page.route('**/api/regenerate-resume', async (route) => {
+    expect(route.request().method()).toBe('POST')
+    expect(route.request().postDataJSON()).toEqual({
+      companyName: 'Northstar Labs',
+      jobTitle: 'Frontend Developer',
+      jobDescription: 'Build accessible React applications.',
+      resumeText: 'React and TypeScript experience.',
+      currentTailoredResume: analysis.tailoredResume,
+      outputLanguage: 'en',
+    })
+    await route.fulfill({ json: { tailoredResume: regeneratedResume } })
   })
 
   await page.goto('/profile')
@@ -83,10 +103,18 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await expect(tailoredResume.getByRole('heading', { name: 'SKILLS' })).toBeVisible()
   await expect(tailoredResume.locator('li').filter({ hasText: /^React$/ })).toBeVisible()
 
+  const tailoredResumePanel = page.locator('.tailored-resume-panel')
+  await tailoredResumePanel.getByRole('button', { name: 'Regenerate with AI' }).click()
+  await expect(page.getByRole('status')).toHaveText('New AI resume generated and saved.')
+  await expect(tailoredResume.getByText(/Newly regenerated resume/)).toBeVisible()
+  await tailoredResumePanel.getByRole('button', { name: 'Undo regeneration' }).click()
+  await expect(page.getByRole('status')).toHaveText('Previous resume restored.')
+  await expect(tailoredResume.getByText(/Frontend developer experienced/)).toBeVisible()
+
   await page.evaluate(() => {
     window.print = () => document.body.setAttribute('data-print-invoked', 'true')
   })
-  await page.locator('.tailored-resume-panel')
+  await tailoredResumePanel
     .getByRole('button', { name: 'Print', exact: true })
     .click()
   await expect.poll(() => page.evaluate(() => document.body.dataset.printTarget))

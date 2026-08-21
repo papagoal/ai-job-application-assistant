@@ -870,11 +870,16 @@ function AnalysisResultPage() {
         <div>
           <p className="eyebrow">Application analysis</p>
           <h1>{analysis.jobTitle}</h1>
-          <p className="page-description">
-            {analysis.companyName} · {analysis.aiModel === 'deepseek-v4-pro'
-              ? 'DeepSeek V4 Pro'
-              : 'DeepSeek V4 Flash'} · Application ID: {id}
-          </p>
+          <p className="analysis-company">{analysis.companyName}</p>
+          <div className="analysis-meta-list" aria-label="Analysis details">
+            <span>
+              {analysis.aiModel === 'deepseek-v4-pro'
+                ? 'DeepSeek V4 Pro'
+                : 'DeepSeek V4 Flash'}
+            </span>
+            <span>{analysis.outputLanguage === 'zh' ? 'Chinese output' : 'English output'}</span>
+            <span>Application ID: {id}</span>
+          </div>
         </div>
         <div className="analysis-heading-actions">
           <Link className="secondary-action" to="/">Back to Dashboard</Link>
@@ -891,23 +896,29 @@ function AnalysisResultPage() {
 
       {deleteError && <p className="delete-error" role="alert">{deleteError}</p>}
 
-      <div className="analysis-panel-controls" aria-label="Analysis section controls">
-        <button
-          className="secondary-action"
-          type="button"
-          disabled={analysisPanelIds.every((panelId) => expandedPanels[panelId])}
-          onClick={() => setAllPanels(true)}
-        >
-          Expand all
-        </button>
-        <button
-          className="secondary-action"
-          type="button"
-          disabled={analysisPanelIds.every((panelId) => !expandedPanels[panelId])}
-          onClick={() => setAllPanels(false)}
-        >
-          Collapse all
-        </button>
+      <div className="analysis-toolbar">
+        <div>
+          <p className="analysis-toolbar-label">Your application workspace</p>
+          <p>Review the match, prepare your documents, and track the next step.</p>
+        </div>
+        <div className="analysis-panel-controls" aria-label="Analysis section controls">
+          <button
+            className="secondary-action"
+            type="button"
+            disabled={analysisPanelIds.every((panelId) => expandedPanels[panelId])}
+            onClick={() => setAllPanels(true)}
+          >
+            Expand all
+          </button>
+          <button
+            className="secondary-action"
+            type="button"
+            disabled={analysisPanelIds.every((panelId) => !expandedPanels[panelId])}
+            onClick={() => setAllPanels(false)}
+          >
+            Collapse all
+          </button>
+        </div>
       </div>
 
       <div className="analysis-layout">
@@ -918,8 +929,16 @@ function AnalysisResultPage() {
             aria-label={`${analysis.matchScore} percent match`}
           >
             <strong>{analysis.matchScore}</strong>
-            <span>/ 100</span>
+            <span>out of 100</span>
           </div>
+          <progress
+            className="analysis-score-progress"
+            value={analysis.matchScore}
+            max="100"
+            aria-label="Match score progress"
+          >
+            {analysis.matchScore}%
+          </progress>
           <p className="score-summary">{analysis.scoreSummary}</p>
           <p className="score-description">{analysis.scoreDescription}</p>
 
@@ -957,7 +976,7 @@ function AnalysisResultPage() {
 
             <div id="skills-content" hidden={!expandedPanels.skills}>
               <div className="skills-columns">
-              <div>
+              <div className="skill-group matching-skill-group">
                 <h3>Matching skills</h3>
                 <ul className="skill-list matching-skills">
                   {analysis.matchingSkills.map((skill) => (
@@ -965,7 +984,7 @@ function AnalysisResultPage() {
                   ))}
                 </ul>
               </div>
-              <div>
+              <div className="skill-group missing-skill-group">
                 <h3>Missing skills</h3>
                 <ul className="skill-list missing-skills">
                   {analysis.missingSkills.map((skill) => (

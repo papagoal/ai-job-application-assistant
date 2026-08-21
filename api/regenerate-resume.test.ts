@@ -58,4 +58,17 @@ describe('/api/regenerate-resume', () => {
     expect(result.tailoredResume).toContain('refreshed resume')
     expect(Object.keys(result)).toEqual(['tailoredResume'])
   })
+
+  it('rejects unsupported AI models', async () => {
+    const handler = await loadHandler()
+    const response = await handler.fetch(
+      new Request('http://localhost/api/regenerate-resume', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...validInput, aiModel: 'deepseek-unknown' }),
+      }),
+    )
+
+    expect(response.status).toBe(400)
+  })
 })

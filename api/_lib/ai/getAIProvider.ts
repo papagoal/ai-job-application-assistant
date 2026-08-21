@@ -1,4 +1,5 @@
 import type { AIProvider } from './AIProvider'
+import type { DeepSeekModel } from '../../../src/types/jobApplication'
 import { DeepSeekProvider } from './DeepSeekProvider.js'
 import { MockAIProvider } from './MockAIProvider.js'
 
@@ -10,7 +11,11 @@ interface ServerRuntime {
   }
 }
 
-export function getAIProvider(): AIProvider {
+function isDeepSeekModel(value: unknown): value is DeepSeekModel {
+  return value === 'deepseek-v4-flash' || value === 'deepseek-v4-pro'
+}
+
+export function getAIProvider(requestedModel?: DeepSeekModel): AIProvider {
   const { env } = (globalThis as typeof globalThis & ServerRuntime).process
   const providerName = env.AI_PROVIDER?.trim().toLowerCase() ?? 'mock'
 
@@ -23,7 +28,18 @@ export function getAIProvider(): AIProvider {
       throw new Error('DEEPSEEK_API_KEY is required when AI_PROVIDER is deepseek.')
     }
 
-    return new DeepSeekProvider(apiKey, env.DEEPSEEK_MODEL)
+    const configuredModel = env.DEEPSEEK_MODEL?.trim()
+    if (configuredModel && !isDeepSeekModel(configuredModel)) {
+      throw new Error(`Unsupported DeepSeek model: ${configuredModel}`)
+    }
+    const configuredDeepSeekModel = isDeepSeekModel(configuredModel)
+      ? configuredModel
+      : undefined
+
+    return new DeepSeekProvider(
+      apiKey,
+      requestedModel ?? configuredDeepSeekModel ?? 'deepseek-v4-flash',
+    )
   }
 
   throw new Error(`Unsupported AI provider: ${providerName}`)

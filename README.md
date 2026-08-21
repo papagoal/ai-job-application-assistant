@@ -8,6 +8,7 @@ A React application that compares a job description with a resume, produces an A
 - Public job-listing link import for company, role, and job-description fields
 - Job-to-resume match analysis
 - English and Simplified Chinese AI output
+- Per-application DeepSeek V4 Flash or V4 Pro model selection
 - Matching and missing skills
 - Resume suggestions and cover-letter draft
 - Editable tailored-resume drafts with copy, download, and print-ready PDF export
@@ -69,6 +70,10 @@ AI_PROVIDER=deepseek
 DEEPSEEK_API_KEY=your-key
 DEEPSEEK_MODEL=deepseek-v4-flash
 ```
+
+`DEEPSEEK_MODEL` is the server fallback. New applications can choose V4 Flash
+or V4 Pro in the form, and that choice is reused for resume regeneration and
+interview preparation. Public job-listing extraction always uses V4 Flash.
 
 Keep `DEEPSEEK_API_KEY` server-side. Variables prefixed with `VITE_` are bundled into the browser and must not contain secrets.
 

@@ -131,6 +131,7 @@ describe('NewApplicationPage', () => {
       'Build accessible React applications.',
     )
     await user.selectOptions(screen.getByLabelText('AI output language'), 'zh')
+    await user.selectOptions(screen.getByLabelText('AI model'), 'deepseek-v4-pro')
     await user.click(screen.getByRole('button', { name: 'Analyze match' }))
 
     expect(resume).toBeTruthy()
@@ -143,6 +144,7 @@ describe('NewApplicationPage', () => {
       jobDescription: 'Build accessible React applications.',
       resumeText: 'Saved React and TypeScript resume.',
       outputLanguage: 'zh',
+      aiModel: 'deepseek-v4-pro',
     })
     expect(mockedSaveApplication).not.toHaveBeenCalled()
   })

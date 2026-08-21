@@ -19,6 +19,7 @@ describe('MockAIProvider', () => {
       companyName: 'Northstar Labs',
       jobTitle: 'Frontend Developer',
       outputLanguage: 'en',
+      aiModel: 'deepseek-v4-flash',
       tailoredResume: `PROFESSIONAL SUMMARY
 React and TypeScript experience.
 

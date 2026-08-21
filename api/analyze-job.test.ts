@@ -6,6 +6,7 @@ const validInput = {
   jobDescription: 'Build accessible React applications.',
   resumeText: 'React and TypeScript experience.',
   outputLanguage: 'en',
+  aiModel: 'deepseek-v4-pro',
 }
 
 async function loadHandler() {
@@ -79,6 +80,7 @@ describe('/api/analyze-job', () => {
     expect(analysis.matchScore).toBeTypeOf('number')
     expect(analysis.tailoredResume).toContain(validInput.resumeText)
     expect(analysis.outputLanguage).toBe('en')
+    expect(analysis.aiModel).toBe('deepseek-v4-pro')
   })
 
   it('rejects unsupported output languages', async () => {
@@ -88,6 +90,19 @@ describe('/api/analyze-job', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...validInput, outputLanguage: 'fr' }),
+      }),
+    )
+
+    expect(response.status).toBe(400)
+  })
+
+  it('rejects unsupported AI models', async () => {
+    const handler = await loadHandler()
+    const response = await handler.fetch(
+      new Request('http://localhost/api/analyze-job', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...validInput, aiModel: 'deepseek-unknown' }),
       }),
     )
 

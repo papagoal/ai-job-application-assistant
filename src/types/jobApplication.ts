@@ -1,4 +1,5 @@
 export type AIOutputLanguage = 'en' | 'zh'
+export type DeepSeekModel = 'deepseek-v4-flash' | 'deepseek-v4-pro'
 
 export interface JobDescriptionInput {
   companyName: string
@@ -6,6 +7,7 @@ export interface JobDescriptionInput {
   jobDescription: string
   resumeText: string
   outputLanguage?: AIOutputLanguage
+  aiModel?: DeepSeekModel
 }
 
 export interface ResumeRegenerationInput extends JobDescriptionInput {

@@ -33,6 +33,7 @@ export class MockAIProvider implements AIProvider {
         : mockJobAnalysis.coverLetter,
       tailoredResume,
       outputLanguage,
+      aiModel: input.aiModel ?? 'deepseek-v4-flash',
     })
   }
 

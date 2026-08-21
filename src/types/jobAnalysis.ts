@@ -1,4 +1,4 @@
-import type { AIOutputLanguage } from './jobApplication'
+import type { AIOutputLanguage, DeepSeekModel } from './jobApplication'
 
 export interface InterviewPrepQuestion {
   question: string
@@ -22,5 +22,6 @@ export interface JobAnalysis {
   coverLetter: string
   tailoredResume?: string
   outputLanguage?: AIOutputLanguage
+  aiModel?: DeepSeekModel
   interviewPrep?: InterviewPrep
 }

@@ -1,7 +1,5 @@
-import type { JobDescriptionInput } from '../src/types/jobApplication'
+import type { DeepSeekModel, JobDescriptionInput } from '../src/types/jobApplication'
 import { getAIProvider } from './_lib/ai/getAIProvider.js'
-
-const aiProvider = getAIProvider()
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
@@ -9,6 +7,12 @@ function isNonEmptyString(value: unknown): value is string {
 
 function isOutputLanguage(value: unknown) {
   return value === undefined || value === 'en' || value === 'zh'
+}
+
+function isAIModel(value: unknown): value is DeepSeekModel | undefined {
+  return value === undefined
+    || value === 'deepseek-v4-flash'
+    || value === 'deepseek-v4-pro'
 }
 
 function isJobDescriptionInput(value: unknown): value is JobDescriptionInput {
@@ -21,7 +25,8 @@ function isJobDescriptionInput(value: unknown): value is JobDescriptionInput {
     isNonEmptyString(input.jobTitle) &&
     isNonEmptyString(input.jobDescription) &&
     isNonEmptyString(input.resumeText) &&
-    isOutputLanguage(input.outputLanguage)
+    isOutputLanguage(input.outputLanguage) &&
+    isAIModel(input.aiModel)
   )
 }
 
@@ -49,7 +54,7 @@ export default {
       )
     }
 
-    const analysis = await aiProvider.analyze(body)
+    const analysis = await getAIProvider(body.aiModel).analyze(body)
 
     return Response.json(analysis)
   },

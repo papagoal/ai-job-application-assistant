@@ -913,6 +913,10 @@ h1 {
   padding: 26px;
 }
 
+.analysis-panel [hidden] {
+  display: none !important;
+}
+
 .analysis-panel-heading {
   margin-bottom: 24px;
 }

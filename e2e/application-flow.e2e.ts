@@ -151,6 +151,10 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   const tailoredResumePanelToggle = tailoredResumePanel.getByRole('button', {
     name: 'Job-targeted draft',
   })
+  const resumeImprovementsToggle = page.getByRole('button', {
+    name: 'Suggestions for this application',
+  })
+  const privateNotesToggle = page.getByRole('button', { name: 'Private notes' })
   await expect(skillsPanelToggle).toHaveAttribute('aria-expanded', 'true')
   await expect(tailoredResumePanelToggle).toHaveAttribute('aria-expanded', 'false')
   await expect(tailoredResume).toBeHidden()
@@ -159,6 +163,12 @@ test('completes the profile-to-application workflow', async ({ page }) => {
   await expect(tailoredResume).toBeVisible()
   await page.getByRole('button', { name: 'Collapse all' }).click()
   await expect(skillsPanelToggle).toHaveAttribute('aria-expanded', 'false')
+  await expect(page.locator('.suggestion-list')).toBeHidden()
+  await expect(page.locator('.notes-editor')).toBeHidden()
+  await resumeImprovementsToggle.click()
+  await privateNotesToggle.click()
+  await expect(page.locator('.suggestion-list')).toBeVisible()
+  await expect(page.locator('.notes-editor')).toBeVisible()
   await tailoredResumePanelToggle.click()
 
   await expect(tailoredResume.getByRole('heading', { name: 'Test Candidate' })).toBeVisible()

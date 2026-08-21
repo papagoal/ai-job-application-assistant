@@ -11,6 +11,7 @@ const analysis = {
   missingSkills: ['Playwright'],
   suggestions: ['Highlight automated testing experience.'],
   coverLetter: 'Dear Hiring Manager, I am excited to apply.',
+  outputLanguage: 'en' as const,
   tailoredResume: `PROFESSIONAL SUMMARY
 Frontend developer experienced with React and TypeScript.
 
@@ -28,6 +29,7 @@ test('completes the profile-to-application workflow', async ({ page }) => {
       jobTitle: 'Frontend Developer',
       jobDescription: 'Build accessible React applications.',
       resumeText: 'React and TypeScript experience.',
+      outputLanguage: 'en',
     })
     await route.fulfill({ json: analysis })
   })

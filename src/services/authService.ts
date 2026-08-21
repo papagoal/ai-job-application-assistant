@@ -53,6 +53,21 @@ export async function sendExistingAccountMagicLink(email: string): Promise<void>
   if (error) throw error
 }
 
+export async function continueWithGoogle(user: User | null): Promise<void> {
+  const client = requireSupabase()
+  const credentials = {
+    provider: 'google' as const,
+    options: {
+      redirectTo: `${window.location.origin}/account`,
+    },
+  }
+  const { error } = user
+    ? await client.auth.linkIdentity(credentials)
+    : await client.auth.signInWithOAuth(credentials)
+
+  if (error) throw error
+}
+
 export async function signOut(): Promise<void> {
   const client = requireSupabase()
   const { error } = await client.auth.signOut()

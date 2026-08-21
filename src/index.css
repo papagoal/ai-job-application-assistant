@@ -300,6 +300,15 @@ h1 {
   flex-shrink: 0;
 }
 
+.dashboard-page {
+  max-width: 1200px;
+}
+
+.dashboard-page-heading {
+  align-items: flex-start;
+  margin-bottom: 28px;
+}
+
 .dashboard-export {
   display: grid;
   flex-shrink: 0;
@@ -314,6 +323,28 @@ h1 {
 .dashboard-heading-actions {
   display: flex;
   gap: 10px;
+}
+
+.dashboard-heading-actions .secondary-action {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 13px;
+  border-color: #d4d4d8;
+  border-radius: 9px;
+  box-shadow: 0 1px 3px rgba(24, 24, 27, 0.06);
+  cursor: pointer;
+}
+
+.dashboard-heading-actions svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .dashboard-view-button {
@@ -332,7 +363,7 @@ h1 {
 .application-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
+  gap: 16px;
 }
 
 .application-table-container {
@@ -360,7 +391,7 @@ h1 {
 
 .application-table th {
   color: var(--color-muted);
-  background: #f8f9fc;
+  background: #f4f4f5;
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -392,7 +423,7 @@ h1 {
 }
 
 .application-table tbody tr:hover {
-  background: #fafbff;
+  background: #fafafa;
 }
 
 .application-table a {
@@ -402,8 +433,26 @@ h1 {
 }
 
 .application-table a:hover {
-  color: var(--color-primary);
-  text-decoration: underline;
+  color: #52525b;
+}
+
+.table-company-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.table-company-mark {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #d4d4d8;
+  border-radius: 8px;
+  color: #3f3f46;
+  background: #fafafa;
+  font-size: 0.68rem;
+  font-weight: 800;
 }
 
 .application-table time {
@@ -424,14 +473,17 @@ h1 {
 .application-summary {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
-  margin: -8px 0 28px;
+  gap: 14px;
+  margin: 0 0 24px;
 }
 
 .summary-card {
-  padding: 18px 20px;
+  min-height: 136px;
+  display: flex;
+  flex-direction: column;
+  padding: 19px 20px;
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: 14px;
   background: var(--color-surface);
   box-shadow: var(--shadow-card);
 }
@@ -442,18 +494,30 @@ h1 {
   font-weight: 700;
 }
 
-.summary-card dd {
-  margin: 7px 0 0;
+.summary-card-value {
+  margin: 14px 0 0;
   color: var(--color-text);
-  font-size: 1.55rem;
-  font-weight: 800;
+  font-size: 1.75rem;
+  font-weight: 780;
   line-height: 1;
+}
+
+.summary-card-detail {
+  margin: auto 0 0;
+  color: #a1a1aa;
+  font-size: 0.72rem;
+  line-height: 1.35;
 }
 
 .dashboard-controls {
   display: grid;
-  gap: 18px;
-  margin: -8px 0 24px;
+  gap: 16px;
+  margin: 0 0 24px;
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 }
 
 .dashboard-control-row {
@@ -469,29 +533,43 @@ h1 {
 }
 
 .application-search label {
-  color: var(--color-text);
-  font-size: 0.86rem;
+  color: var(--color-muted);
+  font-size: 0.74rem;
   font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
 .application-search-input {
   display: flex;
   align-items: center;
-  border: 1px solid #cdd3de;
-  border-radius: 8px;
-  background: var(--color-surface);
+  min-height: 42px;
+  border: 1px solid #d4d4d8;
+  border-radius: 9px;
+  background: #fafafa;
 }
 
 .application-search-input:focus-within {
-  border-color: var(--color-primary);
-  outline: 3px solid rgba(49, 87, 213, 0.14);
+  border-color: #71717a;
+  outline: 3px solid rgba(24, 24, 27, 0.08);
+}
+
+.application-search-input svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  margin-left: 12px;
+  color: #a1a1aa;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .application-search-input input {
   min-width: 0;
   flex: 1;
   border: 0;
-  padding: 11px 12px;
+  padding: 10px 11px;
   color: var(--color-text);
   background: transparent;
   outline: 0;
@@ -514,23 +592,32 @@ h1 {
 }
 
 .application-sort label {
-  color: var(--color-text);
-  font-size: 0.86rem;
+  color: var(--color-muted);
+  font-size: 0.74rem;
   font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
 .application-sort select {
   width: 100%;
-  border: 1px solid #cdd3de;
-  border-radius: 8px;
-  padding: 10px 12px;
+  min-height: 42px;
+  border: 1px solid #d4d4d8;
+  border-radius: 9px;
+  padding: 9px 12px;
   color: var(--color-text);
-  background: var(--color-surface);
+  background: #fafafa;
 }
 
 .application-sort select:focus {
-  border-color: var(--color-primary);
-  outline: 3px solid rgba(49, 87, 213, 0.14);
+  border-color: #71717a;
+  outline: 3px solid rgba(24, 24, 27, 0.08);
+}
+
+.dashboard-controls-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
 }
 
 .status-filters {
@@ -541,8 +628,8 @@ h1 {
 
 .status-filter-button {
   border: 1px solid var(--color-border);
-  border-radius: 999px;
-  padding: 8px 14px;
+  border-radius: 8px;
+  padding: 7px 12px;
   color: var(--color-muted);
   background: var(--color-surface);
   font-size: 0.85rem;
@@ -552,13 +639,21 @@ h1 {
 
 .status-filter-button:hover {
   color: var(--color-text);
-  background: #f1f3f8;
+  background: #f4f4f5;
 }
 
 .status-filter-button[aria-pressed="true"] {
   border-color: var(--color-primary);
   color: #ffffff;
   background: var(--color-primary);
+}
+
+.application-result-count {
+  flex: 0 0 auto;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
 }
 
 .status-filter-reset {
@@ -573,9 +668,10 @@ h1 {
   justify-content: center;
   gap: 12px;
   padding: 48px 24px;
-  border: 1px dashed var(--color-border);
-  border-radius: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
   background: var(--color-surface);
+  box-shadow: var(--shadow-card);
   text-align: center;
 }
 
@@ -592,11 +688,17 @@ h1 {
 }
 
 .application-card {
-  padding: 24px;
+  padding: 22px;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 14px;
   background: var(--color-surface);
   box-shadow: var(--shadow-card);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.application-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(24, 24, 27, 0.09), 0 20px 42px rgba(24, 24, 27, 0.08);
 }
 
 .application-card-header {
@@ -604,6 +706,27 @@ h1 {
   align-items: flex-start;
   justify-content: space-between;
   gap: 20px;
+}
+
+.application-card-identity {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.company-mark {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d4d4d8;
+  border-radius: 10px;
+  color: #3f3f46;
+  background: #fafafa;
+  font-size: 0.78rem;
+  font-weight: 800;
 }
 
 .company-name {
@@ -621,14 +744,15 @@ h1 {
 }
 
 .match-score {
-  width: 68px;
-  height: 68px;
-  flex: 0 0 68px;
+  width: 62px;
+  height: 54px;
+  flex: 0 0 62px;
   display: grid;
   place-content: center;
-  border: 3px solid #9eb2f7;
-  border-radius: 50%;
-  color: var(--color-primary);
+  border: 1px solid #d4d4d8;
+  border-radius: 11px;
+  color: var(--color-text);
+  background: #fafafa;
   text-align: center;
 }
 
@@ -687,7 +811,7 @@ h1 {
 }
 
 .application-card-footer > a {
-  color: var(--color-primary);
+  color: var(--color-text);
   font-size: 0.88rem;
   font-weight: 700;
   text-decoration: none;
@@ -695,7 +819,17 @@ h1 {
 }
 
 .application-card-footer > a:hover {
-  text-decoration: underline;
+  color: #52525b;
+}
+
+.status-offer {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.status-rejected {
+  color: #9f1239;
+  background: #fff1f2;
 }
 
 .form-page {
@@ -1788,6 +1922,12 @@ h1 {
   display: none;
 }
 
+@media (min-width: 721px) and (max-width: 1180px) {
+  .application-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 900px) {
   .app-shell {
     display: block;
@@ -2058,6 +2198,20 @@ h1 {
     flex: 1;
   }
 
+  .dashboard-controls {
+    padding: 15px;
+  }
+
+  .dashboard-controls-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .application-result-count {
+    order: -1;
+  }
+
   .analysis-heading-actions {
     width: 100%;
     flex-wrap: wrap;
@@ -2088,6 +2242,11 @@ h1 {
 
   .application-summary {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .summary-card {
+    min-height: 126px;
+    padding: 17px;
   }
 
   .application-card {

@@ -11,9 +11,14 @@ function ApplicationCard({ application }: ApplicationCardProps) {
   return (
     <article className="application-card">
       <div className="application-card-header">
-        <div>
-          <p className="company-name">{companyName}</p>
-          <h2>{jobTitle}</h2>
+        <div className="application-card-identity">
+          <span className="company-mark" aria-hidden="true">
+            {companyName.trim().charAt(0).toUpperCase() || 'J'}
+          </span>
+          <div>
+            <p className="company-name">{companyName}</p>
+            <h2>{jobTitle}</h2>
+          </div>
         </div>
         <div className="match-score" aria-label={`${matchScore}% match`}>
           <strong>{matchScore}%</strong>

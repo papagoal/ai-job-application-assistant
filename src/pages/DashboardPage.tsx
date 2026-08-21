@@ -18,6 +18,44 @@ const statusFilters: StatusFilter[] = [
   'Rejected',
 ]
 
+function TableIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+      <rect x="2.5" y="3" width="15" height="14" rx="2" />
+      <path d="M2.5 8h15M7.5 3v14" />
+    </svg>
+  )
+}
+
+function CardIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+      <rect x="2.5" y="3" width="6" height="6" rx="1.5" />
+      <rect x="11.5" y="3" width="6" height="6" rx="1.5" />
+      <rect x="2.5" y="12" width="6" height="5" rx="1.5" />
+      <rect x="11.5" y="12" width="6" height="5" rx="1.5" />
+    </svg>
+  )
+}
+
+function ExportIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+      <path d="M10 2.5v10M6.5 9 10 12.5 13.5 9" />
+      <path d="M3 12.5v3A1.5 1.5 0 0 0 4.5 17h11a1.5 1.5 0 0 0 1.5-1.5v-3" />
+    </svg>
+  )
+}
+
+function SearchIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+      <circle cx="8.5" cy="8.5" r="5" />
+      <path d="m12.5 12.5 4 4" />
+    </svg>
+  )
+}
+
 function encodeCsvCell(value: string | number) {
   let cell = String(value)
 
@@ -72,19 +110,30 @@ function DashboardPage() {
     : 0
 
   const applicationSummary = [
-    { label: 'Total applications', value: applications.length },
-    { label: 'Average match', value: `${averageMatchScore}%` },
+    {
+      label: 'Total applications',
+      value: applications.length,
+      detail: 'Roles in your tracker',
+    },
+    {
+      label: 'Average match',
+      value: `${averageMatchScore}%`,
+      detail: 'Across every saved role',
+    },
     {
       label: 'Applied',
       value: applications.filter((application) => application.status === 'Applied').length,
+      detail: 'Applications submitted',
     },
     {
       label: 'Interviews',
       value: applications.filter((application) => application.status === 'Interview').length,
+      detail: 'Active conversations',
     },
     {
       label: 'Offers',
       value: applications.filter((application) => application.status === 'Offer').length,
+      detail: 'Successful outcomes',
     },
   ]
 
@@ -129,10 +178,10 @@ function DashboardPage() {
   }
 
   return (
-    <section>
-      <div className="page-heading">
+    <section className="dashboard-page">
+      <div className="page-heading dashboard-page-heading">
         <div>
-          <p className="eyebrow">Application tracker</p>
+          <p className="eyebrow">Workspace overview</p>
           <h1>Your applications</h1>
           <p className="page-description">
             Review your job matches and continue working on saved applications.
@@ -149,14 +198,16 @@ function DashboardPage() {
                   currentView === 'cards' ? 'table' : 'cards'
                 ))}
               >
-                {viewMode === 'cards' ? 'Table view' : 'Card view'}
+                {viewMode === 'cards' ? <TableIcon /> : <CardIcon />}
+                <span>{viewMode === 'cards' ? 'Table view' : 'Card view'}</span>
               </button>
               <button
                 className="secondary-action dashboard-export-button"
                 type="button"
                 onClick={handleExportCsv}
               >
-                {isCsvExported ? 'Exported!' : 'Export CSV'}
+                <ExportIcon />
+                <span>{isCsvExported ? 'Exported!' : 'Export CSV'}</span>
               </button>
             </div>
             {csvExportError && <p role="alert">{csvExportError}</p>}
@@ -169,7 +220,8 @@ function DashboardPage() {
           {applicationSummary.map((item) => (
             <div className="summary-card" key={item.label}>
               <dt>{item.label}</dt>
-              <dd>{item.value}</dd>
+              <dd className="summary-card-value">{item.value}</dd>
+              <dd className="summary-card-detail">{item.detail}</dd>
             </div>
           ))}
         </dl>
@@ -181,6 +233,7 @@ function DashboardPage() {
             <div className="application-search" role="search">
               <label htmlFor="application-search">Search applications</label>
               <div className="application-search-input">
+                <SearchIcon />
                 <input
                   id="application-search"
                   type="search"
@@ -211,18 +264,23 @@ function DashboardPage() {
             </div>
           </div>
 
-          <div className="status-filters" role="group" aria-label="Filter applications by status">
-            {statusFilters.map((filter) => (
-              <button
-                className="status-filter-button"
-                type="button"
-                key={filter}
-                aria-pressed={statusFilter === filter}
-                onClick={() => setStatusFilter(filter)}
-              >
-                {filter}
-              </button>
-            ))}
+          <div className="dashboard-controls-footer">
+            <div className="status-filters" role="group" aria-label="Filter applications by status">
+              {statusFilters.map((filter) => (
+                <button
+                  className="status-filter-button"
+                  type="button"
+                  key={filter}
+                  aria-pressed={statusFilter === filter}
+                  onClick={() => setStatusFilter(filter)}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
+            <p className="application-result-count" aria-live="polite">
+              Showing {visibleApplications.length} of {applications.length}
+            </p>
           </div>
         </div>
       )}

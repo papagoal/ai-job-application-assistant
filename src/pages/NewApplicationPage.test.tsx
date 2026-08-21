@@ -74,6 +74,7 @@ describe('NewApplicationPage', () => {
       screen.getByLabelText('Job description'),
       'Build accessible React applications.',
     )
+    await user.selectOptions(screen.getByLabelText('AI output language'), 'zh')
     await user.click(screen.getByRole('button', { name: 'Analyze match' }))
 
     expect(resume).toBeTruthy()
@@ -85,6 +86,7 @@ describe('NewApplicationPage', () => {
       jobTitle: 'Frontend Developer',
       jobDescription: 'Build accessible React applications.',
       resumeText: 'Saved React and TypeScript resume.',
+      outputLanguage: 'zh',
     })
     expect(mockedSaveApplication).not.toHaveBeenCalled()
   })

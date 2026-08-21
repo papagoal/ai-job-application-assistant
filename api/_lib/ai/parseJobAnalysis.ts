@@ -12,18 +12,39 @@ function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every(isNonEmptyString)
 }
 
+const chineseSectionHeadings = new Set([
+  '专业摘要',
+  '核心技能',
+  '技术技能',
+  '专业技能',
+  '技能专长',
+  '工作经历',
+  '工作经验',
+  '职业经历',
+  '项目经历',
+  '项目经验',
+  '教育背景',
+  '教育经历',
+  '证书与认证',
+  '语言能力',
+  '目标职位',
+])
+
 function isSectionHeading(value: string) {
   const heading = value.trim()
-  return heading.length > 0
+  return chineseSectionHeadings.has(heading.replace(/:$/, ''))
+    || (heading.length > 0
     && heading.length <= 60
     && heading === heading.toUpperCase()
-    && /[A-Z]/.test(heading)
+    && /[A-Z]/.test(heading))
 }
 
 export function hasProfessionalSummary(tailoredResume: string) {
   const lines = tailoredResume.trim().split('\n')
   const headingIndex = lines.findIndex(
-    (line) => line.trim().replace(/:$/, '') === 'PROFESSIONAL SUMMARY',
+    (line) => ['PROFESSIONAL SUMMARY', '专业摘要'].includes(
+      line.trim().replace(/:$/, ''),
+    ),
   )
   if (headingIndex === -1) return false
 

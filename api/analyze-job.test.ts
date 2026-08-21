@@ -5,6 +5,7 @@ const validInput = {
   jobTitle: 'Frontend Developer',
   jobDescription: 'Build accessible React applications.',
   resumeText: 'React and TypeScript experience.',
+  outputLanguage: 'en',
 }
 
 async function loadHandler() {
@@ -77,5 +78,19 @@ describe('/api/analyze-job', () => {
     expect(analysis.jobTitle).toBe(validInput.jobTitle)
     expect(analysis.matchScore).toBeTypeOf('number')
     expect(analysis.tailoredResume).toContain(validInput.resumeText)
+    expect(analysis.outputLanguage).toBe('en')
+  })
+
+  it('rejects unsupported output languages', async () => {
+    const handler = await loadHandler()
+    const response = await handler.fetch(
+      new Request('http://localhost/api/analyze-job', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...validInput, outputLanguage: 'fr' }),
+      }),
+    )
+
+    expect(response.status).toBe(400)
   })
 })

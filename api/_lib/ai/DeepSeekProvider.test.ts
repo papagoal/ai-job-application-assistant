@@ -8,6 +8,7 @@ const input: JobDescriptionInput = {
   jobTitle: 'Frontend Developer',
   jobDescription: 'Build accessible React applications.',
   resumeText: 'React and TypeScript experience.',
+  outputLanguage: 'en',
 }
 
 function completion(analysis: typeof mockJobAnalysis) {
@@ -29,6 +30,28 @@ describe('DeepSeekProvider', () => {
 
     expect(fetchMock).toHaveBeenCalledOnce()
     expect(result.tailoredResume).toContain('Frontend developer experienced')
+    expect(result.outputLanguage).toBe('en')
+  })
+
+  it('accepts a Chinese professional summary and records the output language', async () => {
+    const chineseAnalysis = {
+      ...mockJobAnalysis,
+      scoreSummary: '匹配良好',
+      tailoredResume: `专业摘要
+具备 React 与 TypeScript 项目经验，能够针对职位要求开发可靠的前端功能。
+
+技术技能
+React, TypeScript`,
+    }
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(completion(chineseAnalysis)))
+
+    const result = await new DeepSeekProvider('test-key').analyze({
+      ...input,
+      outputLanguage: 'zh',
+    })
+
+    expect(result.outputLanguage).toBe('zh')
+    expect(result.tailoredResume).toContain('专业摘要')
   })
 
   it('asks DeepSeek to correct an empty professional summary once', async () => {

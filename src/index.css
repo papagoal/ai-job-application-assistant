@@ -504,6 +504,7 @@ h1 {
 }
 
 .form-field input,
+.form-field select,
 .form-field textarea {
   width: 100%;
   border: 1px solid #cdd3de;
@@ -519,6 +520,7 @@ h1 {
 }
 
 .form-field input:focus,
+.form-field select:focus,
 .form-field textarea:focus {
   border-color: var(--color-primary);
   outline: 3px solid rgba(49, 87, 213, 0.14);

@@ -6,6 +6,15 @@ export interface AnalysisPrompt {
 }
 
 export function buildAnalysisPrompt(input: JobDescriptionInput): AnalysisPrompt {
+  const outputLanguage = input.outputLanguage ?? 'en'
+  const isChinese = outputLanguage === 'zh'
+  const languageInstruction = isChinese
+    ? `Write scoreSummary, scoreDescription, matchingSkills, missingSkills, suggestions, coverLetter, and tailoredResume in Simplified Chinese. Keep company names, job titles, technology names, product names, and other proper nouns in their original language when that is clearer. The JSON property names must remain in English.`
+    : `Write all generated content in English.`
+  const resumeStructureInstruction = isChinese
+    ? `Begin with a non-empty 专业摘要 section containing two or three newly written, concise Chinese sentences that connect the candidate's most relevant verified experience and skills to this specific job description. Use short Simplified Chinese section headings and hyphen-prefixed bullet points where appropriate.`
+    : `Begin with a non-empty PROFESSIONAL SUMMARY section containing two or three newly written, concise sentences that connect the candidate's most relevant verified experience and skills to this specific job description. Use short uppercase English section headings and hyphen-prefixed bullet points where appropriate.`
+
   return {
     system: `You are an expert job application assistant. Compare a resume with a job description and return only valid JSON.
 
@@ -27,7 +36,9 @@ Return this exact JSON shape:
 
 The matchScore must be a number from 0 to 100. Base every claim on the supplied resume and job description. Do not invent candidate experience.
 
-The tailoredResume must be a plain-text resume draft targeted to this job and designed to fill one A4 page. Aim for 350 to 450 words when the supplied resume contains enough verified detail; if it does not, return a shorter accurate resume instead of adding filler or invented content. Use relevant responsibilities, achievements, projects, and skills from the supplied resume to create a complete role-targeted draft. Begin with a non-empty PROFESSIONAL SUMMARY section containing two or three newly written, concise sentences that connect the candidate's most relevant verified experience and skills to this specific job description. Do not copy resume sentences verbatim, use generic filler, mention missing qualifications, or leave the section blank. Reorder and rephrase only facts found in the supplied resume. Never invent or embellish skills, employers, job titles, dates, education, certifications, achievements, or metrics. Use short uppercase section headings and hyphen-prefixed bullet points where appropriate. Do not include a candidate name, email address, phone number, or contact header because the application adds verified profile details separately.`,
+${languageInstruction}
+
+The tailoredResume must be a plain-text resume draft targeted to this job and designed to fill one A4 page. Aim for 350 to 450 words when the supplied resume contains enough verified detail; if it does not, return a shorter accurate resume instead of adding filler or invented content. Use relevant responsibilities, achievements, projects, and skills from the supplied resume to create a complete role-targeted draft. ${resumeStructureInstruction} Do not copy resume sentences verbatim, use generic filler, mention missing qualifications, or leave the summary section blank. Reorder and rephrase only facts found in the supplied resume. Never invent or embellish skills, employers, job titles, dates, education, certifications, achievements, or metrics. Do not include a candidate name, email address, phone number, or contact header because the application adds verified profile details separately.`,
     user: `Analyze this application and respond in JSON.
 
 COMPANY:

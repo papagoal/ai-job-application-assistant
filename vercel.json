@@ -6,6 +6,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/account",
+      "destination": "/index.html"
+    },
+    {
       "source": "/applications/(.*)",
       "destination": "/index.html"
     }

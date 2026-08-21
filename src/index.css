@@ -938,6 +938,150 @@ h1 {
   min-width: 142px;
 }
 
+.new-application-page {
+  max-width: 1040px;
+}
+
+.new-application-heading {
+  margin-bottom: 28px;
+}
+
+.new-application-form {
+  gap: 22px;
+}
+
+.form-section.new-application-section {
+  padding: 30px;
+  border-radius: 16px;
+}
+
+.form-step-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.form-step-index {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d4d4d8;
+  border-radius: 9px;
+  color: #52525b;
+  background: #fafafa;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.new-application-page .form-grid {
+  gap: 18px;
+}
+
+.new-application-page .form-field label {
+  font-size: 0.82rem;
+}
+
+.new-application-page .form-field input,
+.new-application-page .form-field select,
+.new-application-page .form-field textarea {
+  border-color: #d4d4d8;
+  border-radius: 9px;
+  background: #fafafa;
+}
+
+.new-application-page .form-field input,
+.new-application-page .form-field select {
+  min-height: 46px;
+}
+
+.new-application-page .form-field input:focus,
+.new-application-page .form-field select:focus,
+.new-application-page .form-field textarea:focus {
+  border-color: #71717a;
+  outline: 3px solid rgba(24, 24, 27, 0.08);
+  background: #ffffff;
+}
+
+.new-application-page .job-import-block {
+  padding: 20px;
+  border-color: #e4e4e7;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.new-application-page .job-import-button {
+  min-height: 46px;
+  border-color: #d4d4d8;
+  box-shadow: 0 1px 3px rgba(24, 24, 27, 0.06);
+}
+
+.new-application-page .job-import-block .save-message,
+.new-application-page .job-import-block .field-error {
+  padding: 9px 11px;
+  border-radius: 8px;
+}
+
+.new-application-page .job-import-block .save-message {
+  background: #ecfdf3;
+}
+
+.new-application-page .job-import-block .field-error {
+  background: #fff1f2;
+}
+
+.new-application-page .ai-settings-grid {
+  padding: 17px;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.new-application-page .ai-settings-grid select {
+  background: #ffffff;
+}
+
+.role-details-section textarea {
+  min-height: 360px;
+  line-height: 1.65;
+}
+
+.application-resume-section textarea {
+  min-height: 380px;
+  line-height: 1.65;
+}
+
+.new-application-actions {
+  position: sticky;
+  bottom: 16px;
+  z-index: 10;
+  min-height: 66px;
+  margin-top: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 8px 24px rgba(24, 24, 27, 0.12), 0 2px 6px rgba(24, 24, 27, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.new-application-actions > .secondary-action {
+  min-width: 96px;
+  text-align: center;
+}
+
+.new-application-actions .form-submit-group {
+  min-width: 0;
+  margin-left: auto;
+}
+
+.new-application-actions .submit-button {
+  min-width: 148px;
+}
+
 .form-section {
   display: grid;
   gap: 24px;
@@ -2358,6 +2502,10 @@ h1 {
     padding: 20px;
   }
 
+  .form-section.new-application-section {
+    padding: 20px;
+  }
+
   .profile-section-header {
     gap: 11px;
     padding-bottom: 18px;
@@ -2380,6 +2528,38 @@ h1 {
 
   .profile-save-feedback {
     width: 100%;
+  }
+
+  .form-step-header {
+    gap: 11px;
+    padding-bottom: 18px;
+  }
+
+  .new-application-page .ai-settings-grid,
+  .new-application-page .job-import-block {
+    padding: 14px;
+  }
+
+  .role-details-section textarea,
+  .application-resume-section textarea {
+    min-height: 320px;
+  }
+
+  .new-application-page .field-details {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .new-application-actions {
+    bottom: 8px;
+    padding: 12px;
+  }
+
+  .new-application-actions > .secondary-action,
+  .new-application-actions .form-submit-group {
+    width: 100%;
+    margin-left: 0;
   }
 
   .form-grid {

@@ -50,6 +50,10 @@ describe('NewApplicationPage', () => {
     const user = userEvent.setup()
     renderPage()
 
+    expect(screen.getByRole('heading', { name: 'Import a job listing' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Role and analysis settings' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Resume source' })).toBeTruthy()
+
     await user.type(
       screen.getByLabelText(/Job listing link/),
       'https://jobs.example.com/frontend-developer',

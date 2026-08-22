@@ -1777,6 +1777,14 @@ h1 {
   text-align: center;
 }
 
+.account-actions button:disabled {
+  cursor: not-allowed;
+}
+
+.account-actions button[aria-busy="true"] {
+  cursor: wait;
+}
+
 .account-divider {
   display: flex;
   align-items: center;

@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const authMocks = vi.hoisted(() => ({
   linkIdentity: vi.fn(),
+  signOut: vi.fn(),
   signInWithOAuth: vi.fn(),
 }))
 
@@ -15,12 +16,25 @@ vi.mock('./supabaseClient', () => ({
   },
 }))
 
-import { continueWithGoogle } from './authService'
+import { continueWithGoogle, signInToExistingGoogleAccount } from './authService'
 
 beforeEach(() => {
   vi.clearAllMocks()
   authMocks.linkIdentity.mockResolvedValue({ data: {}, error: null })
+  authMocks.signOut.mockResolvedValue({ error: null })
   authMocks.signInWithOAuth.mockResolvedValue({ data: {}, error: null })
+})
+
+describe('signInToExistingGoogleAccount', () => {
+  it('leaves the current session before starting regular Google OAuth', async () => {
+    await signInToExistingGoogleAccount()
+
+    expect(authMocks.signOut).toHaveBeenCalledOnce()
+    expect(authMocks.signInWithOAuth).toHaveBeenCalledWith({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/account` },
+    })
+  })
 })
 
 describe('continueWithGoogle', () => {

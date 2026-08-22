@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /account
+Disallow: /profile
+Disallow: /applications/
+
+Sitemap: https://rolelumi.com/sitemap.xml

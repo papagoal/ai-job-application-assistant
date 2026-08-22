@@ -201,8 +201,10 @@ function AppLayout() {
       >
         <div className="sidebar-header">
           <Link className="sidebar-brand" to="/" onClick={closeMenu}>
-            <span className="brand-mark" aria-hidden="true">J</span>
-            <span>Job Assistant</span>
+            <span className="brand-mark" aria-hidden="true">
+              <img src="/rolelumi-logo.png" alt="" />
+            </span>
+            <span>RoleLumi</span>
           </Link>
           <button
             className="sidebar-close"
@@ -291,9 +293,11 @@ function AppLayout() {
 
       <div className="app-main">
         <header className="mobile-app-bar">
-          <Link className="mobile-brand" to="/" aria-label="Job Assistant home">
-            <span className="brand-mark" aria-hidden="true">J</span>
-            <span>Job Assistant</span>
+          <Link className="mobile-brand" to="/" aria-label="RoleLumi home">
+            <span className="brand-mark" aria-hidden="true">
+              <img src="/rolelumi-logo.png" alt="" />
+            </span>
+            <span>RoleLumi</span>
           </Link>
           <button
             className="mobile-menu-button"

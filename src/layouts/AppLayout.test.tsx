@@ -60,6 +60,7 @@ describe('AppLayout sidebar', () => {
   it('shows primary navigation and the signed-in user', async () => {
     renderLayout()
 
+    expect(screen.getByRole('link', { name: 'RoleLumi' })).toBeTruthy()
     expect(screen.getByRole('link', { name: 'New Application' })).toBeTruthy()
     expect(screen.getByRole('link', { name: 'Dashboard' })).toBeTruthy()
     expect(screen.getByRole('link', { name: 'Profile & Resume' })).toBeTruthy()

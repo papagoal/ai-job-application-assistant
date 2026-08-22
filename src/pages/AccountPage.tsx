@@ -20,6 +20,24 @@ function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : 'Something went wrong. Please try again.'
 }
 
+function AccountOverview() {
+  return (
+    <aside className="account-overview" aria-label="Cloud account benefits">
+      <p className="account-overview-label">Cloud workspace</p>
+      <h2>One account, every application.</h2>
+      <p>
+        Keep your profile and application history available when you return on
+        another browser.
+      </p>
+      <ul className="account-benefit-list">
+        <li><span aria-hidden="true">01</span>Protect your saved application data</li>
+        <li><span aria-hidden="true">02</span>Continue with email or Google</li>
+        <li><span aria-hidden="true">03</span>Keep your existing guest work</li>
+      </ul>
+    </aside>
+  )
+}
+
 function AccountPage() {
   const [user, setUser] = useState<User | null>(null)
   const [email, setEmail] = useState('')
@@ -103,7 +121,7 @@ function AccountPage() {
 
   if (!isSupabaseConfigured) {
     return (
-      <section className="form-page">
+      <section className="account-page">
         <div className="page-heading">
           <div>
             <p className="eyebrow">Account</p>
@@ -113,12 +131,32 @@ function AccountPage() {
             </p>
           </div>
         </div>
+        <div className="account-unavailable-card">
+          <span className="account-unavailable-mark" aria-hidden="true">!</span>
+          <div>
+            <h2>Local mode is still available</h2>
+            <p>
+              You can continue using this browser. Cloud sign-in will appear after
+              the Supabase project settings are added.
+            </p>
+          </div>
+        </div>
       </section>
     )
   }
 
   if (isLoading) {
-    return <p className="account-loading" role="status">Loading account…</p>
+    return (
+      <section className="account-page">
+        <div className="account-loading-card" role="status">
+          <span className="account-loading-mark" aria-hidden="true" />
+          <div>
+            <strong>Loading account</strong>
+            <p>Checking this browser’s secure cloud session…</p>
+          </div>
+        </div>
+      </section>
+    )
   }
 
   const isConnectedAccount = user && !user.is_anonymous
@@ -127,8 +165,8 @@ function AccountPage() {
   ) ?? false
 
   return (
-    <section className="form-page">
-      <div className="page-heading">
+    <section className="account-page">
+      <div className="page-heading account-page-heading">
         <div>
           <p className="eyebrow">Account</p>
           <h1>{isConnectedAccount ? 'Your cloud account' : 'Keep your cloud data'}</h1>
@@ -141,98 +179,120 @@ function AccountPage() {
       </div>
 
       {isConnectedAccount ? (
-        <div className="form-section account-card">
-          <div>
-            <p className="account-label">Signed in as</p>
-            <p className="account-email">{user.email}</p>
-          </div>
-          <div className="account-card-actions">
-            {hasGoogleIdentity ? (
-              <span className="google-connected-status">Google connected</span>
-            ) : (
+        <div className="account-layout">
+          <AccountOverview />
+          <div className="form-section account-session-card">
+            <div className="account-session-heading">
+              <span className="account-status-pill">Active session</span>
+              <h2>Signed in successfully</h2>
+              <p>Your cloud workspace is connected to this browser.</p>
+            </div>
+            <div className="account-identity-card">
+              <span className="account-identity-mark" aria-hidden="true">
+                {(user.email?.[0] ?? 'A').toUpperCase()}
+              </span>
+              <div>
+                <p className="account-label">Signed in as</p>
+                <p className="account-email">{user.email}</p>
+              </div>
+            </div>
+            <div className="account-card-actions">
+              {hasGoogleIdentity ? (
+                <span className="google-connected-status">Google connected</span>
+              ) : (
+                <button
+                  className="google-sign-in-button account-google-button"
+                  type="button"
+                  disabled={pendingAction !== null}
+                  onClick={handleGoogleSignIn}
+                >
+                  <span className="google-sign-in-mark" aria-hidden="true">G</span>
+                  {pendingAction === 'google' ? 'Opening Google…' : 'Connect Google'}
+                </button>
+              )}
               <button
-                className="google-sign-in-button account-google-button"
+                className="secondary-action account-button"
+                type="button"
+                disabled={pendingAction !== null}
+                onClick={handleSignOut}
+              >
+                {pendingAction === 'sign-out' ? 'Signing out…' : 'Sign out'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="account-layout">
+          <AccountOverview />
+          <form className="account-auth-form" onSubmit={handleConnect}>
+            <div className="form-section account-auth-card">
+              <div className="account-auth-heading">
+                <span className="account-auth-index" aria-hidden="true">01</span>
+                <div>
+                  <h2>Choose how to continue</h2>
+                  <p>Use one email address to protect or reopen your cloud workspace.</p>
+                </div>
+              </div>
+
+              <div className="account-email-route">
+                <p className="account-route-label">Email access</p>
+                <div className="form-field">
+                  <label htmlFor="account-email">Email address</label>
+                  <input
+                    id="account-email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(event) => {
+                      setEmail(event.target.value)
+                      resetFeedback()
+                    }}
+                    placeholder="you@example.com"
+                  />
+                </div>
+
+                <div className="account-actions">
+                  <button className="submit-button" type="submit" disabled={pendingAction !== null || !email.trim()}>
+                    {pendingAction === 'connect' ? 'Sending confirmation…' : 'Connect current data'}
+                  </button>
+                  <button
+                    className="secondary-action account-button"
+                    type="button"
+                    disabled={pendingAction !== null || !email.trim()}
+                    onClick={handleMagicLink}
+                  >
+                    {pendingAction === 'magic-link' ? 'Sending Magic Link…' : 'Sign in with Magic Link'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="account-divider" aria-hidden="true"><span>or continue with</span></div>
+
+              <button
+                className="google-sign-in-button"
                 type="button"
                 disabled={pendingAction !== null}
                 onClick={handleGoogleSignIn}
               >
                 <span className="google-sign-in-mark" aria-hidden="true">G</span>
-                {pendingAction === 'google' ? 'Opening Google…' : 'Connect Google'}
+                {pendingAction === 'google' ? 'Opening Google…' : 'Continue with Google'}
               </button>
-            )}
-            <button
-              className="secondary-action account-button"
-              type="button"
-              disabled={pendingAction !== null}
-              onClick={handleSignOut}
-            >
-              {pendingAction === 'sign-out' ? 'Signing out…' : 'Sign out'}
-            </button>
-          </div>
+              <p className="field-hint account-google-hint">
+                {user?.is_anonymous
+                  ? 'Your current profile and applications stay with this account.'
+                  : 'Sign in or create an account using your Google email.'}
+              </p>
+
+              <p className="account-warning">
+                <strong>Before you switch accounts</strong>
+                Magic Link sign-in to an existing account does not merge guest data. Google
+                sign-in keeps the current data when this browser is using a guest account.
+              </p>
+            </div>
+          </form>
         </div>
-      ) : (
-        <form className="profile-form" onSubmit={handleConnect}>
-          <div className="form-section">
-            <div className="form-section-heading">
-              <h2>Connect this guest account</h2>
-              <p>A confirmation link will be sent to your email. Your current profile and applications stay with this account.</p>
-            </div>
-
-            <div className="form-field">
-              <label htmlFor="account-email">Email</label>
-              <input
-                id="account-email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(event) => {
-                  setEmail(event.target.value)
-                  resetFeedback()
-                }}
-                placeholder="you@example.com"
-              />
-            </div>
-
-            <div className="account-actions">
-              <button className="submit-button" type="submit" disabled={pendingAction !== null || !email.trim()}>
-                {pendingAction === 'connect' ? 'Sending confirmation…' : 'Connect current data to email'}
-              </button>
-              <button
-                className="secondary-action account-button"
-                type="button"
-                disabled={pendingAction !== null || !email.trim()}
-                onClick={handleMagicLink}
-              >
-                {pendingAction === 'magic-link' ? 'Sending Magic Link…' : 'Sign in to existing account'}
-              </button>
-            </div>
-
-            <div className="account-divider" aria-hidden="true"><span>or</span></div>
-
-            <button
-              className="google-sign-in-button"
-              type="button"
-              disabled={pendingAction !== null}
-              onClick={handleGoogleSignIn}
-            >
-              <span className="google-sign-in-mark" aria-hidden="true">G</span>
-              {pendingAction === 'google' ? 'Opening Google…' : 'Continue with Google'}
-            </button>
-            <p className="field-hint">
-              {user?.is_anonymous
-                ? 'Your current profile and applications stay with this account.'
-                : 'Sign in or create an account using your Google email.'}
-            </p>
-
-            <p className="account-warning">
-              Magic Link sign-in to an existing account switches accounts and does not merge
-              guest data. Google sign-in keeps the current data when this browser is using a
-              guest account.
-            </p>
-          </div>
-        </form>
       )}
 
       {message && <p className="account-feedback account-success" role="status">{message}</p>}

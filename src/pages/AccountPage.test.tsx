@@ -45,6 +45,9 @@ describe('AccountPage Google sign-in', () => {
     const googleButton = await screen.findByRole('button', {
       name: 'Continue with Google',
     })
+    expect(screen.getByRole('heading', { name: 'One account, every application.' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Choose how to continue' })).toBeTruthy()
+    expect(screen.getByLabelText('Email address')).toBeTruthy()
     expect(screen.getByText(
       'Your current profile and applications stay with this account.',
     )).toBeTruthy()
@@ -68,6 +71,8 @@ describe('AccountPage Google sign-in', () => {
     const connectGoogleButton = await screen.findByRole('button', {
       name: 'Connect Google',
     })
+    expect(screen.getByRole('heading', { name: 'Signed in successfully' })).toBeTruthy()
+    expect(screen.getByText('candidate@example.com')).toBeTruthy()
     await user.click(connectGoogleButton)
 
     expect(mockedContinueWithGoogle).toHaveBeenCalledWith(connectedUser)

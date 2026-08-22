@@ -9,6 +9,7 @@ import {
   continueWithGoogle,
   getCurrentUser,
   sendExistingAccountMagicLink,
+  signInToExistingGoogleAccount,
   subscribeToAuthChanges,
 } from '../services/authService'
 import AccountPage from './AccountPage'
@@ -19,6 +20,7 @@ vi.mock('../services/authService', () => ({
   getCurrentUser: vi.fn(),
   isSupabaseConfigured: true,
   sendExistingAccountMagicLink: vi.fn(),
+  signInToExistingGoogleAccount: vi.fn(),
   signOut: vi.fn(),
   subscribeToAuthChanges: vi.fn(),
 }))
@@ -27,6 +29,7 @@ const mockedConnectGuestAccount = vi.mocked(connectGuestAccount)
 const mockedContinueWithGoogle = vi.mocked(continueWithGoogle)
 const mockedGetCurrentUser = vi.mocked(getCurrentUser)
 const mockedSendExistingAccountMagicLink = vi.mocked(sendExistingAccountMagicLink)
+const mockedSignInToExistingGoogleAccount = vi.mocked(signInToExistingGoogleAccount)
 const mockedSubscribeToAuthChanges = vi.mocked(subscribeToAuthChanges)
 const guestUser = { is_anonymous: true } as User
 
@@ -36,11 +39,13 @@ beforeEach(() => {
   mockedConnectGuestAccount.mockResolvedValue()
   mockedContinueWithGoogle.mockResolvedValue()
   mockedSendExistingAccountMagicLink.mockResolvedValue()
+  mockedSignInToExistingGoogleAccount.mockResolvedValue()
 })
 
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
+  window.history.replaceState({}, '', '/account')
 })
 
 describe('AccountPage Google sign-in', () => {
@@ -82,6 +87,27 @@ describe('AccountPage Google sign-in', () => {
     await user.click(connectGoogleButton)
 
     expect(mockedContinueWithGoogle).toHaveBeenCalledWith(connectedUser)
+  })
+
+  it('offers an existing-account sign-in after Google reports an identity conflict', async () => {
+    window.history.replaceState({}, '', '/account?error_code=identity_already_exists')
+    const user = userEvent.setup()
+    render(<AccountPage />)
+
+    const existingGoogleButton = await screen.findByRole('button', {
+      name: 'Sign in to existing Google account',
+    })
+    expect((await screen.findByRole('alert')).textContent).toContain(
+      'This Google account already belongs to another RoleLumi account.',
+    )
+    expect(screen.getByText(
+      'This switches to the existing account. Current workspace data will not be merged.',
+    )).toBeTruthy()
+
+    await user.click(existingGoogleButton)
+
+    expect(mockedSignInToExistingGoogleAccount).toHaveBeenCalledOnce()
+    expect(mockedContinueWithGoogle).not.toHaveBeenCalled()
   })
 })
 

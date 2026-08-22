@@ -6,11 +6,18 @@ import {
   getCurrentUser,
   isSupabaseConfigured,
   sendExistingAccountMagicLink,
+  signInToExistingGoogleAccount,
   signOut,
   subscribeToAuthChanges,
 } from '../services/authService'
 
 type PendingAction = 'connect' | 'magic-link' | 'google' | 'sign-out' | null
+
+function hasGoogleIdentityConflict() {
+  const query = new URLSearchParams(window.location.search)
+  const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''))
+  return (query.get('error_code') ?? hash.get('error_code')) === 'identity_already_exists'
+}
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) {
@@ -53,6 +60,7 @@ function AccountPage() {
   const [pendingAction, setPendingAction] = useState<PendingAction>(null)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+  const [googleIdentityConflict] = useState(hasGoogleIdentityConflict)
 
   useEffect(() => {
     if (!isSupabaseConfigured) return
@@ -65,6 +73,15 @@ function AccountPage() {
 
     return unsubscribe
   }, [])
+
+  useEffect(() => {
+    if (!googleIdentityConflict) return
+
+    setError(
+      'This Google account already belongs to another RoleLumi account. Use “Sign in to existing Google account” to switch. Current workspace data will not be merged.',
+    )
+    window.history.replaceState({}, document.title, window.location.pathname)
+  }, [googleIdentityConflict])
 
   function resetFeedback() {
     setMessage('')
@@ -120,7 +137,11 @@ function AccountPage() {
     setPendingAction('google')
 
     try {
-      await continueWithGoogle(user)
+      if (googleIdentityConflict) {
+        await signInToExistingGoogleAccount()
+      } else {
+        await continueWithGoogle(user)
+      }
     } catch (googleError) {
       setError(getErrorMessage(googleError))
       setPendingAction(null)
@@ -215,7 +236,11 @@ function AccountPage() {
                   onClick={handleGoogleSignIn}
                 >
                   <span className="google-sign-in-mark" aria-hidden="true">G</span>
-                  {pendingAction === 'google' ? 'Opening Google…' : 'Connect Google'}
+                  {pendingAction === 'google'
+                    ? 'Opening Google…'
+                    : googleIdentityConflict
+                      ? 'Sign in to existing Google account'
+                      : 'Connect Google'}
                 </button>
               )}
               <button
@@ -291,18 +316,25 @@ function AccountPage() {
                 onClick={handleGoogleSignIn}
               >
                 <span className="google-sign-in-mark" aria-hidden="true">G</span>
-                {pendingAction === 'google' ? 'Opening Google…' : 'Continue with Google'}
+                {pendingAction === 'google'
+                  ? 'Opening Google…'
+                  : googleIdentityConflict
+                    ? 'Sign in to existing Google account'
+                    : 'Continue with Google'}
               </button>
               <p className="field-hint account-google-hint">
-                {user?.is_anonymous
+                {googleIdentityConflict
+                  ? 'This switches to the existing account. Current workspace data will not be merged.'
+                  : user?.is_anonymous
                   ? 'Your current profile and applications stay with this account.'
                   : 'Sign in or create an account using your Google email.'}
               </p>
 
               <p className="account-warning">
                 <strong>Before you switch accounts</strong>
-                Magic Link sign-in to an existing account does not merge guest data. Google
-                sign-in keeps the current data when this browser is using a guest account.
+                {googleIdentityConflict
+                  ? 'Signing in to the existing Google account switches workspaces and does not merge the current data.'
+                  : 'Magic Link sign-in to an existing account does not merge guest data. Google sign-in keeps the current data when this browser is using a guest account.'}
               </p>
             </div>
           </form>

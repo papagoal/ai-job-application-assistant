@@ -30,6 +30,13 @@ function getErrorMessage(error: unknown) {
     if (normalizedMessage.includes('signups not allowed for otp')) {
       return 'No existing account was found for this email. Use “Create account with email” first.'
     }
+
+    if (
+      normalizedMessage.includes('email rate limit exceeded')
+      || normalizedMessage.includes('over_email_send_rate_limit')
+    ) {
+      return 'Too many sign-in emails were requested. Please wait a minute and try again.'
+    }
   }
 
   return error instanceof Error ? error.message : 'Something went wrong. Please try again.'

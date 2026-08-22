@@ -142,4 +142,19 @@ describe('AccountPage email access', () => {
       'No existing account was found for this email. Use “Create account with email” first.',
     )
   })
+
+  it('turns the email rate limit error into retry guidance', async () => {
+    const user = userEvent.setup()
+    mockedSendExistingAccountMagicLink.mockRejectedValue(
+      new Error('email rate limit exceeded'),
+    )
+    render(<AccountPage />)
+
+    await user.type(await screen.findByLabelText('Email address'), 'candidate@example.com')
+    await user.click(screen.getByRole('button', { name: 'Sign in to existing account' }))
+
+    expect((await screen.findByRole('alert')).textContent).toBe(
+      'Too many sign-in emails were requested. Please wait a minute and try again.',
+    )
+  })
 })

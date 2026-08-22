@@ -187,32 +187,35 @@ function DashboardPage() {
             Review your job matches and continue working on saved applications.
           </p>
         </div>
-        {!isLoading && !loadError && applications.length > 0 && (
-          <div className="dashboard-export">
-            <div className="dashboard-heading-actions">
-              <button
-                className="secondary-action dashboard-view-button"
-                type="button"
-                aria-pressed={viewMode === 'table'}
-                onClick={() => setViewMode((currentView) => (
-                  currentView === 'cards' ? 'table' : 'cards'
-                ))}
-              >
-                {viewMode === 'cards' ? <TableIcon /> : <CardIcon />}
-                <span>{viewMode === 'cards' ? 'Table view' : 'Card view'}</span>
-              </button>
-              <button
-                className="secondary-action dashboard-export-button"
-                type="button"
-                onClick={handleExportCsv}
-              >
-                <ExportIcon />
-                <span>{isCsvExported ? 'Exported!' : 'Export CSV'}</span>
-              </button>
+        <div className="dashboard-heading-side">
+          <span className="app-version-badge">RoleLumi v{import.meta.env.PACKAGE_VERSION}</span>
+          {!isLoading && !loadError && applications.length > 0 && (
+            <div className="dashboard-export">
+              <div className="dashboard-heading-actions">
+                <button
+                  className="secondary-action dashboard-view-button"
+                  type="button"
+                  aria-pressed={viewMode === 'table'}
+                  onClick={() => setViewMode((currentView) => (
+                    currentView === 'cards' ? 'table' : 'cards'
+                  ))}
+                >
+                  {viewMode === 'cards' ? <TableIcon /> : <CardIcon />}
+                  <span>{viewMode === 'cards' ? 'Table view' : 'Card view'}</span>
+                </button>
+                <button
+                  className="secondary-action dashboard-export-button"
+                  type="button"
+                  onClick={handleExportCsv}
+                >
+                  <ExportIcon />
+                  <span>{isCsvExported ? 'Exported!' : 'Export CSV'}</span>
+                </button>
+              </div>
+              {csvExportError && <p role="alert">{csvExportError}</p>}
             </div>
-            {csvExportError && <p role="alert">{csvExportError}</p>}
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {!isLoading && !loadError && applications.length > 0 && (

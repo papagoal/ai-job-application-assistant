@@ -421,6 +421,29 @@ h1 {
   margin-bottom: 28px;
 }
 
+.dashboard-heading-side {
+  display: grid;
+  flex-shrink: 0;
+  justify-items: end;
+  gap: 10px;
+}
+
+.app-version-badge {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px solid var(--color-accent);
+  border-radius: 999px;
+  color: #52525b;
+  background: var(--color-accent-soft);
+  box-shadow: 0 1px 3px rgba(24, 24, 27, 0.06);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
 .dashboard-export {
   display: grid;
   flex-shrink: 0;
@@ -2992,6 +3015,11 @@ h1 {
   }
 
   .dashboard-export {
+    width: 100%;
+    justify-items: start;
+  }
+
+  .dashboard-heading-side {
     width: 100%;
     justify-items: start;
   }

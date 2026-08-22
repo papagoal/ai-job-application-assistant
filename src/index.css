@@ -217,10 +217,10 @@ textarea {
 
 .sidebar-account-popover {
   position: absolute;
-  right: 0;
-  bottom: calc(100% + 9px);
-  left: 0;
+  bottom: 0;
+  left: calc(100% + 10px);
   z-index: 45;
+  width: 200px;
   display: grid;
   gap: 3px;
   padding: 6px;
@@ -233,12 +233,12 @@ textarea {
 
 .sidebar-account-popover::after {
   position: absolute;
-  right: 17px;
-  bottom: -5px;
+  bottom: 15px;
+  left: -5px;
   width: 9px;
   height: 9px;
-  border-right: 1px solid #d4d4d8;
   border-bottom: 1px solid #d4d4d8;
+  border-left: 1px solid #d4d4d8;
   background: #ffffff;
   content: '';
   transform: rotate(45deg);
@@ -247,7 +247,7 @@ textarea {
 @keyframes sidebar-account-popover-in {
   from {
     opacity: 0;
-    transform: translateY(5px) scale(0.98);
+    transform: translateX(-5px) scale(0.98);
   }
 }
 

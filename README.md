@@ -1,6 +1,6 @@
-# AI Job Application Assistant
+# RoleLumi
 
-A React application that compares a job description with a resume, produces an AI match analysis, and tracks saved applications.
+RoleLumi is a React application that compares a job description with a resume, produces an AI match analysis, and tracks saved applications.
 
 ## Features
 

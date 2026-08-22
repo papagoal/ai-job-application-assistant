@@ -90,6 +90,12 @@ textarea {
   font-weight: 850;
 }
 
+.brand-mark img {
+  width: 74%;
+  height: 74%;
+  object-fit: contain;
+}
+
 .sidebar-close {
   display: none;
 }

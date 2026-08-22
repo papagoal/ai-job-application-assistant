@@ -72,6 +72,12 @@ afterEach(() => {
 })
 
 describe('DashboardPage', () => {
+  it('shows the current application version', () => {
+    renderPage()
+
+    expect(screen.getByText('RoleLumi v1.2.0')).toBeTruthy()
+  })
+
   it('searches and filters saved applications', async () => {
     const user = userEvent.setup()
     renderPage()

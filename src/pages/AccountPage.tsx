@@ -262,13 +262,19 @@ function AccountPage() {
                 </div>
 
                 <div className="account-actions">
-                  <button className="submit-button" type="submit" disabled={pendingAction !== null || !email.trim()}>
+                  <button
+                    className="submit-button"
+                    type="submit"
+                    disabled={pendingAction !== null || !email.trim()}
+                    aria-busy={pendingAction === 'connect'}
+                  >
                     {pendingAction === 'connect' ? 'Sending confirmation…' : 'Create account with email'}
                   </button>
                   <button
                     className="secondary-action account-button"
                     type="button"
                     disabled={pendingAction !== null || !email.trim()}
+                    aria-busy={pendingAction === 'magic-link'}
                     onClick={handleMagicLink}
                   >
                     {pendingAction === 'magic-link' ? 'Sending Magic Link…' : 'Sign in to existing account'}

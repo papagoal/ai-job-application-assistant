@@ -93,8 +93,13 @@ describe('AccountPage email access', () => {
     const emailInput = await screen.findByLabelText('Email address')
     await user.type(emailInput, 'new@example.com')
 
-    expect(screen.getByRole('button', { name: 'Create account with email' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Sign in to existing account' })).toBeTruthy()
+    const createButton = screen.getByRole('button', { name: 'Create account with email' })
+    const signInButton = screen.getByRole('button', { name: 'Sign in to existing account' })
+
+    expect(createButton).toBeTruthy()
+    expect(createButton.getAttribute('aria-busy')).toBe('false')
+    expect(signInButton).toBeTruthy()
+    expect(signInButton.getAttribute('aria-busy')).toBe('false')
   })
 
   it('explains when a Magic Link email does not have an existing account', async () => {

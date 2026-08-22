@@ -75,7 +75,7 @@ describe('DashboardPage', () => {
   it('shows the current application version', () => {
     renderPage()
 
-    expect(screen.getByText('RoleLumi v1.2.0')).toBeTruthy()
+    expect(screen.getByText('RoleLumi v1.3.0')).toBeTruthy()
   })
 
   it('searches and filters saved applications', async () => {

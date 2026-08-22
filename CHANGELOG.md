@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-08-21
+
+### Added
+
+- A compact left sidebar with responsive mobile navigation, a persistent new-application action, and signed-in user details.
+- A bottom-left account popover with account navigation, safe sign-out behavior, outside-click dismissal, and keyboard dismissal.
+- A concise application table view alongside the existing dashboard cards.
+- A dashboard version badge sourced automatically from the package version.
+- RoleLumi search, Open Graph, and social-sharing metadata, plus a public sitemap and privacy-conscious crawler rules.
+
+### Changed
+
+- Rebranded the product as RoleLumi with the supplied logo, favicon, browser title, and documentation updates.
+- Redesigned the dashboard, profile, new-application, analysis, and account pages around a consistent black, white, soft-gray, and restrained beige visual system.
+- Improved card depth, content hierarchy, form alignment, responsive layouts, empty states, and analysis-section presentation.
+- Established `https://rolelumi.com` as the canonical production domain with `www` redirection.
+
+### Security
+
+- Kept account, profile, and private application routes out of search-engine crawling instructions.
+- Preserved the existing Supabase project reference, Row Level Security, authentication callbacks, and server-only AI credentials throughout the domain and brand migration.
+
+### Quality
+
+- Expanded automated coverage to 113 unit, component, API, authentication, and end-to-end tests.
+- Verified the RoleLumi custom domain, Magic Link flow, Google sign-in, sitemap submission, and production indexing request manually.
+
 ## [1.2.0] - 2026-08-21
 
 ### Added
@@ -86,6 +113,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Added GitHub Actions checks for tests, linting, end-to-end verification, and production builds.
 - Added Vercel SPA routing and serverless runtime compatibility.
 
+[1.3.0]: https://github.com/papagoal/ai-job-application-assistant/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/papagoal/ai-job-application-assistant/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/papagoal/ai-job-application-assistant/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/papagoal/ai-job-application-assistant/releases/tag/v1.0.0

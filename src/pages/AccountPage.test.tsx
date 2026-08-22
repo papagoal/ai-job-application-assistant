@@ -5,8 +5,10 @@ import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  connectGuestAccount,
   continueWithGoogle,
   getCurrentUser,
+  sendExistingAccountMagicLink,
   subscribeToAuthChanges,
 } from '../services/authService'
 import AccountPage from './AccountPage'
@@ -21,15 +23,19 @@ vi.mock('../services/authService', () => ({
   subscribeToAuthChanges: vi.fn(),
 }))
 
+const mockedConnectGuestAccount = vi.mocked(connectGuestAccount)
 const mockedContinueWithGoogle = vi.mocked(continueWithGoogle)
 const mockedGetCurrentUser = vi.mocked(getCurrentUser)
+const mockedSendExistingAccountMagicLink = vi.mocked(sendExistingAccountMagicLink)
 const mockedSubscribeToAuthChanges = vi.mocked(subscribeToAuthChanges)
 const guestUser = { is_anonymous: true } as User
 
 beforeEach(() => {
   mockedGetCurrentUser.mockResolvedValue(guestUser)
   mockedSubscribeToAuthChanges.mockReturnValue(vi.fn())
+  mockedConnectGuestAccount.mockResolvedValue()
   mockedContinueWithGoogle.mockResolvedValue()
+  mockedSendExistingAccountMagicLink.mockResolvedValue()
 })
 
 afterEach(() => {
@@ -76,5 +82,33 @@ describe('AccountPage Google sign-in', () => {
     await user.click(connectGoogleButton)
 
     expect(mockedContinueWithGoogle).toHaveBeenCalledWith(connectedUser)
+  })
+})
+
+describe('AccountPage email access', () => {
+  it('distinguishes new account creation from existing account sign-in', async () => {
+    const user = userEvent.setup()
+    render(<AccountPage />)
+
+    const emailInput = await screen.findByLabelText('Email address')
+    await user.type(emailInput, 'new@example.com')
+
+    expect(screen.getByRole('button', { name: 'Create account with email' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Sign in to existing account' })).toBeTruthy()
+  })
+
+  it('explains when a Magic Link email does not have an existing account', async () => {
+    const user = userEvent.setup()
+    mockedSendExistingAccountMagicLink.mockRejectedValue(
+      new Error('Signups not allowed for otp'),
+    )
+    render(<AccountPage />)
+
+    await user.type(await screen.findByLabelText('Email address'), 'new@example.com')
+    await user.click(screen.getByRole('button', { name: 'Sign in to existing account' }))
+
+    expect((await screen.findByRole('alert')).textContent).toBe(
+      'No existing account was found for this email. Use “Create account with email” first.',
+    )
   })
 })

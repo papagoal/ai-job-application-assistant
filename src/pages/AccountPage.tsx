@@ -13,8 +13,16 @@ import {
 type PendingAction = 'connect' | 'magic-link' | 'google' | 'sign-out' | null
 
 function getErrorMessage(error: unknown) {
-  if (error instanceof Error && error.message.toLowerCase().includes('already registered')) {
-    return 'This email already has an account. Use “Sign in to existing account” instead.'
+  if (error instanceof Error) {
+    const normalizedMessage = error.message.toLowerCase()
+
+    if (normalizedMessage.includes('already registered')) {
+      return 'This email already has an account. Use “Sign in to existing account” instead.'
+    }
+
+    if (normalizedMessage.includes('signups not allowed for otp')) {
+      return 'No existing account was found for this email. Use “Create account with email” first.'
+    }
   }
 
   return error instanceof Error ? error.message : 'Something went wrong. Please try again.'
@@ -255,7 +263,7 @@ function AccountPage() {
 
                 <div className="account-actions">
                   <button className="submit-button" type="submit" disabled={pendingAction !== null || !email.trim()}>
-                    {pendingAction === 'connect' ? 'Sending confirmation…' : 'Connect current data'}
+                    {pendingAction === 'connect' ? 'Sending confirmation…' : 'Create account with email'}
                   </button>
                   <button
                     className="secondary-action account-button"
@@ -263,7 +271,7 @@ function AccountPage() {
                     disabled={pendingAction !== null || !email.trim()}
                     onClick={handleMagicLink}
                   >
-                    {pendingAction === 'magic-link' ? 'Sending Magic Link…' : 'Sign in with Magic Link'}
+                    {pendingAction === 'magic-link' ? 'Sending Magic Link…' : 'Sign in to existing account'}
                   </button>
                 </div>
               </div>

@@ -1,9 +1,10 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import type { User } from '@supabase/supabase-js'
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   getCurrentUser,
   isSupabaseConfigured,
+  signOut,
   subscribeToAuthChanges,
 } from '../services/authService'
 
@@ -63,6 +64,24 @@ function CloseIcon() {
   )
 }
 
+function AccountIcon() {
+  return (
+    <NavigationIcon>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="9" r="3" />
+      <path d="M7.5 18a5 5 0 0 1 9 0" />
+    </NavigationIcon>
+  )
+}
+
+function LogoutIcon() {
+  return (
+    <NavigationIcon>
+      <path d="M10 5H5v14h5M14 8l4 4-4 4M18 12H9" />
+    </NavigationIcon>
+  )
+}
+
 function getUserDetails(user: User | null) {
   if (!isSupabaseConfigured) {
     return {
@@ -105,8 +124,14 @@ function getUserDetails(user: User | null) {
 }
 
 function AppLayout() {
+  const location = useLocation()
+  const navigate = useNavigate()
   const [user, setUser] = useState<User | null>(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false)
+  const [isSigningOut, setIsSigningOut] = useState(false)
+  const [accountMenuError, setAccountMenuError] = useState('')
+  const accountMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!isSupabaseConfigured) return
@@ -117,8 +142,55 @@ function AppLayout() {
     return unsubscribe
   }, [])
 
+  useEffect(() => {
+    if (!isAccountMenuOpen) return
+
+    function handlePointerDown(event: MouseEvent) {
+      if (!accountMenuRef.current?.contains(event.target as Node)) {
+        setIsAccountMenuOpen(false)
+        setAccountMenuError('')
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsAccountMenuOpen(false)
+        setAccountMenuError('')
+      }
+    }
+
+    document.addEventListener('mousedown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isAccountMenuOpen])
+
   const userDetails = getUserDetails(user)
-  const closeMenu = () => setIsMenuOpen(false)
+  const isConnectedAccount = Boolean(user && !user.is_anonymous)
+  const closeMenu = () => {
+    setIsMenuOpen(false)
+    setIsAccountMenuOpen(false)
+    setAccountMenuError('')
+  }
+
+  async function handleSidebarSignOut() {
+    setAccountMenuError('')
+    setIsSigningOut(true)
+
+    try {
+      await signOut()
+      setUser(null)
+      closeMenu()
+      navigate('/account')
+    } catch {
+      setAccountMenuError('Log out failed. Please try again.')
+    } finally {
+      setIsSigningOut(false)
+    }
+  }
 
   return (
     <div className="app-shell">
@@ -159,18 +231,53 @@ function AppLayout() {
           </NavLink>
         </nav>
 
-        <NavLink className="sidebar-account" to="/account" onClick={closeMenu}>
-          <span className="sidebar-avatar" aria-hidden="true">
-            {userDetails.avatarUrl ? (
-              <img src={userDetails.avatarUrl} alt="" referrerPolicy="no-referrer" />
-            ) : userDetails.initials}
-          </span>
-          <span className="sidebar-account-copy">
-            <strong>{userDetails.name}</strong>
-            <span>{userDetails.detail}</span>
-          </span>
-          <span className="sidebar-account-menu" aria-hidden="true">•••</span>
-        </NavLink>
+        <div className="sidebar-account-wrapper" ref={accountMenuRef}>
+          {isAccountMenuOpen && (
+            <nav className="sidebar-account-popover" aria-label="Account menu">
+              <NavLink className="sidebar-account-option" to="/account" onClick={closeMenu}>
+                <AccountIcon />
+                <span>Account</span>
+              </NavLink>
+              {isConnectedAccount && (
+                <button
+                  className="sidebar-account-option sidebar-account-logout"
+                  type="button"
+                  disabled={isSigningOut}
+                  onClick={handleSidebarSignOut}
+                >
+                  <LogoutIcon />
+                  <span>{isSigningOut ? 'Logging out…' : 'Log out'}</span>
+                </button>
+              )}
+              {accountMenuError && (
+                <p className="sidebar-account-error" role="alert">{accountMenuError}</p>
+              )}
+            </nav>
+          )}
+
+          <button
+            className={`sidebar-account-trigger${location.pathname === '/account' ? ' active' : ''}`}
+            type="button"
+            aria-label={`Open account menu for ${userDetails.name}`}
+            aria-haspopup="true"
+            aria-expanded={isAccountMenuOpen}
+            onClick={() => {
+              setIsAccountMenuOpen((isOpen) => !isOpen)
+              setAccountMenuError('')
+            }}
+          >
+            <span className="sidebar-avatar" aria-hidden="true">
+              {userDetails.avatarUrl ? (
+                <img src={userDetails.avatarUrl} alt="" referrerPolicy="no-referrer" />
+              ) : userDetails.initials}
+            </span>
+            <span className="sidebar-account-copy">
+              <strong>{userDetails.name}</strong>
+              <span>{userDetails.detail}</span>
+            </span>
+            <span className="sidebar-account-menu" aria-hidden="true">•••</span>
+          </button>
+        </div>
       </aside>
 
       {isMenuOpen && (

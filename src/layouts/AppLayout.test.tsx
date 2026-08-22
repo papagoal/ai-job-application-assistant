@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import {
   getCurrentUser,
+  signOut,
   subscribeToAuthChanges,
 } from '../services/authService'
 import AppLayout from './AppLayout'
@@ -14,10 +15,12 @@ import AppLayout from './AppLayout'
 vi.mock('../services/authService', () => ({
   getCurrentUser: vi.fn(),
   isSupabaseConfigured: true,
+  signOut: vi.fn(),
   subscribeToAuthChanges: vi.fn(),
 }))
 
 const mockedGetCurrentUser = vi.mocked(getCurrentUser)
+const mockedSignOut = vi.mocked(signOut)
 const mockedSubscribeToAuthChanges = vi.mocked(subscribeToAuthChanges)
 const connectedUser = {
   email: 'candidate@example.com',
@@ -44,6 +47,7 @@ function renderLayout() {
 
 beforeEach(() => {
   mockedGetCurrentUser.mockResolvedValue(connectedUser)
+  mockedSignOut.mockResolvedValue()
   mockedSubscribeToAuthChanges.mockReturnValue(vi.fn())
 })
 
@@ -75,5 +79,43 @@ describe('AppLayout sidebar', () => {
 
     expect(menuButton.getAttribute('aria-expanded')).toBe('false')
     expect(screen.getByText('Profile content')).toBeTruthy()
+  })
+
+  it('opens the account menu and logs out a connected account', async () => {
+    const user = userEvent.setup()
+    renderLayout()
+
+    const accountTrigger = await screen.findByRole('button', {
+      name: 'Open account menu for Candidate Name',
+    })
+    await user.click(accountTrigger)
+
+    expect(screen.getByRole('navigation', { name: 'Account menu' })).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Account' })).toBeTruthy()
+
+    await user.click(screen.getByRole('button', { name: 'Log out' }))
+
+    expect(mockedSignOut).toHaveBeenCalledTimes(1)
+    expect(await screen.findByText('Account content')).toBeTruthy()
+  })
+
+  it('keeps logout hidden in a guest workspace', async () => {
+    const user = userEvent.setup()
+    mockedGetCurrentUser.mockResolvedValue({
+      is_anonymous: true,
+      user_metadata: {},
+    } as unknown as User)
+    renderLayout()
+
+    const accountTrigger = await screen.findByRole('button', {
+      name: 'Open account menu for Guest workspace',
+    })
+    await user.click(accountTrigger)
+
+    expect(screen.getByRole('link', { name: 'Account' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Log out' })).toBeNull()
+
+    await user.keyboard('{Escape}')
+    expect(screen.queryByRole('navigation', { name: 'Account menu' })).toBeNull()
   })
 })

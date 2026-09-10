@@ -58,6 +58,10 @@ describe('AccountPage Google sign-in', () => {
     })
     expect(screen.getByRole('heading', { name: 'One account, every application.' })).toBeTruthy()
     expect(screen.getByRole('heading', { name: 'Choose how to continue' })).toBeTruthy()
+    expect(screen.getByText(
+      'Continue with Google to protect this guest workspace, or use email as a backup.',
+    )).toBeTruthy()
+    expect(screen.getByText('Use email instead')).toBeTruthy()
     expect(screen.getByLabelText('Email address')).toBeTruthy()
     expect(screen.getByText(
       'Your current profile and applications stay with this account.',
@@ -116,6 +120,12 @@ describe('AccountPage email access', () => {
     const user = userEvent.setup()
     render(<AccountPage />)
 
+    const emailSummary = await screen.findByText('Use email instead')
+    const emailOptions = emailSummary.closest('details')
+    expect(emailOptions?.hasAttribute('open')).toBe(false)
+    await user.click(emailSummary)
+    expect(emailOptions?.hasAttribute('open')).toBe(true)
+
     const emailInput = await screen.findByLabelText('Email address')
     await user.type(emailInput, 'new@example.com')
 
@@ -135,6 +145,7 @@ describe('AccountPage email access', () => {
     )
     render(<AccountPage />)
 
+    await user.click(await screen.findByText('Use email instead'))
     await user.type(await screen.findByLabelText('Email address'), 'new@example.com')
     await user.click(screen.getByRole('button', { name: 'Sign in to existing account' }))
 
@@ -150,6 +161,7 @@ describe('AccountPage email access', () => {
     )
     render(<AccountPage />)
 
+    await user.click(await screen.findByText('Use email instead'))
     await user.type(await screen.findByLabelText('Email address'), 'candidate@example.com')
     await user.click(screen.getByRole('button', { name: 'Sign in to existing account' }))
 

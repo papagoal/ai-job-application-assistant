@@ -209,7 +209,7 @@ function AccountPage() {
           <p className="page-description">
             {isConnectedAccount
               ? 'This browser is signed in and can access the data protected by your account.'
-              : 'Connect the current guest account to an email, or sign in to an account you already created.'}
+              : 'Continue with Google to protect this guest workspace, or use email as a backup.'}
           </p>
         </div>
       </div>
@@ -270,54 +270,12 @@ function AccountPage() {
                 <span className="account-auth-index" aria-hidden="true">01</span>
                 <div>
                   <h2>Choose how to continue</h2>
-                  <p>Use one email address to protect or reopen your cloud workspace.</p>
+                  <p>Continue with Google, or use email as a backup.</p>
                 </div>
               </div>
-
-              <div className="account-email-route">
-                <p className="account-route-label">Email access</p>
-                <div className="form-field">
-                  <label htmlFor="account-email">Email address</label>
-                  <input
-                    id="account-email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(event) => {
-                      setEmail(event.target.value)
-                      resetFeedback()
-                    }}
-                    placeholder="you@example.com"
-                  />
-                </div>
-
-                <div className="account-actions">
-                  <button
-                    className="submit-button"
-                    type="submit"
-                    disabled={pendingAction !== null || !email.trim()}
-                    aria-busy={pendingAction === 'connect'}
-                  >
-                    {pendingAction === 'connect' ? 'Sending confirmation…' : 'Create account with email'}
-                  </button>
-                  <button
-                    className="secondary-action account-button"
-                    type="button"
-                    disabled={pendingAction !== null || !email.trim()}
-                    aria-busy={pendingAction === 'magic-link'}
-                    onClick={handleMagicLink}
-                  >
-                    {pendingAction === 'magic-link' ? 'Sending Magic Link…' : 'Sign in to existing account'}
-                  </button>
-                </div>
-              </div>
-
-              <div className="account-divider" aria-hidden="true"><span>or continue with</span></div>
 
               <button
-                className="google-sign-in-button"
+                className="google-sign-in-button google-sign-in-button-primary"
                 type="button"
                 disabled={pendingAction !== null}
                 onClick={handleGoogleSignIn}
@@ -336,6 +294,51 @@ function AccountPage() {
                   ? 'Your current profile and applications stay with this account.'
                   : 'Sign in or create an account using your Google email.'}
               </p>
+
+              <div className="account-divider" aria-hidden="true"><span>or</span></div>
+
+              <details className="account-email-options">
+                <summary>Use email instead</summary>
+                <div className="account-email-route">
+                  <p className="account-route-label">Email access</p>
+                  <div className="form-field">
+                    <label htmlFor="account-email">Email address</label>
+                    <input
+                      id="account-email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={email}
+                      onChange={(event) => {
+                        setEmail(event.target.value)
+                        resetFeedback()
+                      }}
+                      placeholder="you@example.com"
+                    />
+                  </div>
+
+                  <div className="account-actions">
+                    <button
+                      className="submit-button"
+                      type="submit"
+                      disabled={pendingAction !== null || !email.trim()}
+                      aria-busy={pendingAction === 'connect'}
+                    >
+                      {pendingAction === 'connect' ? 'Sending confirmation…' : 'Create account with email'}
+                    </button>
+                    <button
+                      className="secondary-action account-button"
+                      type="button"
+                      disabled={pendingAction !== null || !email.trim()}
+                      aria-busy={pendingAction === 'magic-link'}
+                      onClick={handleMagicLink}
+                    >
+                      {pendingAction === 'magic-link' ? 'Sending Magic Link…' : 'Sign in to existing account'}
+                    </button>
+                  </div>
+                </div>
+              </details>
 
               <p className="account-warning">
                 <strong>Before you switch accounts</strong>

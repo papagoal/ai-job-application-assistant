@@ -1456,67 +1456,67 @@ h1 {
 .account-overview {
   position: relative;
   overflow: hidden;
-  min-height: 520px;
-  padding: 32px;
+  align-self: start;
+  padding: 26px;
   border: 1px solid #d4d4d8;
   border-radius: 16px;
   color: var(--color-text);
-  background: #ffffff;
-  box-shadow: 0 3px 8px rgba(24, 24, 27, 0.1), 0 18px 42px rgba(24, 24, 27, 0.09);
+  background: #fcfcfb;
+  box-shadow: 0 2px 5px rgba(24, 24, 27, 0.06), 0 10px 24px rgba(24, 24, 27, 0.05);
 }
 
 .account-overview::before {
   position: absolute;
   inset: 0 0 auto;
-  height: 5px;
-  background: var(--color-accent);
+  height: 2px;
+  background: rgba(232, 201, 167, 0.72);
   content: '';
 }
 
 .account-overview::after {
   position: absolute;
-  right: -86px;
-  bottom: -110px;
-  width: 260px;
-  height: 260px;
-  border: 1px solid rgba(232, 201, 167, 0.38);
+  right: -78px;
+  bottom: -92px;
+  width: 210px;
+  height: 210px;
+  border: 1px solid rgba(232, 201, 167, 0.26);
   border-radius: 50%;
-  box-shadow: 0 0 0 38px rgba(232, 201, 167, 0.1), 0 0 0 76px rgba(232, 201, 167, 0.06);
+  box-shadow: 0 0 0 30px rgba(232, 201, 167, 0.07), 0 0 0 60px rgba(232, 201, 167, 0.035);
   content: '';
 }
 
 .account-overview-label {
-  margin: 0 0 22px;
+  margin: 0 0 14px;
   color: #715a43;
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 800;
   letter-spacing: 0.11em;
   text-transform: uppercase;
 }
 
 .account-overview h2 {
-  max-width: 320px;
+  max-width: 280px;
   margin: 0;
   color: var(--color-text);
-  font-size: clamp(1.85rem, 4vw, 2.6rem);
-  line-height: 1.08;
-  letter-spacing: -0.04em;
+  font-size: clamp(1.45rem, 2.5vw, 1.9rem);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
 }
 
 .account-overview > p:not(.account-overview-label) {
   max-width: 370px;
-  margin: 18px 0 0;
+  margin: 13px 0 0;
   color: var(--color-muted);
-  font-size: 0.9rem;
-  line-height: 1.65;
+  font-size: 0.82rem;
+  line-height: 1.55;
 }
 
 .account-benefit-list {
   position: relative;
   z-index: 1;
   display: grid;
-  gap: 14px;
-  margin: 44px 0 0;
+  gap: 10px;
+  margin: 26px 0 0;
   padding: 0;
   list-style: none;
 }
@@ -1524,24 +1524,24 @@ h1 {
 .account-benefit-list li {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 9px;
   color: #3f3f46;
-  font-size: 0.82rem;
-  font-weight: 650;
+  font-size: 0.76rem;
+  font-weight: 600;
 }
 
 .account-benefit-list span {
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   flex: 0 0 auto;
   display: grid;
   place-items: center;
   border: 1px solid rgba(232, 201, 167, 0.5);
-  border-radius: 8px;
+  border-radius: 7px;
   color: #18181b;
   background: var(--color-accent);
-  font-size: 0.62rem;
-  font-weight: 850;
+  font-size: 0.56rem;
+  font-weight: 800;
 }
 
 .account-auth-form {
@@ -3112,13 +3112,16 @@ h1 {
     grid-template-columns: 1fr;
   }
 
+  .account-auth-form {
+    order: -1;
+  }
+
   .account-overview {
-    min-height: auto;
-    padding: 26px 22px;
+    padding: 22px 20px;
   }
 
   .account-benefit-list {
-    margin-top: 28px;
+    margin-top: 22px;
   }
 
   .form-section.account-auth-card,

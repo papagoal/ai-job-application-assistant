@@ -56,7 +56,9 @@ describe('AccountPage Google sign-in', () => {
     const googleButton = await screen.findByRole('button', {
       name: 'Continue with Google',
     })
-    expect(screen.getByRole('heading', { name: 'One account, every application.' })).toBeTruthy()
+    expect(screen.getByText(
+      'One account keeps your profile and application history available across browsers.',
+    )).toBeTruthy()
     expect(screen.getByRole('heading', { name: 'Choose how to continue' })).toBeTruthy()
     expect(screen.getByText(
       'Continue with Google to protect this guest workspace, or use email as a backup.',

@@ -1448,100 +1448,16 @@ h1 {
 
 .account-layout {
   display: grid;
-  grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.18fr);
-  gap: 22px;
-  align-items: stretch;
+  gap: 12px;
+  max-width: 720px;
 }
 
-.account-overview {
-  position: relative;
-  overflow: hidden;
-  align-self: start;
-  padding: 26px;
-  border: 1px solid #d4d4d8;
-  border-radius: 16px;
-  color: var(--color-text);
-  background: #fcfcfb;
-  box-shadow: 0 2px 5px rgba(24, 24, 27, 0.06), 0 10px 24px rgba(24, 24, 27, 0.05);
-}
-
-.account-overview::before {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 2px;
-  background: rgba(232, 201, 167, 0.72);
-  content: '';
-}
-
-.account-overview::after {
-  position: absolute;
-  right: -78px;
-  bottom: -92px;
-  width: 210px;
-  height: 210px;
-  border: 1px solid rgba(232, 201, 167, 0.26);
-  border-radius: 50%;
-  box-shadow: 0 0 0 30px rgba(232, 201, 167, 0.07), 0 0 0 60px rgba(232, 201, 167, 0.035);
-  content: '';
-}
-
-.account-overview-label {
-  margin: 0 0 14px;
-  color: #715a43;
-  font-size: 0.66rem;
-  font-weight: 800;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-}
-
-.account-overview h2 {
-  max-width: 280px;
+.account-workspace-note {
   margin: 0;
-  color: var(--color-text);
-  font-size: clamp(1.45rem, 2.5vw, 1.9rem);
-  line-height: 1.12;
-  letter-spacing: -0.03em;
-}
-
-.account-overview > p:not(.account-overview-label) {
-  max-width: 370px;
-  margin: 13px 0 0;
+  padding: 0 4px;
   color: var(--color-muted);
   font-size: 0.82rem;
   line-height: 1.55;
-}
-
-.account-benefit-list {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: 10px;
-  margin: 26px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.account-benefit-list li {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  color: #3f3f46;
-  font-size: 0.76rem;
-  font-weight: 600;
-}
-
-.account-benefit-list span {
-  width: 24px;
-  height: 24px;
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(232, 201, 167, 0.5);
-  border-radius: 7px;
-  color: #18181b;
-  background: var(--color-accent);
-  font-size: 0.56rem;
-  font-weight: 800;
 }
 
 .account-auth-form {
@@ -3110,18 +3026,6 @@ h1 {
 
   .account-layout {
     grid-template-columns: 1fr;
-  }
-
-  .account-auth-form {
-    order: -1;
-  }
-
-  .account-overview {
-    padding: 22px 20px;
-  }
-
-  .account-benefit-list {
-    margin-top: 22px;
   }
 
   .form-section.account-auth-card,

@@ -42,21 +42,11 @@ function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : 'Something went wrong. Please try again.'
 }
 
-function AccountOverview() {
+function AccountWorkspaceNote() {
   return (
-    <aside className="account-overview" aria-label="Cloud account benefits">
-      <p className="account-overview-label">Cloud workspace</p>
-      <h2>One account, every application.</h2>
-      <p>
-        Keep your profile and application history available when you return on
-        another browser.
-      </p>
-      <ul className="account-benefit-list">
-        <li><span aria-hidden="true">01</span>Protect your saved application data</li>
-        <li><span aria-hidden="true">02</span>Continue with email or Google</li>
-        <li><span aria-hidden="true">03</span>Keep your existing guest work</li>
-      </ul>
-    </aside>
+    <p className="account-workspace-note">
+      One account keeps your profile and application history available across browsers.
+    </p>
   )
 }
 
@@ -216,7 +206,7 @@ function AccountPage() {
 
       {isConnectedAccount ? (
         <div className="account-layout">
-          <AccountOverview />
+          <AccountWorkspaceNote />
           <div className="form-section account-session-card">
             <div className="account-session-heading">
               <span className="account-status-pill">Active session</span>
@@ -263,7 +253,7 @@ function AccountPage() {
         </div>
       ) : (
         <div className="account-layout">
-          <AccountOverview />
+          <AccountWorkspaceNote />
           <form className="account-auth-form" onSubmit={handleConnect}>
             <div className="form-section account-auth-card">
               <div className="account-auth-heading">

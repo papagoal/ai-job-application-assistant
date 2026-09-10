@@ -129,12 +129,12 @@ function AccountPage() {
     }
   }
 
-  async function handleGoogleSignIn() {
+  async function handleGoogleSignIn(linkCurrentAccount = false) {
     resetFeedback()
     setPendingAction('google')
 
     try {
-      if (googleIdentityConflict) {
+      if (!linkCurrentAccount || googleIdentityConflict) {
         await signInToExistingGoogleAccount()
       } else {
         await continueWithGoogle(user)
@@ -199,7 +199,7 @@ function AccountPage() {
           <p className="page-description">
             {isConnectedAccount
               ? 'This browser is signed in and can access the data protected by your account.'
-              : 'Continue with Google to protect this guest workspace, or use email as a backup.'}
+              : 'Sign in with Google to open your account, or use email as a backup.'}
           </p>
         </div>
       </div>
@@ -230,7 +230,7 @@ function AccountPage() {
                   className="google-sign-in-button account-google-button"
                   type="button"
                   disabled={pendingAction !== null}
-                  onClick={handleGoogleSignIn}
+                  onClick={() => handleGoogleSignIn(true)}
                 >
                   <span className="google-sign-in-mark" aria-hidden="true">G</span>
                   {pendingAction === 'google'
@@ -267,7 +267,7 @@ function AccountPage() {
                 className="google-sign-in-button google-sign-in-button-primary"
                 type="button"
                 disabled={pendingAction !== null}
-                onClick={handleGoogleSignIn}
+                onClick={() => handleGoogleSignIn()}
               >
                 <span className="google-sign-in-mark" aria-hidden="true">G</span>
                 {pendingAction === 'google'
@@ -279,8 +279,6 @@ function AccountPage() {
               <p className="field-hint account-google-hint">
                 {googleIdentityConflict
                   ? 'This switches to the existing account. Current workspace data will not be merged.'
-                  : user?.is_anonymous
-                  ? 'Your current profile and applications stay with this account.'
                   : 'Sign in or create an account using your Google email.'}
               </p>
 
@@ -329,11 +327,30 @@ function AccountPage() {
                 </div>
               </details>
 
+              {user?.is_anonymous && !googleIdentityConflict && (
+                <details className="account-email-options">
+                  <summary>Keep this guest workspace</summary>
+                  <div className="account-email-route">
+                    <p className="field-hint">
+                      Link a Google account that is not already used on RoleLumi to keep this workspace’s profile and applications.
+                    </p>
+                    <button
+                      className="secondary-action"
+                      type="button"
+                      disabled={pendingAction !== null}
+                      onClick={() => handleGoogleSignIn(true)}
+                    >
+                      Link Google to this workspace
+                    </button>
+                  </div>
+                </details>
+              )}
+
               <p className="account-warning">
                 <strong>Before you switch accounts</strong>
                 {googleIdentityConflict
                   ? 'Signing in to the existing Google account switches workspaces and does not merge the current data.'
-                  : 'Magic Link sign-in to an existing account does not merge guest data. Google sign-in keeps the current data when this browser is using a guest account.'}
+                  : 'Signing in opens the selected account. Current guest data will not be merged. To keep guest work, use “Keep this guest workspace” before switching.'}
               </p>
             </div>
           </form>

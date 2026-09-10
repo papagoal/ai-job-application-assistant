@@ -49,7 +49,7 @@ afterEach(() => {
 })
 
 describe('AccountPage Google sign-in', () => {
-  it('offers Google sign-in and preserves the active guest account', async () => {
+  it('uses regular Google sign-in even when a guest session exists', async () => {
     const user = userEvent.setup()
     render(<AccountPage />)
 
@@ -61,18 +61,28 @@ describe('AccountPage Google sign-in', () => {
     )).toBeTruthy()
     expect(screen.getByRole('heading', { name: 'Choose how to continue' })).toBeTruthy()
     expect(screen.getByText(
-      'Continue with Google to protect this guest workspace, or use email as a backup.',
+      'Sign in with Google to open your account, or use email as a backup.',
     )).toBeTruthy()
     expect(screen.getByText('Use email instead')).toBeTruthy()
     expect(screen.getByLabelText('Email address')).toBeTruthy()
     expect(screen.getByText(
-      'Your current profile and applications stay with this account.',
+      'Sign in or create an account using your Google email.',
     )).toBeTruthy()
 
     await user.click(googleButton)
 
-    expect(mockedContinueWithGoogle).toHaveBeenCalledWith(guestUser)
+    expect(mockedSignInToExistingGoogleAccount).toHaveBeenCalledOnce()
+    expect(mockedContinueWithGoogle).not.toHaveBeenCalled()
     expect(screen.getByRole('button', { name: 'Opening Google…' })).toBeTruthy()
+  })
+
+  it('links a guest workspace only after the separate keep-workspace action', async () => {
+    const user = userEvent.setup()
+    render(<AccountPage />)
+    await user.click(await screen.findByText('Keep this guest workspace'))
+    await user.click(screen.getByRole('button', { name: 'Link Google to this workspace' }))
+    expect(mockedContinueWithGoogle).toHaveBeenCalledWith(guestUser)
+    expect(mockedSignInToExistingGoogleAccount).not.toHaveBeenCalled()
   })
 
   it('lets an existing email account connect Google without signing out', async () => {

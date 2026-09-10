@@ -26,10 +26,11 @@ beforeEach(() => {
 })
 
 describe('signInToExistingGoogleAccount', () => {
-  it('leaves the current session before starting regular Google OAuth', async () => {
+  it('starts regular OAuth without linking or discarding the current session first', async () => {
     await signInToExistingGoogleAccount()
 
-    expect(authMocks.signOut).toHaveBeenCalledOnce()
+    expect(authMocks.signOut).not.toHaveBeenCalled()
+    expect(authMocks.linkIdentity).not.toHaveBeenCalled()
     expect(authMocks.signInWithOAuth).toHaveBeenCalledWith({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}/account` },

@@ -70,9 +70,6 @@ export async function continueWithGoogle(user: User | null): Promise<void> {
 
 export async function signInToExistingGoogleAccount(): Promise<void> {
   const client = requireSupabase()
-  const { error: signOutError } = await client.auth.signOut()
-  if (signOutError) throw signOutError
-
   const { error } = await client.auth.signInWithOAuth({
     provider: 'google',
     options: {

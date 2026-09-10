@@ -267,7 +267,6 @@ function AccountPage() {
           <form className="account-auth-form" onSubmit={handleConnect}>
             <div className="form-section account-auth-card">
               <div className="account-auth-heading">
-                <span className="account-auth-index" aria-hidden="true">01</span>
                 <div>
                   <h2>Choose how to continue</h2>
                   <p>Continue with Google, or use email as a backup.</p>

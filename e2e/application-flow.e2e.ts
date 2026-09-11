@@ -256,15 +256,11 @@ TECHNICAL SKILLS
 - Delivery: Git, GitHub Actions, Docker, AWS, Vercel, CI workflows
 
 PROFESSIONAL EXPERIENCE
-- Developed and maintained full-stack product features using React, TypeScript, Node.js, GraphQL, and PostgreSQL, supporting customer-facing workflows and internal operational tools.
-- Built reusable interface components, integrated REST and GraphQL services, and diagnosed issues across frontend, backend, database, and third-party integrations.
-- Added automated unit and end-to-end testing to improve regression coverage, validate critical application flows, and support safer feature delivery.
-- Implemented authentication, authorization, and protected data access using secure session handling and role-aware application behavior.
-- Containerized application environments and used cloud deployment tools, logs, and monitoring workflows to validate production behavior.
+Independent Software Projects | Toronto, ON | Nov 2023 - Present - Built and shipped production-style web applications using React, TypeScript, serverless APIs, and PostgreSQL. - Designed responsive interfaces and implemented secure authentication.
+AIRM Consulting Ltd. | Winnipeg, MB | Jun 2019 - Oct 2023 Software Developer - Developed and maintained full-stack features using Python, Django, React, GraphQL, and PostgreSQL. - Added automated testing and containerized application environments.
 
 SELECTED PROJECT
-- Built an AI job application assistant with React, TypeScript, Vite, Supabase, and Vercel Functions, including resume analysis, job-specific summaries, cover letters, application tracking, authentication, and direct PDF export.
-- Used feature branches, conventional commits, draft pull requests, automated checks, and manual acceptance testing to deliver changes incrementally.
+AI Job Application Assistant | Personal Portfolio Project | 2026 - Built an AI job application assistant with React, TypeScript, Vite, Supabase, and Vercel Functions. - Used feature branches, automated checks, and manual acceptance testing to deliver changes incrementally.
 
 EDUCATION
 University degree with continued practical development in modern web engineering.`)
@@ -272,6 +268,13 @@ University degree with continued practical development in modern web engineering
   await expect(tailoredResumePanel.getByRole('status')).toHaveText(
     'Tailored resume saved.',
   )
+  await expect(tailoredResume.getByRole('heading', {
+    name: 'Independent Software Projects | Toronto, ON | Nov 2023 - Present',
+    level: 4,
+  })).toBeVisible()
+  await expect(tailoredResume.getByText(
+    'Built and shipped production-style web applications using React, TypeScript, serverless APIs, and PostgreSQL.',
+  )).toBeVisible()
 
   await page.getByRole('button', { name: 'Copy as text' }).click()
   await expect(page.getByRole('button', { name: 'Copied!' })).toBeVisible()

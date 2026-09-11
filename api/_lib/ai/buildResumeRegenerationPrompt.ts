@@ -6,8 +6,8 @@ export function buildResumeRegenerationPrompt(
 ): AnalysisPrompt {
   const isChinese = (input.outputLanguage ?? 'en') === 'zh'
   const languageInstruction = isChinese
-    ? `Write the complete tailoredResume in Simplified Chinese. Keep company names, job titles, technology names, product names, and other proper nouns in their original language when that is clearer. Begin with a non-empty 专业摘要 section containing two or three newly written Chinese sentences.`
-    : `Write the complete tailoredResume in English. Begin with a non-empty PROFESSIONAL SUMMARY section containing two or three newly written sentences.`
+    ? `Write the complete tailoredResume in Simplified Chinese. Keep company names, job titles, technology names, product names, and other proper nouns in their original language when that is clearer. Begin with a non-empty 专业摘要 section containing two or three newly written Chinese sentences. Do not include the target company name in the 专业摘要 section.`
+    : `Write the complete tailoredResume in English. Begin with a non-empty PROFESSIONAL SUMMARY section containing two or three newly written sentences. Do not include the target company name in the PROFESSIONAL SUMMARY section.`
   const headingInstruction = isChinese
     ? 'Use short Simplified Chinese section headings.'
     : 'Use short uppercase English section headings.'

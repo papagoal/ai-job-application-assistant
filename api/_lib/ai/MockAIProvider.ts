@@ -43,12 +43,12 @@ export class MockAIProvider implements AIProvider {
 
     if ((input.outputLanguage ?? 'en') === 'zh') {
       return Promise.resolve(
-        `专业摘要\n这是为 ${companyName} 的 ${jobTitle} 职位重新生成的简历版本。\n\n核心技能\n${input.resumeText.trim()}`,
+        `专业摘要\n具备与 ${jobTitle} 职位相关的实践经验与技能。\n\n目标职位\n${companyName} ${jobTitle}\n\n核心技能\n${input.resumeText.trim()}`,
       )
     }
 
     return Promise.resolve(
-      `PROFESSIONAL SUMMARY\nThis refreshed resume targets the ${jobTitle} role at ${companyName}.\n\nCORE SKILLS\n${input.resumeText.trim()}`,
+      `PROFESSIONAL SUMMARY\nExperienced candidate with skills relevant to the ${jobTitle} role.\n\nTARGET ROLE\n${jobTitle} at ${companyName}\n\nCORE SKILLS\n${input.resumeText.trim()}`,
     )
   }
 

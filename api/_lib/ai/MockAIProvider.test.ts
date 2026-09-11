@@ -56,7 +56,8 @@ Existing resume draft.`
     })
 
     expect(result).toContain('PROFESSIONAL SUMMARY')
-    expect(result).toContain('Frontend Developer role at Northstar Labs')
+    expect(result).toContain('Frontend Developer at Northstar Labs')
+    expect(result.split('\n\nTARGET ROLE')[0]).not.toContain('Northstar Labs')
     expect(result).not.toBe(currentTailoredResume)
   })
 

@@ -27,6 +27,9 @@ describe('buildAnalysisPrompt', () => {
     expect(prompt.system).toContain('shorter accurate resume instead of adding filler')
     expect(prompt.system).toContain('Begin with a non-empty PROFESSIONAL SUMMARY section')
     expect(prompt.system).toContain('two or three newly written, concise sentences')
+    expect(prompt.system).toContain(
+      'Do not include the target company name in the PROFESSIONAL SUMMARY section.',
+    )
     expect(prompt.system).toContain('Do not copy resume sentences verbatim')
     expect(prompt.system).toContain('Do not include a candidate name, email address')
     expect(prompt.system).toContain('uppercase English section headings')
@@ -54,6 +57,7 @@ describe('buildAnalysisPrompt', () => {
     expect(prompt.system).toContain('in Simplified Chinese')
     expect(prompt.system).toContain('The JSON property names must remain in English')
     expect(prompt.system).toContain('专业摘要')
+    expect(prompt.system).toContain('Do not include the target company name in the 专业摘要 section.')
     expect(prompt.system).toContain('technology names')
   })
 })

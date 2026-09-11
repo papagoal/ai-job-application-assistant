@@ -16,14 +16,13 @@ import {
 } from '../services/persistenceService'
 import type { ApplicationStatus } from '../types/application'
 import type { InterviewPrepQuestion, JobAnalysis } from '../types/jobAnalysis'
+import {
+  toResumeContentBlocks,
+  type ResumeContentBlock,
+} from '../utils/resumeFormatting'
 
 interface AnalysisLocationState {
   analysis?: JobAnalysis
-}
-
-interface ResumePdfBlock {
-  type: 'heading' | 'paragraph' | 'bullet'
-  text: string
 }
 
 type AnalysisPanelId =
@@ -53,24 +52,6 @@ const applicationStatuses: ApplicationStatus[] = [
   'Rejected',
 ]
 
-const chineseResumeSectionHeadings = new Set([
-  '专业摘要',
-  '核心技能',
-  '技术技能',
-  '专业技能',
-  '技能专长',
-  '工作经历',
-  '工作经验',
-  '职业经历',
-  '项目经历',
-  '项目经验',
-  '教育背景',
-  '教育经历',
-  '证书与认证',
-  '语言能力',
-  '目标职位',
-])
-
 function toFileNamePart(value: string) {
   return value
     .trim()
@@ -79,65 +60,37 @@ function toFileNamePart(value: string) {
     || 'application'
 }
 
-function isSectionHeading(value: string) {
-  const heading = value.trim()
-  return chineseResumeSectionHeadings.has(heading.replace(/:$/, ''))
-    || (heading.length > 0
-    && heading.length <= 60
-    && heading === heading.toUpperCase()
-    && /[A-Z]/.test(heading))
-}
-
-function toResumePdfBlocks(content: string): ResumePdfBlock[] {
-  return content.trim().split(/\n\s*\n/).flatMap((block) => {
-    const lines = block.split('\n').map((line) => line.trim()).filter(Boolean)
-    const blocks: ResumePdfBlock[] = []
-
-    if (lines.length > 0 && isSectionHeading(lines[0])) {
-      blocks.push({ type: 'heading', text: lines.shift() ?? '' })
-    }
-
-    if (lines.length > 0 && lines.every((line) => /^[-*•]\s+/.test(line))) {
-      blocks.push(...lines.map((line) => ({
-        type: 'bullet' as const,
-        text: line.replace(/^[-*•]\s+/, ''),
-      })))
-    } else if (lines.length > 0) {
-      blocks.push({ type: 'paragraph', text: lines.join(' ') })
-    }
-
-    return blocks
-  })
-}
-
 function TailoredResumeContent({ content }: { content: string }) {
-  const blocks = content.trim().split(/\n\s*\n/)
+  const blocks = toResumeContentBlocks(content)
+  const elements: ReactNode[] = []
 
-  return blocks.flatMap((block, blockIndex) => {
-    const lines = block.split('\n').map((line) => line.trim()).filter(Boolean)
-    const elements: ReactNode[] = []
-    const firstLine = lines[0]
-    const startsWithHeading = isSectionHeading(firstLine)
-
-    if (startsWithHeading) {
-      elements.push(<h3 key={`heading-${blockIndex}`}>{firstLine}</h3>)
-      lines.shift()
-    }
-
-    if (lines.length && lines.every((line) => /^[-*•]\s+/.test(line))) {
+  for (let index = 0; index < blocks.length; index += 1) {
+    const block = blocks[index]
+    if (block.type === 'heading') {
+      elements.push(<h3 key={`heading-${index}`}>{block.text}</h3>)
+    } else if (block.type === 'subheading') {
+      elements.push(<h4 key={`subheading-${index}`}>{block.text}</h4>)
+    } else if (block.type === 'paragraph') {
+      elements.push(<p key={`paragraph-${index}`}>{block.text}</p>)
+    } else {
+      const bullets: ResumeContentBlock[] = []
+      let bulletIndex = index
+      while (blocks[bulletIndex]?.type === 'bullet') {
+        bullets.push(blocks[bulletIndex])
+        bulletIndex += 1
+      }
       elements.push(
-        <ul key={`list-${blockIndex}`}>
-          {lines.map((line, lineIndex) => (
-            <li key={`${line}-${lineIndex}`}>{line.replace(/^[-*•]\s+/, '')}</li>
+        <ul key={`list-${index}`}>
+          {bullets.map((bullet, itemIndex) => (
+            <li key={`${bullet.text}-${itemIndex}`}>{bullet.text}</li>
           ))}
         </ul>,
       )
-    } else if (lines.length) {
-      elements.push(<p key={`paragraph-${blockIndex}`}>{lines.join('\n')}</p>)
+      index = bulletIndex - 1
     }
+  }
 
-    return elements
-  })
+  return elements
 }
 
 function InterviewQuestionGroup({
@@ -551,7 +504,7 @@ function AnalysisResultPage() {
       const contentWidth = pageWidth - (margin * 2)
       const contentBottom = pageHeight - margin
       const contentStart = 88
-      const blocks = toResumePdfBlocks(analysis.tailoredResume)
+      const blocks = toResumeContentBlocks(analysis.tailoredResume)
       const contactDetails = [candidateEmail, candidatePhone, candidateLocation]
         .filter(Boolean)
         .join('  |  ')
@@ -590,10 +543,14 @@ function AnalysisResultPage() {
             + extraBlockSpacing
         }
         const prefix = block.type === 'bullet' ? '- ' : ''
-        pdf.setFont('times', 'normal')
+        pdf.setFont('times', block.type === 'subheading' ? 'bold' : 'normal')
         pdf.setFontSize(fontSize)
         const lines = pdf.splitTextToSize(`${prefix}${block.text}`, contentWidth) as string[]
-        const blockSpacing = block.type === 'bullet' ? fontSize * 0.2 : fontSize * 0.55
+        const blockSpacing = block.type === 'bullet'
+          ? fontSize * 0.2
+          : block.type === 'subheading'
+            ? fontSize * 0.3
+            : fontSize * 0.55
         return height
           + (lines.length * fontSize * lineHeightFactor)
           + blockSpacing
@@ -613,7 +570,7 @@ function AnalysisResultPage() {
       const textLineCount = blocks.reduce((count, block) => {
         if (block.type === 'heading') return count
         const prefix = block.type === 'bullet' ? '- ' : ''
-        pdf.setFont('times', 'normal')
+        pdf.setFont('times', block.type === 'subheading' ? 'bold' : 'normal')
         pdf.setFontSize(bodyFontSize)
         const lines = pdf.splitTextToSize(`${prefix}${block.text}`, contentWidth) as string[]
         return count + lines.length
@@ -651,14 +608,16 @@ function AnalysisResultPage() {
         }
 
         const prefix = block.type === 'bullet' ? '- ' : ''
-        pdf.setFont('times', 'normal')
+        pdf.setFont('times', block.type === 'subheading' ? 'bold' : 'normal')
         pdf.setFontSize(bodyFontSize)
         pdf.setTextColor('#111827')
         const lines = pdf.splitTextToSize(`${prefix}${block.text}`, contentWidth) as string[]
         pdf.text(lines, margin, y, { lineHeightFactor })
         const blockSpacing = block.type === 'bullet'
           ? bodyFontSize * 0.2
-          : bodyFontSize * 0.55
+          : block.type === 'subheading'
+            ? bodyFontSize * 0.3
+            : bodyFontSize * 0.55
         y += (lines.length * bodyFontSize * lineHeightFactor)
           + blockSpacing
           + extraBlockSpacing

@@ -2610,6 +2610,14 @@ h1 {
   letter-spacing: 0.12em;
 }
 
+.tailored-resume-document h4 {
+  margin: 10px 0 5px;
+  color: #101828;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.98rem;
+  line-height: 1.4;
+}
+
 .tailored-resume-document p {
   margin: 0 0 12px;
   white-space: pre-line;
@@ -2948,6 +2956,12 @@ h1 {
     padding-bottom: 3pt;
     color: #2345a4;
     font-size: 8.5pt;
+  }
+
+  .tailored-resume-document h4 {
+    break-after: avoid;
+    margin: 5pt 0 2pt;
+    font-size: 9.5pt;
   }
 
   .tailored-resume-document p {

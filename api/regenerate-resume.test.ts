@@ -53,9 +53,13 @@ describe('/api/regenerate-resume', () => {
       }),
     )
     const result = (await response.json()) as Record<string, unknown>
+    const tailoredResume = String(result.tailoredResume)
+    const summary = tailoredResume.split('\n\nTARGET ROLE')[0]
 
     expect(response.status).toBe(200)
-    expect(result.tailoredResume).toContain('refreshed resume')
+    expect(summary).toContain('PROFESSIONAL SUMMARY')
+    expect(summary).not.toContain(validInput.companyName)
+    expect(tailoredResume).toContain(validInput.companyName)
     expect(Object.keys(result)).toEqual(['tailoredResume'])
   })
 

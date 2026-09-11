@@ -13,6 +13,7 @@ import { buildInterviewPrepPrompt } from './buildInterviewPrepPrompt.js'
 import { buildResumeRegenerationPrompt } from './buildResumeRegenerationPrompt.js'
 import {
   hasProfessionalSummary,
+  professionalSummaryContainsCompanyName,
   parseImportedJobDetails,
   parseInterviewPrep,
   parseJobAnalysis,
@@ -80,19 +81,27 @@ export class DeepSeekProvider implements AIProvider {
     let content = await this.complete(messages)
     let analysis = parseJobAnalysis(content)
 
-    if (!analysis.tailoredResume || !hasProfessionalSummary(analysis.tailoredResume)) {
+    if (
+      !analysis.tailoredResume
+      || !hasProfessionalSummary(analysis.tailoredResume)
+      || professionalSummaryContainsCompanyName(analysis.tailoredResume, input.companyName)
+    ) {
       content = await this.complete([
         ...messages,
         { role: 'assistant', content },
         {
           role: 'user',
-          content: `Correct the complete JSON response. The tailoredResume must begin with a non-empty ${summaryHeading} section containing two or three newly written sentences tailored to the supplied job description and written in the requested output language. Use only verified facts from the supplied resume and do not copy resume sentences verbatim. Return only the corrected complete JSON object.`,
+          content: `Correct the complete JSON response. The tailoredResume must begin with a non-empty ${summaryHeading} section containing two or three newly written sentences tailored to the supplied job description and written in the requested output language. Do not include the target company name in that summary section. Use only verified facts from the supplied resume and do not copy resume sentences verbatim. Return only the corrected complete JSON object.`,
         },
       ])
       analysis = parseJobAnalysis(content)
 
-      if (!analysis.tailoredResume || !hasProfessionalSummary(analysis.tailoredResume)) {
-        throw new Error('DeepSeek returned a tailored resume without a professional summary.')
+      if (
+        !analysis.tailoredResume
+        || !hasProfessionalSummary(analysis.tailoredResume)
+        || professionalSummaryContainsCompanyName(analysis.tailoredResume, input.companyName)
+      ) {
+        throw new Error('DeepSeek returned an invalid professional summary.')
       }
     }
 
@@ -116,19 +125,25 @@ export class DeepSeekProvider implements AIProvider {
     let content = await this.complete(messages)
     let tailoredResume = parseTailoredResume(content)
 
-    if (!hasProfessionalSummary(tailoredResume)) {
+    if (
+      !hasProfessionalSummary(tailoredResume)
+      || professionalSummaryContainsCompanyName(tailoredResume, input.companyName)
+    ) {
       content = await this.complete([
         ...messages,
         { role: 'assistant', content },
         {
           role: 'user',
-          content: `Correct the JSON response. The tailoredResume must begin with a non-empty ${summaryHeading} section containing two or three newly written sentences in the requested output language. Use only verified facts from the supplied original resume. Return only the corrected complete JSON object.`,
+          content: `Correct the JSON response. The tailoredResume must begin with a non-empty ${summaryHeading} section containing two or three newly written sentences in the requested output language. Do not include the target company name in that summary section. Use only verified facts from the supplied original resume. Return only the corrected complete JSON object.`,
         },
       ])
       tailoredResume = parseTailoredResume(content)
 
-      if (!hasProfessionalSummary(tailoredResume)) {
-        throw new Error('DeepSeek returned a tailored resume without a professional summary.')
+      if (
+        !hasProfessionalSummary(tailoredResume)
+        || professionalSummaryContainsCompanyName(tailoredResume, input.companyName)
+      ) {
+        throw new Error('DeepSeek returned an invalid professional summary.')
       }
     }
 

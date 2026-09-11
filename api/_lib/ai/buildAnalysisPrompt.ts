@@ -12,8 +12,8 @@ export function buildAnalysisPrompt(input: JobDescriptionInput): AnalysisPrompt 
     ? `Write scoreSummary, scoreDescription, matchingSkills, missingSkills, suggestions, coverLetter, and tailoredResume in Simplified Chinese. Keep company names, job titles, technology names, product names, and other proper nouns in their original language when that is clearer. The JSON property names must remain in English.`
     : `Write all generated content in English.`
   const resumeStructureInstruction = isChinese
-    ? `Begin with a non-empty 专业摘要 section containing two or three newly written, concise Chinese sentences that connect the candidate's most relevant verified experience and skills to this specific job description. Use short Simplified Chinese section headings and hyphen-prefixed bullet points where appropriate.`
-    : `Begin with a non-empty PROFESSIONAL SUMMARY section containing two or three newly written, concise sentences that connect the candidate's most relevant verified experience and skills to this specific job description. Use short uppercase English section headings and hyphen-prefixed bullet points where appropriate.`
+    ? `Begin with a non-empty 专业摘要 section containing two or three newly written, concise Chinese sentences that connect the candidate's most relevant verified experience and skills to this specific job description. Do not include the target company name in the 专业摘要 section. Use short Simplified Chinese section headings and hyphen-prefixed bullet points where appropriate.`
+    : `Begin with a non-empty PROFESSIONAL SUMMARY section containing two or three newly written, concise sentences that connect the candidate's most relevant verified experience and skills to this specific job description. Do not include the target company name in the PROFESSIONAL SUMMARY section. Use short uppercase English section headings and hyphen-prefixed bullet points where appropriate.`
 
   return {
     system: `You are an expert job application assistant. Compare a resume with a job description and return only valid JSON.

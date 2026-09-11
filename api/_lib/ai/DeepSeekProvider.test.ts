@@ -106,6 +106,40 @@ React`,
     )
   })
 
+  it('asks DeepSeek to remove the target company from the professional summary', async () => {
+    const companyNamedSummary = {
+      ...mockJobAnalysis,
+      tailoredResume: `PROFESSIONAL SUMMARY
+Frontend developer prepared to contribute at Northstar Labs.
+
+SKILLS
+React`,
+    }
+    const correctedSummary = {
+      ...mockJobAnalysis,
+      tailoredResume: `PROFESSIONAL SUMMARY
+Frontend developer with relevant React experience.
+
+TARGET ROLE
+Frontend Developer at Northstar Labs`,
+    }
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(completion(companyNamedSummary))
+      .mockResolvedValueOnce(completion(correctedSummary))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await new DeepSeekProvider('test-key').analyze(input)
+
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(result.tailoredResume).toBe(correctedSummary.tailoredResume)
+    const retryRequest = JSON.parse(
+      String(fetchMock.mock.calls[1]?.[1]?.body),
+    ) as { messages: Array<{ content: string }> }
+    expect(retryRequest.messages.at(-1)?.content).toContain(
+      'Do not include the target company name in that summary section.',
+    )
+  })
+
   it('rejects a second response that still has no professional summary', async () => {
     const emptySummary = {
       ...mockJobAnalysis,
@@ -119,7 +153,7 @@ React`,
     ))
 
     await expect(new DeepSeekProvider('test-key').analyze(input)).rejects.toThrow(
-      'DeepSeek returned a tailored resume without a professional summary.',
+      'DeepSeek returned an invalid professional summary.',
     )
   })
 
@@ -162,6 +196,31 @@ SKILLS
 React`
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(completion({ tailoredResume: emptySummary }))
+      .mockResolvedValueOnce(completion({ tailoredResume: correctedSummary }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const result = await new DeepSeekProvider('test-key').regenerateResume({
+      ...input,
+      currentTailoredResume: mockJobAnalysis.tailoredResume ?? '',
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(result).toBe(correctedSummary)
+  })
+
+  it('removes the company name when regenerating a tailored resume summary', async () => {
+    const companyNamedSummary = `PROFESSIONAL SUMMARY
+Frontend developer targeting Northstar Labs.
+
+SKILLS
+React`
+    const correctedSummary = `PROFESSIONAL SUMMARY
+Frontend developer with role-specific React experience.
+
+TARGET ROLE
+Frontend Developer at Northstar Labs`
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(completion({ tailoredResume: companyNamedSummary }))
       .mockResolvedValueOnce(completion({ tailoredResume: correctedSummary }))
     vi.stubGlobal('fetch', fetchMock)
 

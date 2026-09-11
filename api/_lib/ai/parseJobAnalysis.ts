@@ -62,14 +62,14 @@ function isSectionHeading(value: string) {
     && /[A-Z]/.test(heading))
 }
 
-export function hasProfessionalSummary(tailoredResume: string) {
+function getProfessionalSummary(tailoredResume: string) {
   const lines = tailoredResume.trim().split('\n')
   const headingIndex = lines.findIndex(
     (line) => ['PROFESSIONAL SUMMARY', '专业摘要'].includes(
       line.trim().replace(/:$/, ''),
     ),
   )
-  if (headingIndex === -1) return false
+  if (headingIndex === -1) return ''
 
   const nextHeadingIndex = lines.findIndex(
     (line, index) => index > headingIndex && isSectionHeading(line),
@@ -78,7 +78,24 @@ export function hasProfessionalSummary(tailoredResume: string) {
 
   return lines
     .slice(headingIndex + 1, sectionEnd)
-    .some((line) => line.trim().length > 0)
+    .join('\n')
+    .trim()
+}
+
+export function hasProfessionalSummary(tailoredResume: string) {
+  return getProfessionalSummary(tailoredResume).length > 0
+}
+
+export function professionalSummaryContainsCompanyName(
+  tailoredResume: string,
+  companyName: string,
+) {
+  const normalizedCompanyName = companyName.trim().toLocaleLowerCase()
+  if (!normalizedCompanyName) return false
+
+  return getProfessionalSummary(tailoredResume)
+    .toLocaleLowerCase()
+    .includes(normalizedCompanyName)
 }
 
 export function parseJobAnalysis(content: string): JobAnalysis {

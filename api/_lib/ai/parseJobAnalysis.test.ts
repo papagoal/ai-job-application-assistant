@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { mockJobAnalysis } from '../../../src/mocks/jobAnalysis'
 import {
   hasProfessionalSummary,
+  professionalSummaryContainsCompanyName,
   parseImportedJobDetails,
   parseInterviewPrep,
   parseJobAnalysis,
@@ -92,6 +93,22 @@ React`,
 
 技术技能
 React`)).toBe(true)
+  })
+})
+
+describe('professionalSummaryContainsCompanyName', () => {
+  it('detects the company name only when it appears in the summary section', () => {
+    expect(professionalSummaryContainsCompanyName(`PROFESSIONAL SUMMARY
+Frontend developer applying to Northstar Labs.
+
+TARGET ROLE
+Frontend Developer at Northstar Labs`, 'Northstar Labs')).toBe(true)
+
+    expect(professionalSummaryContainsCompanyName(`PROFESSIONAL SUMMARY
+Frontend developer with relevant React experience.
+
+TARGET ROLE
+Frontend Developer at Northstar Labs`, 'Northstar Labs')).toBe(false)
   })
 })
 

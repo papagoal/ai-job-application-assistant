@@ -18,6 +18,9 @@ describe('buildResumeRegenerationPrompt', () => {
     expect(prompt.system).toContain('meaningfully different and improved version')
     expect(prompt.system).toContain('Never invent or embellish')
     expect(prompt.system).toContain('PROFESSIONAL SUMMARY')
+    expect(prompt.system).toContain(
+      'Do not include the target company name in the PROFESSIONAL SUMMARY section.',
+    )
     expect(prompt.user).toContain(`JOB DESCRIPTION:\n${input.jobDescription}`)
     expect(prompt.user).toContain(`ORIGINAL RESUME:\n${input.resumeText}`)
     expect(prompt.user).toContain(
@@ -30,6 +33,7 @@ describe('buildResumeRegenerationPrompt', () => {
 
     expect(prompt.system).toContain('in Simplified Chinese')
     expect(prompt.system).toContain('专业摘要')
+    expect(prompt.system).toContain('Do not include the target company name in the 专业摘要 section.')
     expect(prompt.system).toContain('technology names')
   })
 

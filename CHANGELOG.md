@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-09-16
+
+### Added
+
+- A public, responsive RoleLumi landing page with clear product positioning, an example job analysis, a three-step workflow, feature explanations, and focused calls to action.
+- Direct paths for new visitors to try the application and for returning users to open their existing workspace.
+
+### Changed
+
+- Moved the application dashboard from `/` to `/dashboard` while preserving all profile, account, application, and analysis routes.
+- Updated search and social descriptions to explain RoleLumi's job analysis, tailored resume, cover letter, and application tracking capabilities.
+
+### Security
+
+- Kept the private dashboard route out of search-engine crawler instructions while leaving the public landing page indexable.
+
+### Quality
+
+- Expanded automated coverage to 126 unit, component, API, authentication, formatting, landing-page, and end-to-end tests.
+- Verified the complete flow from the landing-page CTA through profile setup, job analysis, PDF download, and dashboard return.
+- Visually checked the full landing page at desktop and 390-pixel mobile widths.
+
 ## [1.3.1] - 2026-09-16
 
 ### Changed
@@ -132,6 +154,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Added GitHub Actions checks for tests, linting, end-to-end verification, and production builds.
 - Added Vercel SPA routing and serverless runtime compatibility.
 
+[1.4.0]: https://github.com/papagoal/ai-job-application-assistant/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/papagoal/ai-job-application-assistant/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/papagoal/ai-job-application-assistant/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/papagoal/ai-job-application-assistant/compare/v1.1.0...v1.2.0

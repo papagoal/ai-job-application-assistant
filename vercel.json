@@ -10,6 +10,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/pricing",
+      "destination": "/index.html"
+    },
+    {
       "source": "/applications/(.*)",
       "destination": "/index.html"
     }

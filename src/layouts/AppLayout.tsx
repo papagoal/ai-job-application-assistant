@@ -200,7 +200,7 @@ function AppLayout() {
         aria-label="Application sidebar"
       >
         <div className="sidebar-header">
-          <Link className="sidebar-brand" to="/" onClick={closeMenu}>
+          <Link className="sidebar-brand" to="/dashboard" onClick={closeMenu}>
             <span className="brand-mark" aria-hidden="true">
               <img src="/rolelumi-logo.png" alt="" />
             </span>
@@ -223,7 +223,7 @@ function AppLayout() {
 
         <nav className="sidebar-navigation" aria-label="Main navigation">
           <p className="sidebar-section-label">Workspace</p>
-          <NavLink to="/" end onClick={closeMenu}>
+          <NavLink to="/dashboard" end onClick={closeMenu}>
             <DashboardIcon />
             <span>Dashboard</span>
           </NavLink>
@@ -293,7 +293,7 @@ function AppLayout() {
 
       <div className="app-main">
         <header className="mobile-app-bar">
-          <Link className="mobile-brand" to="/" aria-label="RoleLumi home">
+          <Link className="mobile-brand" to="/dashboard" aria-label="RoleLumi workspace">
             <span className="brand-mark" aria-hidden="true">
               <img src="/rolelumi-logo.png" alt="" />
             </span>

@@ -293,7 +293,7 @@ function AnalysisResultPage() {
 
     try {
       await deleteApplication(id)
-      navigate('/', { replace: true })
+      navigate('/dashboard', { replace: true })
     } catch {
       setDeleteError('Application could not be deleted. Please try again.')
       setIsDeleting(false)
@@ -818,7 +818,7 @@ function AnalysisResultPage() {
       <section className="empty-state">
         <h1>Analysis not found</h1>
         <p>This application may have been removed or saved in another browser.</p>
-        <Link className="primary-action" to="/">Back to Dashboard</Link>
+        <Link className="primary-action" to="/dashboard">Back to Dashboard</Link>
       </section>
     )
   }
@@ -841,7 +841,7 @@ function AnalysisResultPage() {
           </div>
         </div>
         <div className="analysis-heading-actions">
-          <Link className="secondary-action" to="/">Back to Dashboard</Link>
+          <Link className="secondary-action" to="/dashboard">Back to Dashboard</Link>
           <button
             className="danger-action"
             type="button"

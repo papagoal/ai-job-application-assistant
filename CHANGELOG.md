@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-09-16
+
+### Changed
+
+- Made Google the primary sign-in action for returning users while retaining email and Magic Link access as a fallback.
+- Simplified the signed-out account page by removing redundant step numbering and replacing the oversized workspace card with a concise note.
+
+### Fixed
+
+- Handled Google identities that already belong to another RoleLumi account with a clear account-switching path.
+- Added accurate loading feedback and clearer explanations for email authentication rate limits.
+- Prevented tailored-resume professional summaries from naming the target company.
+- Restored readable resume and PDF structure when AI output places employer details and multiple achievements on the same line.
+
+### Quality
+
+- Expanded automated coverage to 124 unit, component, API, authentication, formatting, and end-to-end tests.
+- Verified the Google sign-in flow and one-page A4 resume PDF output manually.
+
 ## [1.3.0] - 2026-08-21
 
 ### Added
@@ -113,6 +132,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Added GitHub Actions checks for tests, linting, end-to-end verification, and production builds.
 - Added Vercel SPA routing and serverless runtime compatibility.
 
+[1.3.1]: https://github.com/papagoal/ai-job-application-assistant/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/papagoal/ai-job-application-assistant/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/papagoal/ai-job-application-assistant/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/papagoal/ai-job-application-assistant/compare/v1.0.0...v1.1.0

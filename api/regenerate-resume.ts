@@ -1,5 +1,6 @@
 import type { DeepSeekModel, ResumeRegenerationInput } from '../src/types/jobApplication'
 import { getAIProvider } from './_lib/ai/getAIProvider.js'
+import { billingErrorResponse, consumeEntitlement } from './_lib/billing.js'
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
@@ -55,8 +56,12 @@ export default {
       )
     }
 
-    const tailoredResume = await getAIProvider(body.aiModel).regenerateResume(body)
-
-    return Response.json({ tailoredResume })
+    try {
+      await consumeEntitlement(request, 'resume_regeneration')
+      const tailoredResume = await getAIProvider(body.aiModel).regenerateResume(body)
+      return Response.json({ tailoredResume })
+    } catch (error) {
+      return billingErrorResponse(error)
+    }
   },
 }

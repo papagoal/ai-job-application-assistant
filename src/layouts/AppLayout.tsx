@@ -74,6 +74,14 @@ function AccountIcon() {
   )
 }
 
+function PlanIcon() {
+  return (
+    <NavigationIcon>
+      <path d="M12 3v18M17 7.5c0-1.9-2-3-5-3s-5 1.1-5 3 2 3 5 3 5 1.1 5 3-2 3-5 3-5-1.1-5-3" />
+    </NavigationIcon>
+  )
+}
+
 function LogoutIcon() {
   return (
     <NavigationIcon>
@@ -230,6 +238,10 @@ function AppLayout() {
           <NavLink to="/profile" onClick={closeMenu}>
             <ProfileIcon />
             <span>Profile &amp; Resume</span>
+          </NavLink>
+          <NavLink to="/pricing" onClick={closeMenu}>
+            <PlanIcon />
+            <span>Plans</span>
           </NavLink>
         </nav>
 

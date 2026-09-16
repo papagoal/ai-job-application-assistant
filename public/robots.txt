@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /dashboard
 Disallow: /account
 Disallow: /profile
 Disallow: /applications/

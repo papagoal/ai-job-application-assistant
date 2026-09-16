@@ -99,7 +99,16 @@ test('completes the profile-to-application workflow', async ({ page }) => {
     await route.fulfill({ json: interviewPrep })
   })
 
-  await page.goto('/profile')
+  await page.goto('/')
+  await expect(page.getByRole('heading', {
+    name: 'Turn every job posting into a stronger application.',
+  })).toBeVisible()
+  await expect(page.getByRole('complementary', { name: 'Application sidebar' }))
+    .toHaveCount(0)
+  await page.getByRole('link', { name: 'Try RoleLumi free' }).click()
+  await expect(page).toHaveURL('/applications/new')
+  await page.getByRole('link', { name: 'Profile & Resume' }).click()
+  await expect(page).toHaveURL('/profile')
   await expect.poll(() => page.locator('body').evaluate(
     (body) => window.getComputedStyle(body).backgroundImage,
   )).toBe('none')

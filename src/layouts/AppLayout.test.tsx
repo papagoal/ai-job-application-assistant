@@ -32,10 +32,10 @@ const connectedUser = {
 
 function renderLayout() {
   render(
-    <MemoryRouter initialEntries={['/']}>
+    <MemoryRouter initialEntries={['/dashboard']}>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route index element={<p>Dashboard content</p>} />
+          <Route path="dashboard" element={<p>Dashboard content</p>} />
           <Route path="profile" element={<p>Profile content</p>} />
           <Route path="account" element={<p>Account content</p>} />
           <Route path="applications/new" element={<p>New application content</p>} />

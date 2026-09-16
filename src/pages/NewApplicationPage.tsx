@@ -322,7 +322,7 @@ function NewApplicationPage() {
         </div>
 
         <div className="form-actions form-actions-between new-application-actions">
-          <Link className="secondary-action" to="/">Cancel</Link>
+          <Link className="secondary-action" to="/dashboard">Cancel</Link>
           <div className="form-submit-group">
             {submissionError && (
               <p className="submission-error" role="alert">{submissionError}</p>

@@ -7,6 +7,7 @@ import LandingPage from './pages/LandingPage'
 import NewApplicationPage from './pages/NewApplicationPage'
 import NotFoundPage from './pages/NotFoundPage'
 import ProfilePage from './pages/ProfilePage'
+import PricingPage from './pages/PricingPage'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/account" element={<AccountPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
         <Route path="/applications/new" element={<NewApplicationPage />} />
         <Route path="/applications/:id" element={<AnalysisResultPage />} />
         <Route path="*" element={<NotFoundPage />} />

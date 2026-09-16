@@ -71,6 +71,7 @@ function LandingPage() {
         <nav className="landing-navigation" aria-label="Landing page navigation">
           <a href="#how-it-works">How it works</a>
           <a href="#features">Features</a>
+          <Link to="/pricing">Pricing</Link>
         </nav>
 
         <Link className="landing-workspace-link" to="/dashboard">

@@ -10,6 +10,12 @@ import {
   signOut,
   subscribeToAuthChanges,
 } from '../services/authService'
+import {
+  loadBillingStatus,
+  openCustomerPortal,
+  startProCheckout,
+  type BillingStatus,
+} from '../services/billingService'
 
 type PendingAction = 'connect' | 'magic-link' | 'google' | 'sign-out' | null
 
@@ -58,6 +64,9 @@ function AccountPage() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [googleIdentityConflict] = useState(hasGoogleIdentityConflict)
+  const [billing, setBilling] = useState<BillingStatus | null>(null)
+  const [isBillingLoading, setIsBillingLoading] = useState(false)
+  const [billingError, setBillingError] = useState('')
 
   useEffect(() => {
     if (!isSupabaseConfigured) return
@@ -79,6 +88,19 @@ function AccountPage() {
     )
     window.history.replaceState({}, document.title, window.location.pathname)
   }, [googleIdentityConflict])
+
+  useEffect(() => {
+    if (!user || user.is_anonymous) {
+      setBilling(null)
+      return
+    }
+
+    setIsBillingLoading(true)
+    void loadBillingStatus()
+      .then(setBilling)
+      .catch((billingLoadError) => setBillingError(getErrorMessage(billingLoadError)))
+      .finally(() => setIsBillingLoading(false))
+  }, [user])
 
   function resetFeedback() {
     setMessage('')
@@ -142,6 +164,18 @@ function AccountPage() {
     } catch (googleError) {
       setError(getErrorMessage(googleError))
       setPendingAction(null)
+    }
+  }
+
+  async function handleBillingAction() {
+    setBillingError('')
+    setIsBillingLoading(true)
+    try {
+      if (billing?.plan === 'pro') await openCustomerPortal()
+      else await startProCheckout()
+    } catch (billingActionError) {
+      setBillingError(getErrorMessage(billingActionError))
+      setIsBillingLoading(false)
     }
   }
 
@@ -249,6 +283,30 @@ function AccountPage() {
                 {pendingAction === 'sign-out' ? 'Signing out…' : 'Sign out'}
               </button>
             </div>
+          </div>
+          <div className="form-section account-plan-card">
+            <div className="account-session-heading">
+              <span className="account-status-pill">{billing?.plan === 'pro' ? 'Pro plan' : 'Free plan'}</span>
+              <h2>{billing?.plan === 'pro' ? 'Your Pro subscription' : 'Upgrade your workspace'}</h2>
+              <p>
+                {isBillingLoading && !billing
+                  ? 'Loading plan details…'
+                  : `${billing?.remaining ?? 3} of ${billing?.limit ?? 3} job analyses remaining this month.`}
+              </p>
+            </div>
+            <button
+              className={billing?.plan === 'pro' ? 'secondary-action account-button' : 'submit-button'}
+              type="button"
+              disabled={isBillingLoading}
+              onClick={handleBillingAction}
+            >
+              {isBillingLoading
+                ? 'Opening…'
+                : billing?.plan === 'pro'
+                  ? 'Manage subscription'
+                  : 'Upgrade to Pro'}
+            </button>
+            {billingError && <p className="account-feedback account-error" role="alert">{billingError}</p>}
           </div>
         </div>
       ) : (

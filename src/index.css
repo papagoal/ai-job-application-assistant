@@ -2222,6 +2222,99 @@ h1 {
   max-width: 1080px;
 }
 
+.pricing-page {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.pricing-heading {
+  margin-bottom: 32px;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+
+.pricing-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 32px;
+  border: 1px solid var(--border-color, #dfe3e8);
+  border-radius: 20px;
+  background: #fff;
+}
+
+.pricing-card-featured {
+  border-color: #4857d6;
+  box-shadow: 0 18px 45px rgba(43, 53, 130, 0.12);
+}
+
+.pricing-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #edf0ff;
+  color: #3744ba;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.pricing-plan {
+  margin: 0;
+  font-weight: 700;
+}
+
+.pricing-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+}
+
+.pricing-price strong {
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1;
+}
+
+.pricing-price span,
+.pricing-card li {
+  color: #5f6673;
+}
+
+.pricing-card ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.pricing-action {
+  width: 100%;
+  margin-top: auto;
+  text-align: center;
+  justify-content: center;
+}
+
+.account-plan-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+@media (max-width: 720px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .account-page-heading {
   margin-bottom: 28px;
 }

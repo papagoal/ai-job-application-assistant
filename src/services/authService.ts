@@ -22,6 +22,18 @@ export async function getCurrentUser(): Promise<User | null> {
   return data.user
 }
 
+export async function getAccessToken(): Promise<string | null> {
+  if (!supabase) return null
+
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+  if (sessionError) throw sessionError
+  if (sessionData.session?.access_token) return sessionData.session.access_token
+
+  const { data, error } = await supabase.auth.signInAnonymously()
+  if (error) throw error
+  return data.session?.access_token ?? null
+}
+
 export async function connectGuestAccount(email: string): Promise<void> {
   const client = requireSupabase()
   const { data: sessionData, error: sessionError } = await client.auth.getSession()

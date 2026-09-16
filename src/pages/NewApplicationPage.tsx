@@ -118,10 +118,15 @@ function NewApplicationPage() {
       navigate(`/applications/${application.id}`, {
         state: { analysis },
       })
-    } catch {
-      setSubmissionError(
-        'We could not analyze this application. Please check your connection and try again.',
-      )
+    } catch (error) {
+      const apiError = error as { code?: string; message?: string }
+      if (apiError?.code && ['limit_reached', 'pro_required'].includes(apiError.code)) {
+        setSubmissionError(`${apiError.message ?? 'Your plan limit was reached.'} Upgrade to Pro to continue.`)
+      } else {
+        setSubmissionError(
+          'We could not analyze this application. Please check your connection and try again.',
+        )
+      }
     } finally {
       setIsAnalyzing(false)
     }

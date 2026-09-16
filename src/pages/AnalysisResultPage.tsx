@@ -717,9 +717,12 @@ function AnalysisResultPage() {
       setTailoredResumeSaveMessage('New AI resume generated and saved.')
       setIsTailoredResumeCopied(false)
       setIsTailoredResumeDownloaded(false)
-    } catch {
+    } catch (error) {
+      const apiError = error as { code?: string }
       setTailoredResumeRegenerationError(
-        'A new resume could not be generated. Your current resume was kept.',
+        apiError?.code === 'pro_required'
+          ? 'Resume regeneration requires RoleLumi Pro. Visit Plans to upgrade.'
+          : 'A new resume could not be generated. Your current resume was kept.',
       )
     } finally {
       setIsRegeneratingTailoredResume(false)
@@ -780,9 +783,12 @@ function AnalysisResultPage() {
         ? { ...currentAnalysis, interviewPrep }
         : currentAnalysis)
       setInterviewPrepMessage('Interview preparation generated and saved.')
-    } catch {
+    } catch (error) {
+      const apiError = error as { code?: string }
       setInterviewPrepError(
-        'Interview preparation could not be generated. Your application was not changed.',
+        apiError?.code === 'pro_required'
+          ? 'Interview preparation requires RoleLumi Pro. Visit Plans to upgrade.'
+          : 'Interview preparation could not be generated. Your application was not changed.',
       )
     } finally {
       setIsGeneratingInterviewPrep(false)

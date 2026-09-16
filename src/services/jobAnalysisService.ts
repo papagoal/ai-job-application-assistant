@@ -8,6 +8,36 @@ import type {
   JobDescriptionInput,
   ResumeRegenerationInput,
 } from '../types/jobApplication'
+import { getAccessToken } from './authService'
+
+export class JobAnalysisApiError extends Error {
+  status: number
+  code: string
+
+  constructor(status: number, code: string, message: string) {
+    super(message)
+    this.status = status
+    this.code = code
+  }
+}
+
+async function apiHeaders() {
+  const token = await getAccessToken()
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  }
+}
+
+async function requireOk(response: Response, fallbackMessage: string) {
+  if (response.ok) return
+  const result = await response.json().catch(() => ({})) as { code?: string; error?: string }
+  throw new JobAnalysisApiError(
+    response.status,
+    result.code ?? 'request_failed',
+    result.error ?? fallbackMessage,
+  )
+}
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
@@ -37,15 +67,11 @@ function isInterviewPrep(value: unknown): value is InterviewPrep {
 export async function importJobDetails(url: string): Promise<ImportedJobDetails> {
   const response = await fetch('/api/import-job', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: await apiHeaders(),
     body: JSON.stringify({ url }),
   })
 
-  if (!response.ok) {
-    throw new Error(`Job import failed with status ${response.status}.`)
-  }
+  await requireOk(response, `Job import failed with status ${response.status}.`)
 
   const result = (await response.json()) as Record<string, unknown>
   if (
@@ -68,15 +94,11 @@ export async function generateInterviewPrep(
 ): Promise<InterviewPrep> {
   const response = await fetch('/api/generate-interview-prep', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: await apiHeaders(),
     body: JSON.stringify(input),
   })
 
-  if (!response.ok) {
-    throw new Error(`Interview preparation failed with status ${response.status}.`)
-  }
+  await requireOk(response, `Interview preparation failed with status ${response.status}.`)
 
   const result = (await response.json()) as unknown
   if (!isInterviewPrep(result)) {
@@ -89,15 +111,11 @@ export async function generateInterviewPrep(
 export async function analyzeJob(input: JobDescriptionInput): Promise<JobAnalysis> {
   const response = await fetch('/api/analyze-job', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: await apiHeaders(),
     body: JSON.stringify(input),
   })
 
-  if (!response.ok) {
-    throw new Error(`Analysis request failed with status ${response.status}.`)
-  }
+  await requireOk(response, `Analysis request failed with status ${response.status}.`)
 
   return (await response.json()) as JobAnalysis
 }
@@ -107,15 +125,11 @@ export async function regenerateTailoredResume(
 ): Promise<string> {
   const response = await fetch('/api/regenerate-resume', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: await apiHeaders(),
     body: JSON.stringify(input),
   })
 
-  if (!response.ok) {
-    throw new Error(`Resume regeneration failed with status ${response.status}.`)
-  }
+  await requireOk(response, `Resume regeneration failed with status ${response.status}.`)
 
   const result = (await response.json()) as { tailoredResume?: unknown }
   if (typeof result.tailoredResume !== 'string' || !result.tailoredResume.trim()) {

@@ -1,5 +1,6 @@
 import type { DeepSeekModel, JobDescriptionInput } from '../src/types/jobApplication'
 import { getAIProvider } from './_lib/ai/getAIProvider.js'
+import { billingErrorResponse, consumeEntitlement } from './_lib/billing.js'
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
@@ -51,7 +52,12 @@ export default {
       )
     }
 
-    const interviewPrep = await getAIProvider(body.aiModel).generateInterviewPrep(body)
-    return Response.json(interviewPrep)
+    try {
+      await consumeEntitlement(request, 'interview_prep')
+      const interviewPrep = await getAIProvider(body.aiModel).generateInterviewPrep(body)
+      return Response.json(interviewPrep)
+    } catch (error) {
+      return billingErrorResponse(error)
+    }
   },
 }

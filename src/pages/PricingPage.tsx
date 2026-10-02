@@ -1,6 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { startProCheckout } from '../services/billingService'
+import {
+  loadBillingStatus,
+  openCustomerPortal,
+  startProCheckout,
+  type BillingStatus,
+} from '../services/billingService'
 
 const freeFeatures = [
   '3 job analyses per month',
@@ -17,14 +22,26 @@ const proFeatures = [
 ]
 
 function PricingPage() {
+  const [billing, setBilling] = useState<BillingStatus | null>(null)
+  const [isBillingLoading, setIsBillingLoading] = useState(true)
   const [isStartingCheckout, setIsStartingCheckout] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    void loadBillingStatus()
+      .then(setBilling)
+      .catch((billingError) => setError(
+        billingError instanceof Error ? billingError.message : 'Plan details could not be loaded.',
+      ))
+      .finally(() => setIsBillingLoading(false))
+  }, [])
 
   async function handleUpgrade() {
     setError('')
     setIsStartingCheckout(true)
     try {
-      await startProCheckout()
+      if (billing?.plan === 'pro') await openCustomerPortal()
+      else await startProCheckout()
     } catch (checkoutError) {
       setError(checkoutError instanceof Error ? checkoutError.message : 'Checkout could not be opened.')
       setIsStartingCheckout(false)
@@ -54,8 +71,17 @@ function PricingPage() {
           <p className="pricing-plan">Pro</p>
           <p className="pricing-price"><strong>CA$9.99</strong><span>/month</span></p>
           <ul>{proFeatures.map((feature) => <li key={feature}>{feature}</li>)}</ul>
-          <button className="submit-button pricing-action" type="button" disabled={isStartingCheckout} onClick={handleUpgrade}>
-            {isStartingCheckout ? 'Opening checkout…' : 'Upgrade to Pro'}
+          <button
+            className="submit-button pricing-action"
+            type="button"
+            disabled={isBillingLoading || isStartingCheckout || !billing}
+            onClick={handleUpgrade}
+          >
+            {isBillingLoading
+              ? 'Checking plan…'
+              : isStartingCheckout
+                ? billing?.plan === 'pro' ? 'Opening portal…' : 'Opening checkout…'
+                : billing?.plan === 'pro' ? 'Manage subscription' : 'Upgrade to Pro'}
           </button>
           {error && <p className="field-error" role="alert">{error}</p>}
         </article>

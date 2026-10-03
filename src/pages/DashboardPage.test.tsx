@@ -5,15 +5,24 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { mockJobAnalysis } from '../mocks/jobAnalysis'
-import { getApplications } from '../services/persistenceService'
+import { getCurrentUser } from '../services/authService'
+import { getApplications, getProfile } from '../services/persistenceService'
 import type { SavedApplication } from '../types/application'
 import DashboardPage from './DashboardPage'
 
 vi.mock('../services/persistenceService', () => ({
   getApplications: vi.fn(),
+  getProfile: vi.fn(),
+}))
+
+vi.mock('../services/authService', () => ({
+  getCurrentUser: vi.fn(),
+  isSupabaseConfigured: true,
 }))
 
 const mockedGetApplications = vi.mocked(getApplications)
+const mockedGetProfile = vi.mocked(getProfile)
+const mockedGetCurrentUser = vi.mocked(getCurrentUser)
 
 const applications: SavedApplication[] = [
   {
@@ -64,6 +73,8 @@ function renderPage() {
 
 beforeEach(() => {
   mockedGetApplications.mockResolvedValue(applications)
+  mockedGetProfile.mockResolvedValue(null)
+  mockedGetCurrentUser.mockResolvedValue(null)
 })
 
 afterEach(() => {
@@ -76,6 +87,19 @@ describe('DashboardPage', () => {
     renderPage()
 
     expect(screen.getByText('RoleLumi v1.4.0')).toBeTruthy()
+  })
+
+  it('guides a guest through the first application setup', async () => {
+    mockedGetApplications.mockResolvedValue([])
+    renderPage()
+
+    expect(await screen.findByRole('heading', { name: 'Prepare your first application' })).toBeTruthy()
+    expect(screen.getByText('Guest workspace')).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Add profile' }).getAttribute('href')).toBe('/profile')
+    expect(screen.getByRole('link', { name: 'Add application' }).getAttribute('href'))
+      .toBe('/applications/new')
+    expect(screen.getAllByRole('link', { name: 'Connect account' })[0]?.getAttribute('href'))
+      .toBe('/account')
   })
 
   it('searches and filters saved applications', async () => {

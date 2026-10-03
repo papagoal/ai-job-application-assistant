@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ApplicationCard from '../components/ApplicationCard'
 import ApplicationTable from '../components/ApplicationTable'
-import { getApplications } from '../services/persistenceService'
+import { getCurrentUser, isSupabaseConfigured } from '../services/authService'
+import { getApplications, getProfile } from '../services/persistenceService'
 import type { ApplicationStatus, SavedApplication } from '../types/application'
 
 type StatusFilter = 'All' | ApplicationStatus
@@ -73,10 +74,22 @@ function DashboardPage() {
   const [isCsvExported, setIsCsvExported] = useState(false)
   const [csvExportError, setCsvExportError] = useState('')
   const [viewMode, setViewMode] = useState<ViewMode>('cards')
+  const [hasResume, setHasResume] = useState(false)
+  const [isConnectedAccount, setIsConnectedAccount] = useState(false)
 
   useEffect(() => {
     void getApplications()
-      .then(setApplications)
+      .then(async (savedApplications) => {
+        setApplications(savedApplications)
+
+        const profile = await getProfile().catch(() => null)
+        setHasResume(Boolean(profile?.resumeText.trim()))
+
+        if (isSupabaseConfigured) {
+          const user = await getCurrentUser().catch(() => null)
+          setIsConnectedAccount(Boolean(user && !user.is_anonymous))
+        }
+      })
       .catch(() => setLoadError('Applications could not be loaded. Please try again.'))
       .finally(() => setIsLoading(false))
   }, [])
@@ -315,10 +328,47 @@ function DashboardPage() {
           </button>
         </div>
       ) : (
-        <div className="empty-state">
-          <h2>No applications yet</h2>
-          <p>Add a role to compare its requirements with your resume.</p>
-          <Link className="primary-action" to="/applications/new">Add your first application</Link>
+        <div className="onboarding-card">
+          <div className="onboarding-heading">
+            <p className="eyebrow">Getting started</p>
+            <h2>Prepare your first application</h2>
+            <p>Complete these steps once, then reuse your profile for every role.</p>
+          </div>
+
+          {!isConnectedAccount && (
+            <div className="onboarding-guest-note" role="note">
+              <strong>Guest workspace</strong>
+              <span>Your work is tied to this browser. Connect an account to keep it available across devices.</span>
+              <Link to="/account">Connect account</Link>
+            </div>
+          )}
+
+          <ol className="onboarding-steps">
+            <li className={hasResume ? 'is-complete' : ''}>
+              <span className="onboarding-step-number" aria-hidden="true">{hasResume ? '✓' : '1'}</span>
+              <div>
+                <h3>Add your profile and resume</h3>
+                <p>Save your real experience once so RoleLumi can reuse it.</p>
+              </div>
+              <Link to="/profile">{hasResume ? 'Review profile' : 'Add profile'}</Link>
+            </li>
+            <li>
+              <span className="onboarding-step-number" aria-hidden="true">2</span>
+              <div>
+                <h3>Analyze your first role</h3>
+                <p>Paste a job description or import a public job listing.</p>
+              </div>
+              <Link to="/applications/new">Add application</Link>
+            </li>
+            <li className={isConnectedAccount ? 'is-complete' : ''}>
+              <span className="onboarding-step-number" aria-hidden="true">{isConnectedAccount ? '✓' : '3'}</span>
+              <div>
+                <h3>Keep your work safe</h3>
+                <p>Connect Google or email to sync your workspace across browsers.</p>
+              </div>
+              <Link to="/account">{isConnectedAccount ? 'Account connected' : 'Connect account'}</Link>
+            </li>
+          </ol>
         </div>
       )}
     </section>
